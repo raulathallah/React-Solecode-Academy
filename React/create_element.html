@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <style>
+        #image{
+            height: 50px;
+            width: 50px;
+        }
+    </style>
+    
+</head>
+<body>
+    
+
+    <h1>Belajar React</h1>
+    <div id="root"></div>
+    <div id="foo"></div>
+    <div id="image"></div>
+</body>
+
+
+<script>
+    const myElement = React.createElement('h1', null, "Hello React");
+    ReactDOM.createRoot(document.getElementById('root')).render(myElement);
+
+    const myPic = React.createElement('img', {src: 'img/bg.jpg'}, null);
+    ReactDOM.createRoot(document.getElementById('image')).render(myPic);
+
+    // const variable = React.createElement(elementType, properties, element),
+    const myMenu = React.createElement('ul', {}, [
+        React.createElement('li', {key: 'a'}, React.createElement('a', {href: "https://id.wikipedia.org/wiki/Espreso"}, 'Espresso')),
+        React.createElement('li', {key: 'b'}, React.createElement('a', {href: "https://id.wikipedia.org/wiki/Kapucino"}, 'Cappuccino')),
+        React.createElement('li', {key: 'b'}, React.createElement('a', {href: "https://id.wikipedia.org/wiki/Moka"}, 'Moccacino')),
+    ])
+
+    ReactDOM.createRoot(document.getElementById('foo')).render(myMenu);
+</script>
+
+
+</html>
