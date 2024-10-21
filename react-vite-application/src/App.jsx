@@ -173,6 +173,7 @@ function App() {
         )}
     </table>
   )
+  
   // ------------ || ------------
   const kuadrat = (a) => {
     return a*a;
