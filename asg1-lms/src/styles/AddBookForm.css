@@ -1,0 +1,25 @@
+.form {
+  display: flex;
+  border: 1px solid gainsboro;
+  width: fit-content;
+  padding: 15px;
+}
+
+.form-label,
+.form-input {
+  display: grid;
+  grid-row: auto;
+  gap: 15px;
+  width: 200px;
+}
+
+.button {
+  padding: 5px;
+  margin-top: 20px;
+}
+
+select,
+input[type="text"] {
+  padding: 5px;
+  border: 1px solid gainsboro;
+}
