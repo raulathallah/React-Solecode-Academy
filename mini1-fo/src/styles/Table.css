@@ -1,0 +1,43 @@
+table,
+tr,
+th,
+td {
+  border: 1px solid gainsboro;
+  font-weight: 500;
+}
+tr,
+th,
+td {
+  padding: 5px 15px;
+}
+
+th {
+  width: 100px;
+}
+td {
+  font-weight: 400;
+  font-size: small;
+  max-width: 200px;
+  text-overflow: ellipsis;
+}
+
+.bl-action {
+  display: flex;
+  gap: 2px;
+}
+
+.button-table {
+  padding: 5px 5px;
+  margin: 5px 0px;
+  border: 1px solid gainsboro;
+}
+
+.button-table:hover {
+  color: white;
+  background: black;
+  cursor: pointer;
+}
+
+.button-table:active {
+  background: orangered;
+}

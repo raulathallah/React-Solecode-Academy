@@ -1,0 +1,32 @@
+.f-container {
+  padding: 20px;
+  background: gainsboro;
+  color: black;
+  text-align: center;
+  width: 100%dw;
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  align-items: center;
+}
+
+.f-text {
+  font-size: 12px;
+}
+
+.f-socials {
+  text-align: left;
+}
+
+.f-socials-ul {
+  list-style: none;
+}
+
+a {
+  color: black;
+  font-size: 12px;
+}
+
+a:hover {
+  cursor: pointer;
+}
