@@ -99,6 +99,7 @@ export const Menu = () => {
           <label htmlFor="category">Category</label>
           <select
             id="category"
+            required
             onChange={(v) => setCategory(v.target.value)}
             value={category}
           >
@@ -112,6 +113,7 @@ export const Menu = () => {
           <input
             type="number"
             id="year"
+            required
             value={rating}
             placeholder="0 - 5"
             max={5}
@@ -163,7 +165,7 @@ export const Menu = () => {
               <td>{val.category}</td>
               <td>{val.rating}</td>
               <td>{!val.isAvailable ? "Unavailable" : "Available"}</td>
-              <td className="">
+              <td>
                 <button className="button-table">Edit</button>
                 <button
                   className="button-table"

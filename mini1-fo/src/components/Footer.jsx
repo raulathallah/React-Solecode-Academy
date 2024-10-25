@@ -49,35 +49,35 @@ export const Footer = () => {
       <div>
         <ul className="f-menus-ul">
           <li>
-            <a href="">Home</a>
+            <a href="/">Home</a>
           </li>
           <li>
-            <a href="">Menu</a>
+            <a href="/menu">Menu</a>
           </li>
           <li>
-            <a href="">Customer</a>
+            <a href="/customer">Customer</a>
           </li>
           <li>
-            <a href="">Order</a>
+            <a href="/order">Order</a>
           </li>
           <li>
-            <a href="">My Cart</a>
+            <a href="/cart">My Cart</a>
           </li>
           <li>
-            <a href="">Promotion</a>
+            <a href="/promotion">Promotion</a>
           </li>
           <li>
-            <a href="">Contact</a>
+            <a href="/contact">Contact</a>
           </li>
         </ul>
       </div>
       <div>
         <ul className="f-menus-ul">
           <li>
-            <a href="">Login</a>
+            <a href="/login">Login</a>
           </li>
           <li>
-            <a href="">Register</a>
+            <a href="/register">Register</a>
           </li>
         </ul>
       </div>

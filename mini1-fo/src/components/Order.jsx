@@ -36,11 +36,18 @@ export const Order = () => {
     console.log(isOrdered);
     if (isOrdered) {
       isOrdered.count = isOrdered.count + 1;
+      isOrdered.price = isOrdered.price + order.price;
       setOrders([...orders]);
     } else {
       setOrders([...orders, { ...order, count: 1 }]);
     }
     alert("Order added!");
+  };
+
+  const calculateTotalPrice = () => {
+    let total = 0;
+    orders.map((val) => (total = total + val.price));
+    return total;
   };
   const onOpenDetail = (menu) => {
     setOrderDetail(menu);
@@ -76,8 +83,11 @@ export const Order = () => {
         </table>
       </div>
       <div className="o-details">
-        <div>
-          <h3>Order List</h3>
+        <div style={{ display: "grid", gap: "10px" }}>
+          <div>
+            <h3>Order List</h3>
+            <p>Total: {calculateTotalPrice(orders)}</p>
+          </div>
           <table>
             <tr>
               <th>Name</th>

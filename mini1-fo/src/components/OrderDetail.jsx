@@ -8,9 +8,7 @@ export const OrderDetail = (props) => {
       <div className="o-detail">
         <p>Name </p>
         <p className="o-detail-text">: {menu.name}</p>
-        <p>
-          Price <span style={{ fontSize: "12px" }}>/item</span>{" "}
-        </p>
+        <p>Price</p>
         <p className="o-detail-text">: {menu.price}</p>
         <p>Category </p>
         <p className="o-detail-text">: {menu.category}</p>

@@ -1,6 +1,8 @@
 import "../styles/Header.css";
 import { options } from "../utils/DateOptions";
 import logo from "../assets/logo.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 export const Header = () => {
   const header = {
     title: "Online Food Ordering",
@@ -36,15 +38,7 @@ export const Header = () => {
               Order
             </a>
           </li>
-          <li>
-            <a
-              className="h-a"
-              href="/cart"
-              style={{ textDecoration: "underline" }}
-            >
-              My Cart
-            </a>
-          </li>
+
           <li>
             <a className="h-a" href="/promotion">
               Promotion
@@ -59,19 +53,28 @@ export const Header = () => {
       </div>
 
       <div className="h-right">
-        <button
-          className="button"
-          onClick={() => (window.location.pathname = "/login")}
+        <a
+          className="h-a"
+          href="/cart"
+          style={{ textDecoration: "underline", fontSize: "30px" }}
         >
-          Login
-        </button>
-        <button
-          className="button"
-          style={{ background: "none", color: "white", border: "none" }}
-          onClick={() => (window.location.pathname = "/register")}
-        >
-          Register
-        </button>
+          <FontAwesomeIcon icon={faCartShopping} />
+        </a>
+        <div>
+          <button
+            className="button"
+            style={{ background: "none", color: "white", border: "none" }}
+            onClick={() => (window.location.pathname = "/register")}
+          >
+            Register
+          </button>
+          <button
+            className="button"
+            onClick={() => (window.location.pathname = "/login")}
+          >
+            Login
+          </button>
+        </div>
       </div>
     </div>
   );

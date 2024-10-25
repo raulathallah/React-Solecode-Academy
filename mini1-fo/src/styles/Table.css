@@ -22,11 +22,6 @@ td {
   text-overflow: ellipsis;
 }
 
-.bl-action {
-  display: flex;
-  gap: 2px;
-}
-
 .button-table {
   padding: 5px 5px;
   margin: 5px 0px;

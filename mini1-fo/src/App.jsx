@@ -39,6 +39,7 @@ function App() {
   if (location.includes("cart")) {
     content = <MyCart />;
   }
+
   return (
     <div className="container">
       <div>
