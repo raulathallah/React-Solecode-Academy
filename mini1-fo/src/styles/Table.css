@@ -4,6 +4,7 @@ th,
 td {
   border: 1px solid gainsboro;
   font-weight: 500;
+  border-collapse: collapse;
 }
 tr,
 th,

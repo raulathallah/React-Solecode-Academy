@@ -6,9 +6,7 @@ export const Header = () => {
     title: "Online Food Ordering",
     dateNow: new Date().toLocaleDateString("en-US", options),
   };
-
   let { title: NAMA_WEBSITE, dateNow: WAKTU_SEKARANG } = header;
-
   return (
     <div className="header-container">
       <div className="h-left">
@@ -21,7 +19,7 @@ export const Header = () => {
         </div>
       </div>
 
-      <div className="h-right">
+      <div className="h-middle">
         <ul className="h-ul">
           <li>
             <a className="h-a" href="/menu">
@@ -38,7 +36,42 @@ export const Header = () => {
               Order
             </a>
           </li>
+          <li>
+            <a
+              className="h-a"
+              href="/cart"
+              style={{ textDecoration: "underline" }}
+            >
+              My Cart
+            </a>
+          </li>
+          <li>
+            <a className="h-a" href="/promotion">
+              Promotion
+            </a>
+          </li>
+          <li>
+            <a className="h-a" href="/contact">
+              Contact
+            </a>
+          </li>
         </ul>
+      </div>
+
+      <div className="h-right">
+        <button
+          className="button"
+          onClick={() => (window.location.pathname = "/login")}
+        >
+          Login
+        </button>
+        <button
+          className="button"
+          style={{ background: "none", color: "white", border: "none" }}
+          onClick={() => (window.location.pathname = "/register")}
+        >
+          Register
+        </button>
       </div>
     </div>
   );

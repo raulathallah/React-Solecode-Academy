@@ -55,16 +55,15 @@ export const Menu = () => {
     if (!isValidate) {
       return null;
     } else {
-      const body = [
-        {
-          name: name,
-          price: price,
-          category: category,
-          rating: rating,
-          isAvailable: isAvailable,
-        },
-      ];
-      setMenus([...menus, ...body]);
+      const body = {
+        name: name,
+        price: price,
+        category: category,
+        rating: rating,
+        isAvailable: isAvailable,
+      };
+
+      setMenus([...menus, body]);
       alert("Menu added!");
       resetForm();
     }
@@ -73,7 +72,6 @@ export const Menu = () => {
     setMenus([...menus.filter((val) => val !== menu)]);
     alert("Menu deleted!");
   };
-  console.log(menus);
 
   return (
     <div className="content-container">
@@ -85,6 +83,7 @@ export const Menu = () => {
             type="text"
             id="name"
             placeholder="Input name..."
+            required
             value={name}
             onChange={(v) => setName(v.target.value)}
           />
@@ -92,6 +91,7 @@ export const Menu = () => {
           <input
             type="number"
             placeholder="0.01 - 100000"
+            required
             id="price"
             value={price}
             onChange={(v) => setPrice(v.target.value)}

@@ -1,6 +1,5 @@
 #root {
   width: 100%;
-  overflow: hidden;
 }
 .container {
   display: flex;
@@ -8,15 +7,35 @@
   height: 100%;
   justify-content: space-between;
 }
+
 .content-container {
   padding: 15px;
   width: 1500px;
-  gap: 15px;
-  display: flex;
+  display: grid;
+  gap: 20px;
 }
 
 .image {
   width: 100px;
+}
+
+.o-detail {
+  display: grid;
+  width: 200px;
+  grid-template-columns: auto auto;
+}
+
+.o-detail-text {
+  font-weight: 500;
+}
+
+.o-details {
+  display: flex;
+  gap: 40px;
+}
+
+.blank-h1 {
+  padding: 20px;
 }
 
 @keyframes logo-spin {

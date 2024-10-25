@@ -138,7 +138,7 @@ export const Customer = () => {
               <td>{val.email}</td>
               <td>{val.phone}</td>
               <td>{val.address}</td>
-              <td className="bl-action">
+              <td className="">
                 <button className="button-table">Edit</button>
                 <button
                   className="button-table"

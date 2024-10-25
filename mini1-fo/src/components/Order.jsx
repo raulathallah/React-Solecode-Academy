@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { OrderDetail } from "./OrderDetail";
 
 export const Order = () => {
   const menus = [
@@ -24,10 +25,11 @@ export const Order = () => {
   const [orderDetail, setOrderDetail] = useState({
     id: null,
     name: "",
-    price: 0,
+    price: null,
     category: "",
-    rating: 0,
+    rating: null,
     isAvailable: false,
+    count: null,
   });
   const onOrder = (order) => {
     let isOrdered = orders.find((v) => v.id === order.id);
@@ -43,7 +45,7 @@ export const Order = () => {
   const onOpenDetail = (menu) => {
     setOrderDetail(menu);
   };
-
+  console.log(orderDetail);
   return (
     <div className="content-container">
       <div>
@@ -64,7 +66,7 @@ export const Order = () => {
               <td>{val.category}</td>
               <td>{val.rating}</td>
               <td>{!val.isAvailable ? "Unavailable" : "Available"}</td>
-              <td className="bl-action">
+              <td className="">
                 <button className="button-table" onClick={() => onOrder(val)}>
                   Order
                 </button>
@@ -73,35 +75,34 @@ export const Order = () => {
           ))}
         </table>
       </div>
-      <div>
-        <h3>Order List</h3>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Count</th>
-            <th>Action</th>
-          </tr>
-          {orders.map((val, key) => (
-            <tr key={key}>
-              <td>{val.name}</td>
-              <td>{val.price}</td>
-              <td>{val.count}</td>
-              <td>
-                <button
-                  className="button-table"
-                  onClick={(val) => onOpenDetail(val)}
-                >
-                  Detail
-                </button>
-              </td>
+      <div className="o-details">
+        <div>
+          <h3>Order List</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Count</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </table>
-      </div>
-      <div style={{ width: "200px" }}>
-        <h3>Order Detail</h3>
-        <p>Name: {orderDetail.name}</p>
+            {orders.map((val, key) => (
+              <tr key={key}>
+                <td>{val.name}</td>
+                <td>{val.price}</td>
+                <td>{val.count}</td>
+                <td>
+                  <button
+                    className="button-table"
+                    onClick={() => onOpenDetail(val)}
+                  >
+                    Detail
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </table>
+        </div>
+        <OrderDetail menu={orderDetail} />
       </div>
     </div>
   );
