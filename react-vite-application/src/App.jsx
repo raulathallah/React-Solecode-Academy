@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -16,6 +16,10 @@ import TombolEO from './components/TombolEventObject'
 import TombolEPD from './components/TombolEventPassingDown'
 import MyApp from './components/State Class/MyAppClass'
 import DaftarMahasiswaE3 from './components/Exercise3/DaftarMahasiswaE3'
+import BelajarUseState from './components/BelajarUseState'
+import Counter from './components/Exercise4/Counter'
+import { UpdateObjectState } from './components/UpdateObjectState'
+import { Header } from './components/Header'
 
 function App() {
 
@@ -195,6 +199,25 @@ function App() {
   const handleEPDClick = () => {
     alert("Event Passing Down");
   }
+
+  const [view, setView] = useState('exercise1');
+
+  const renderView = () => {
+    switch(view){
+      case 'exercise1':
+        return <DaftarMahasiswaE1 />
+      case 'exercise4':
+        return <Counter />
+    }
+  }
+
+  const foo = useRef("Hei");
+  const handleButtonClickFoo = () => {
+    foo.current = "Hello";
+    console.log(foo.current);
+
+  }
+  console.log(foo.current);
   return (
     <>
       {/* <Belajar />
@@ -221,7 +244,17 @@ function App() {
       {/* <TombolEO>Tombol Event Object</TombolEO>
       <TombolEPD onTombolClick={handleEPDClick}>Tombol Event Passing Down</TombolEPD> */}
       {/* <MyApp /> */}
-      <DaftarMahasiswaE3 />
+      {/* <DaftarMahasiswaE3 />
+      <BelajarUseState /> */}
+      {/* <Counter /> */}
+      {/* <UpdateObjectState /> */}
+      
+
+      {/* <Header setView={setView}/>
+      <div style={{width: "500px"}}>
+        {renderView()}
+      </div> */}
+      <button onClick={() => handleButtonClickFoo()}>change foo</button>
     </>
   )
 }
