@@ -5,6 +5,17 @@ import './App.css'
 import Belajar from './components/Belajar'
 import { haloJakarta as jkt, haloBandung } from './functions/halo'
 import * as sapa from './functions/halo';
+import MyComponent from './components/MyComponents'
+import DaftarMahasiswaClass from './components/DaftarMahasiswaClass'
+import DaftarMahasiswaFunction from './components/DaftarMahasiswaFunction'
+import BelajarPropsClass from './components/BelajarPropsClass'
+import DaftarMahasiswa from './components/Object Props/DaftarMahasiswa'
+import DaftarMahasiswaE1 from './components/Exercise1/DaftarMahasiswaE1'
+import DaftarMahasiswaE2 from './components/Exercise2/DaftarMahasiswaE2'
+import TombolEO from './components/TombolEventObject'
+import TombolEPD from './components/TombolEventPassingDown'
+import MyApp from './components/State Class/MyAppClass'
+import DaftarMahasiswaE3 from './components/Exercise3/DaftarMahasiswaE3'
 
 function App() {
 
@@ -181,18 +192,36 @@ function App() {
 
   //console.log(kuadrat(5));
 
+  const handleEPDClick = () => {
+    alert("Event Passing Down");
+  }
   return (
     <>
-      {/* <Belajar /> */}
-      {/* {formatMahasiswaX} */}
-      {/* {myElement} */}
-      {/* {myImage}
+      {/* <Belajar />
+      {formatMahasiswaX}
+      {myElement}
+      {myImage}
       {fragment}
       {myElemetX}
       {nilai}
-      {pesan} */}
+      {pesan}
+      {mahasiswaTable} */}
 
-      {mahasiswaTable}
+
+      {/* <MyComponent />
+      <DaftarMahasiswaClass />
+      <DaftarMahasiswaFunction />
+      <BelajarPropsClass materi={"JavaScript"} /> */}
+
+      {/* <DaftarMahasiswa /> */}
+      {/* <DaftarMahasiswaE1 /> */}
+      {/* {myElement} */}
+
+      {/* <DaftarMahasiswaE2 /> */}
+      {/* <TombolEO>Tombol Event Object</TombolEO>
+      <TombolEPD onTombolClick={handleEPDClick}>Tombol Event Passing Down</TombolEPD> */}
+      {/* <MyApp /> */}
+      <DaftarMahasiswaE3 />
     </>
   )
 }

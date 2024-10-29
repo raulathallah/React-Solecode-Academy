@@ -1,0 +1,12 @@
+.f-container {
+  padding: 20px;
+  background: black;
+  color: white;
+  text-align: center;
+  width: 100%dw;
+}
+
+.f-text {
+  color: white;
+  font-size: 12px;
+}

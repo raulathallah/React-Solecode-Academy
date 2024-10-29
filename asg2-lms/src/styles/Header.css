@@ -1,0 +1,16 @@
+.header-container {
+  display: block;
+  width: 100%;
+  background: lightseagreen;
+  color: white;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  padding: 15px;
+  gap: 15px;
+}
+
+.text {
+  font-weight: 300;
+  color: white;
+}
