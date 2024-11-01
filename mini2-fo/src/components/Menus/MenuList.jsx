@@ -55,7 +55,7 @@ export const MenuList = ({ menuList, onDelete, openEdit, onOrder }) => {
                           size="sm"
                           onClick={() => onOrder(val)}
                         >
-                          Order
+                          Add
                         </Button>
                       )}
                     </ButtonGroup>

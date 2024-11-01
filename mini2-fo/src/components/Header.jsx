@@ -11,7 +11,7 @@ export const Header = () => {
   let { title: NAMA_WEBSITE, dateNow: WAKTU_SEKARANG } = header;
   return (
     <div
-      className="px-5 py-2 d-flex justify-content-between"
+      className="px-5 py-2 d-flex justify-content-between mb-4"
       style={{ background: "red" }}
     >
       <div className="text-white d-flex gap-2 align-items-center">

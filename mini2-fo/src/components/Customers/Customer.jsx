@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { CustomerForm } from "./CustomerForm";
 import { CustomerList } from "./CustomerList";
+import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 export const Customer = () => {
   const [id, setId] = useState(0);
   const [editId, setEditId] = useState(0);
   const [editBool, setEditBool] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
     id: id + 1,
     name: "",
@@ -72,6 +76,7 @@ export const Customer = () => {
     setEditId(customer.id);
     setNewCustomer(customer);
     setEditBool(true);
+    openAdd();
   };
   const onCancel = () => {
     setEditId(0);
@@ -93,36 +98,38 @@ export const Customer = () => {
       address: "",
     });
     setEditBool(false);
+    setShowModal(false);
+  };
+  const openAdd = () => {
+    setShowModal(true);
+  };
+  const handleCloseAdd = () => {
+    setShowModal(false);
+    clearForm();
   };
   return (
-    <div className="d-grid gap-3 my-3">
-      <div className="border p-3 w-50">
-        {!editBool ? (
-          <>
-            <h3>Add Customer</h3>
-            <CustomerForm
-              onChangeValue={onChangeValue}
-              newCustomer={newCustomer}
-              onAdd={onAddCustomer}
-              type={"add"}
-            />
-          </>
-        ) : (
-          <>
-            <h3>Edit Customer - ID: {editId}</h3>
-            <CustomerForm
-              onChangeValue={onChangeValue}
-              newCustomer={newCustomer}
-              onAdd={onAddCustomer}
-              onEdit={onEditCustomer}
-              onCancel={onCancel}
-              type={"edit"}
-            />
-          </>
-        )}
-      </div>
+    <div className="">
+      <Button
+        variant="primary"
+        onClick={openAdd}
+        className="d-flex align-items-center gap-2"
+      >
+        <FontAwesomeIcon icon={faPlus} />
+        Add
+      </Button>
+      <CustomerForm
+        onChangeValue={onChangeValue}
+        newCustomer={newCustomer}
+        onAdd={onAddCustomer}
+        onEdit={onEditCustomer}
+        onCancel={onCancel}
+        type={!editBool ? "add" : "edit"}
+        handleClose={handleCloseAdd}
+        show={showModal}
+      />
       <div className="p-3 border my-2">
         <h3>Customer List</h3>
+
         <CustomerList
           customerList={customers}
           onDelete={onDeleteCustomer}

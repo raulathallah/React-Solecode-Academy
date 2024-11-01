@@ -2,7 +2,6 @@
 import { Button, ButtonGroup, Container, Row, Table } from "react-bootstrap";
 
 export const CustomerList = ({ customerList, onDelete, openEdit }) => {
-  <table></table>;
   return (
     <>
       <Table striped bordered hover responsive="sm">

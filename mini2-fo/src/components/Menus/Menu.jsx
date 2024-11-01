@@ -1,14 +1,16 @@
 import { useState } from "react";
-import "../../styles/Form.css";
-import "../../styles/Table.css";
 import { categories } from "../../utils/Categories";
 import { MenuForm } from "./MenuForm";
 import { MenuList } from "./MenuList";
+import { Button } from "react-bootstrap";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Menu = () => {
   const [id, setId] = useState(0);
   const [editId, setEditId] = useState(0);
   const [editBool, setEditBool] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [newMenu, setNewMenu] = useState({
     id: id + 1,
     name: "",
@@ -77,7 +79,9 @@ export const Menu = () => {
     setEditId(menu.id);
     setNewMenu(menu);
     setEditBool(true);
+    openAdd();
   };
+
   const onCancel = () => {
     setEditId(0);
     setEditBool(false);
@@ -93,35 +97,35 @@ export const Menu = () => {
       isAvailable: "true",
     });
     setEditBool(false);
+    setShowModal(false);
+  };
+  const openAdd = () => {
+    setShowModal(true);
+  };
+  const handleCloseAdd = () => {
+    setShowModal(false);
+    clearForm();
   };
   return (
-    <div className="d-grid gap-3 my-3">
-      <div className="border p-3 w-50">
-        {!editBool ? (
-          <>
-            <h3>Add Menu</h3>
-            <MenuForm
-              onChangeValue={onChangeValue}
-              newMenu={newMenu}
-              onAdd={onAddMenu}
-              type={"add"}
-            />
-          </>
-        ) : (
-          <>
-            <h3>Edit Menu - ID: {editId}</h3>
-            <MenuForm
-              onChangeValue={onChangeValue}
-              newMenu={newMenu}
-              onAdd={onAddMenu}
-              onEdit={onEditMenu}
-              onCancel={onCancel}
-              type={"edit"}
-            />
-          </>
-        )}
-      </div>
-
+    <div className="">
+      <Button
+        variant="primary"
+        onClick={openAdd}
+        className="d-flex align-items-center gap-2"
+      >
+        <FontAwesomeIcon icon={faPlus} />
+        Add
+      </Button>
+      <MenuForm
+        onChangeValue={onChangeValue}
+        newMenu={newMenu}
+        onAdd={onAddMenu}
+        onEdit={onEditMenu}
+        onCancel={onCancel}
+        type={!editBool ? "add" : "edit"}
+        handleClose={handleCloseAdd}
+        show={showModal}
+      />
       <div className="p-3 border my-2">
         <h3>Menu List</h3>
         <MenuList

@@ -1,12 +1,8 @@
 /* eslint-disable react/prop-types */
 import { Button, ButtonGroup, Container, Row, Table } from "react-bootstrap";
+import { calculateTotalPrice } from "../../utils/Calculation";
 
-export const OrderList = ({ orderList, onOpenDetail }) => {
-  const calculateTotalPrice = (orderList) => {
-    let total = 0;
-    orderList.map((val) => (total = total + val.price));
-    return total;
-  };
+export const OrderList = ({ orderList, onOpenDetail, onRemoveOrder }) => {
   return (
     <>
       <Table striped bordered hover responsive="sm">
@@ -36,6 +32,13 @@ export const OrderList = ({ orderList, onOpenDetail }) => {
                         onClick={() => onOpenDetail(val)}
                       >
                         Detail
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => onRemoveOrder(val.id)}
+                      >
+                        Remove
                       </Button>
                     </ButtonGroup>
                   </Row>

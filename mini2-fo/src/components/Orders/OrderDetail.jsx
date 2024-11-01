@@ -3,7 +3,6 @@ import { Col, Container, Row } from "react-bootstrap";
 /* eslint-disable react/prop-types */
 export const OrderDetail = (props) => {
   const { menu } = props;
-
   return (
     <div>
       <div className="">
@@ -38,14 +37,6 @@ export const OrderDetail = (props) => {
             </Col>
             <Col>
               <p className="">: {menu.rating}</p>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm="3">
-              <p>Count </p>
-            </Col>
-            <Col>
-              <p className="">: {menu.count}</p>
             </Col>
           </Row>
         </Container>
