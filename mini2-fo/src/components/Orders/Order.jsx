@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 import { MenuList } from "../Menus/MenuList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { calculateTotalPrice } from "../../utils/Calculation";
 
 export const Order = () => {
@@ -205,7 +205,7 @@ export const Order = () => {
               <div className="d-flex justify-content-between align-items-start">
                 <h3>Order</h3>
                 <Button variant="warning" onClick={onCheckout}>
-                  Checkout
+                  Place Order
                 </Button>
               </div>
               <div className="d-flex justify-content-between align-items-start">
@@ -239,7 +239,7 @@ export const Order = () => {
 
         {/** STATUS */}
         <Tab eventKey="status" title="Status">
-          <div className="d-flex gap-2 border">
+          <div className="d-flex gap-2">
             <div style={{ display: "grid", gap: "10px" }} className="p-3 my-2">
               <h3>Order Status</h3>
               <div className="d-flex gap-4 flex-wrap">
