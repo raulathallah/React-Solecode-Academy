@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CustomerForm } from "./CustomerForm";
 import { CustomerList } from "./CustomerList";
-import { Button } from "react-bootstrap";
+import { Button, Form, InputGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 export const Customer = () => {
   const [id, setId] = useState(0);
   const [editId, setEditId] = useState(0);
   const [editBool, setEditBool] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [searchKey, setSearchKey] = useState("");
   const [newCustomer, setNewCustomer] = useState({
     id: id + 1,
     name: "",
@@ -17,6 +18,7 @@ export const Customer = () => {
     address: "",
   });
   const [customers, setCustomers] = useState([]);
+  const [filteredCustomer, setFilteredCustomer] = useState([]);
 
   const validateCustomer = () => {
     //Name: Required, length between 2-100 characters.
@@ -107,6 +109,23 @@ export const Customer = () => {
     setShowModal(false);
     clearForm();
   };
+  useEffect(() => {
+    setFilteredCustomer(customers);
+  }, [customers]);
+  useEffect(() => {
+    if (!searchKey) {
+      setFilteredCustomer(customers);
+    } else {
+      let fc = customers.filter(
+        (x) =>
+          x.name.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase()) ||
+          x.email.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase()) ||
+          x.phone.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase()) ||
+          x.address.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase())
+      );
+      setFilteredCustomer(fc);
+    }
+  }, [searchKey, customers]);
   return (
     <div className="">
       <Button
@@ -129,9 +148,21 @@ export const Customer = () => {
       />
       <div className="p-3 border my-2">
         <h3>Customer List</h3>
-
+        <InputGroup className="mb-3 w-50">
+          <Form.Control
+            placeholder="Search Name/Email/Phone/Address..."
+            type="text"
+            required
+            value={searchKey}
+            size="sm"
+            onChange={(e) => setSearchKey(e.target.value)}
+          />
+          <InputGroup.Text>
+            <FontAwesomeIcon icon={faSearch} />
+          </InputGroup.Text>
+        </InputGroup>
         <CustomerList
-          customerList={customers}
+          customerList={filteredCustomer}
           onDelete={onDeleteCustomer}
           openEdit={openEdit}
         />

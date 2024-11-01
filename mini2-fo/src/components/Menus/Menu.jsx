@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { categories } from "../../utils/Categories";
 import { MenuForm } from "./MenuForm";
 import { MenuList } from "./MenuList";
-import { Button } from "react-bootstrap";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Button, Form, InputGroup } from "react-bootstrap";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Menu = () => {
@@ -11,6 +11,7 @@ export const Menu = () => {
   const [editId, setEditId] = useState(0);
   const [editBool, setEditBool] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [searchKey, setSearchKey] = useState("");
   const [newMenu, setNewMenu] = useState({
     id: id + 1,
     name: "",
@@ -20,6 +21,7 @@ export const Menu = () => {
     isAvailable: "true",
   });
   const [menus, setMenus] = useState([]);
+  const [filteredMenu, setFilteredMenu] = useState([]);
 
   const validateMenu = () => {
     //`Name` can not be null, the character length 2-100
@@ -106,6 +108,22 @@ export const Menu = () => {
     setShowModal(false);
     clearForm();
   };
+  useEffect(() => {
+    setFilteredMenu(menus);
+  }, [menus]);
+  useEffect(() => {
+    if (!searchKey) {
+      setFilteredMenu(menus);
+    } else {
+      let fm = menus.filter(
+        (x) =>
+          x.name.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase()) ||
+          x.category.toLocaleLowerCase().includes(searchKey.toLocaleLowerCase())
+      );
+      setFilteredMenu(fm);
+    }
+  }, [searchKey, menus]);
+
   return (
     <div className="">
       <Button
@@ -128,8 +146,21 @@ export const Menu = () => {
       />
       <div className="p-3 border my-2">
         <h3>Menu List</h3>
+        <InputGroup className="mb-3 w-50">
+          <Form.Control
+            placeholder="Search Name/Category..."
+            type="text"
+            required
+            value={searchKey}
+            size="sm"
+            onChange={(e) => setSearchKey(e.target.value)}
+          />
+          <InputGroup.Text>
+            <FontAwesomeIcon icon={faSearch} />
+          </InputGroup.Text>
+        </InputGroup>
         <MenuList
-          menuList={menus}
+          menuList={filteredMenu}
           onDelete={onDeleteMenu}
           openEdit={openEdit}
         />
