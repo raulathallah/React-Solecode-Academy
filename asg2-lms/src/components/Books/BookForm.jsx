@@ -51,16 +51,12 @@ export const BookForm = ({
         </Col>
       </Form.Group>
 
-      <Form.Group as={Row} className="mb-3" controlId="formAuthor">
+      <Form.Group as={Row} className="mb-3" controlId="formCategory">
         <Form.Label column sm="2">
           Category
         </Form.Label>
         <Col sm="10">
-          <Form.Select
-            aria-label="Default select example"
-            required
-            onChange={(e) => onChangeValue("category", e)}
-          >
+          <Form.Select required onChange={(e) => onChangeValue("category", e)}>
             {categories.map((val) => (
               <option key={val} value={val}>
                 {val}
@@ -70,7 +66,7 @@ export const BookForm = ({
         </Col>
       </Form.Group>
 
-      <Form.Group as={Row} className="mb-3" controlId="formAuthor">
+      <Form.Group as={Row} className="mb-3" controlId="formYear">
         <Form.Label column sm="2">
           Year
         </Form.Label>
@@ -86,7 +82,7 @@ export const BookForm = ({
         </Col>
       </Form.Group>
 
-      <Form.Group as={Row} className="mb-3" controlId="formAuthor">
+      <Form.Group as={Row} className="mb-3" controlId="formIsbn">
         <Form.Label column sm="2">
           ISBN
         </Form.Label>
