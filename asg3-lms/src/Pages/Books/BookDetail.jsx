@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { getBooks } from "../../../utils/Books";
+import { getBooks } from "../../utils/Books";
 
 const BookDetail = () => {
   const { id } = useParams();
@@ -23,7 +23,7 @@ const BookDetail = () => {
       <Card.Body className="d-grid gap-4">
         <Row className="mb-3">
           <Col>
-            <Card.Subtitle>ID</Card.Subtitle>
+            <Card.Subtitle>Book ID</Card.Subtitle>
             <Card.Text>{detail.id}</Card.Text>
           </Col>
         </Row>
@@ -51,6 +51,16 @@ const BookDetail = () => {
           <Col>
             <Card.Subtitle>ISBN</Card.Subtitle>
             <Card.Text>{detail.isbn}</Card.Text>
+          </Col>
+          <Col>
+            <Card.Subtitle>Availability</Card.Subtitle>
+            <Card.Text className="mt-1">
+              {detail.isAvailable ? (
+                <Badge bg="success">Available</Badge>
+              ) : (
+                <Badge bg="secondary">Not Available</Badge>
+              )}
+            </Card.Text>
           </Col>
         </Row>
       </Card.Body>

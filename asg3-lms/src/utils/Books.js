@@ -8,16 +8,16 @@ export const getBooks = () => {
 };
 
 export const generateBookId = () => {
-  let id = parseInt(JSON.parse(localStorage.getItem("id")));
+  let id = parseInt(JSON.parse(localStorage.getItem("bookId")));
   console.log(id);
   if (!id) {
     id = 1;
 
-    localStorage.setItem("id", id);
+    localStorage.setItem("bookId", id);
     return id;
   }
 
   id = id + 1;
-  localStorage.setItem("id", id);
+  localStorage.setItem("bookId", id);
   return id;
 };

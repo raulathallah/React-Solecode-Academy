@@ -2,10 +2,10 @@
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { generateBookId, getBooks } from "../../../utils/Books";
-import { categories } from "../../../utils/Categories";
+import { generateBookId, getBooks } from "../../utils/Books";
+import { categories } from "../../utils/Categories";
 
-export const BookForm = ({ type }) => {
+const BookForm = ({ type }) => {
   const navigate = useNavigate();
   const inputFocus = useRef(null);
   useEffect(() => {
@@ -19,6 +19,14 @@ export const BookForm = ({ type }) => {
       setNewBook(getBooks().find((val) => val.id === parseInt(id)));
     }
   }, [id]);
+  const [errors, setErrors] = useState({
+    title: "",
+    author: "",
+    year: "",
+    isbn: "",
+    category: "",
+    isAvailable: "",
+  });
 
   const [newBook, setNewBook] = useState({
     id: 0,
@@ -27,6 +35,7 @@ export const BookForm = ({ type }) => {
     category: categories[0],
     year: new Date().getFullYear(),
     isbn: "",
+    isAvailable: false,
   });
 
   //CLEAR FORM
@@ -38,21 +47,82 @@ export const BookForm = ({ type }) => {
       category: categories[0],
       year: new Date().getFullYear(),
       isbn: "",
+      isAvailable: false,
     });
   };
 
   //ADD BOOK
   const onAddBook = (e) => {
     e.preventDefault();
-    let bookAddId = { ...newBook, id: generateBookId() };
+    let newId = generateBookId();
+    let bookAddId = { ...newBook, id: newId };
     let oldData = getBooks();
     let newData = [...oldData, bookAddId];
-    localStorage.setItem("books", JSON.stringify(newData));
-    alert("Book Added!");
-    navigate("/books");
-    clearForm();
+
+    let valid = ValidateBook(oldData, newBook);
+
+    if (valid) {
+      localStorage.setItem("books", JSON.stringify(newData));
+      alert("Book Added!");
+      navigate("/books");
+      clearForm();
+    } else {
+      localStorage.setItem("bookId", newId - 1);
+    }
   };
 
+  //VALIDATION BOOK
+  const ValidateBook = (oldData, book) => {
+    let errorMessages = {};
+    let yearNow = new Date().getFullYear();
+    //-- isbn
+    if (!book.isbn) {
+      errorMessages.isbn = "ISBN must be filled!";
+    } else if (
+      book.isbn.length < 10 ||
+      book.isbn.length > 13 ||
+      typeof parseInt(book.isbn) !== typeof 0
+    ) {
+      errorMessages.isbn = `Must be a valid ISBN number! (10-13 Number)`;
+    } else if (oldData.find((x) => x.isbn === book.isbn)) {
+      errorMessages.isbn = `Book with ${book.isbn} already exist!`;
+    }
+
+    //-- title
+    if (!book.title) {
+      errorMessages.title = "Title must be filled!";
+    } else if (book.title.length < 3) {
+      errorMessages.title = "Title must be 3 character minimum!";
+    }
+
+    //-- year
+    if (!book.year) {
+      errorMessages.year = "Publication year must be filled!";
+    } else if (book.year < 1900 || book.year > yearNow) {
+      errorMessages.year = `Must be a valid year! (1900-${yearNow})`;
+    }
+
+    //-- author
+    if (!book.author) {
+      errorMessages.author = "Author must be filled!";
+    }
+
+    //-- category
+    if (!book.category) {
+      errorMessages.category = "Category must be choosen!";
+    }
+
+    setErrors(errorMessages);
+
+    let formValid = true;
+    for (let propName in errorMessages) {
+      if (errorMessages[propName].length > 0) {
+        formValid = false;
+      }
+    }
+
+    return formValid;
+  };
   //EDIT BOOK
   const onEditBook = (e) => {
     e.preventDefault();
@@ -68,13 +138,19 @@ export const BookForm = ({ type }) => {
     navigate("/books");
     clearForm();
   };
-
   //ON CHANGE VALUE
   const onChangeValue = (key, e) => {
-    setNewBook({
-      ...newBook,
-      [key]: e.target.value,
-    });
+    if (e.target.type === "checkbox") {
+      setNewBook({
+        ...newBook,
+        [key]: e.target.checked,
+      });
+    } else {
+      setNewBook({
+        ...newBook,
+        [key]: e.target.value,
+      });
+    }
   };
 
   //ON CANCEL
@@ -89,38 +165,40 @@ export const BookForm = ({ type }) => {
           <Row className="mb-3">
             <Col>
               <Form.Group controlId="formTitle">
-                <Form.Label>Title</Form.Label>
+                <Form.Label className="fw-semibold">Title</Form.Label>
                 <Form.Control
                   ref={inputFocus}
                   type="text"
-                  required
                   value={newBook.title}
                   size="sm"
                   onChange={(e) => onChangeValue("title", e)}
+                  isInvalid={errors.title}
                 />
-                <small>test</small>
+                {errors.title && <small>{errors.title}</small>}
               </Form.Group>
             </Col>
             <Col>
               <Form.Group controlId="formAuthor">
-                <Form.Label>Author</Form.Label>
+                <Form.Label className="fw-semibold">Author</Form.Label>
                 <Form.Control
                   type="text"
-                  required
                   value={newBook.author}
                   size="sm"
                   onChange={(e) => onChangeValue("author", e)}
+                  isInvalid={errors.author}
                 />
+                {errors.author && <small>{errors.author}</small>}
               </Form.Group>
             </Col>
           </Row>
           <Row className="mb-3">
             <Col>
               <Form.Group controlId="formCategory">
-                <Form.Label>Category</Form.Label>
+                <Form.Label className="fw-semibold">Category</Form.Label>
+
                 <Form.Select
-                  required
                   onChange={(e) => onChangeValue("category", e)}
+                  isInvalid={errors.category}
                 >
                   {categories.map((val) => (
                     <option key={val} value={val}>
@@ -128,36 +206,55 @@ export const BookForm = ({ type }) => {
                     </option>
                   ))}
                 </Form.Select>
+                {errors.category && <small>{errors.category}</small>}
               </Form.Group>
             </Col>
             <Col>
               <Form.Group controlId="formYear">
-                <Form.Label>Year</Form.Label>
+                <Form.Label className="fw-semibold">Year</Form.Label>
                 <Form.Control
                   type="number"
-                  required
-                  max={new Date().getFullYear()}
                   value={newBook.year}
                   size="sm"
                   onChange={(e) => onChangeValue("year", e)}
+                  isInvalid={errors.year}
                 />
+                {errors.year && <small>{errors.year}</small>}
               </Form.Group>
             </Col>
           </Row>
           <Row className="mb-3">
             <Col>
               <Form.Group controlId="formIsbn">
-                <Form.Label>ISBN</Form.Label>
+                <Form.Label className="fw-semibold">ISBN</Form.Label>
                 <Form.Control
                   type="text"
                   value={newBook.isbn}
-                  required
                   size="sm"
                   onChange={(e) => onChangeValue("isbn", e)}
+                  isInvalid={errors.isbn}
                 />
+                {errors.isbn && <small>{errors.isbn}</small>}
               </Form.Group>
             </Col>
-            <Col></Col>
+            <Col>
+              <Form.Group
+                controlId="formIsAvailable"
+                className="d-grid align-items-center"
+              >
+                <Form.Label className="fw-semibold">Availability</Form.Label>
+                <Form.Check
+                  inline
+                  label="Available"
+                  name="group1"
+                  type="checkbox"
+                  checked={newBook.isAvailable}
+                  id={`checkbox-1`}
+                  onChange={(e) => onChangeValue("isAvailable", e)}
+                />
+                {errors.isAvailable && <small>{errors.isAvailable}</small>}
+              </Form.Group>
+            </Col>
           </Row>
         </Card.Body>
         <Card.Footer className="text-muted">
@@ -187,3 +284,5 @@ export const BookForm = ({ type }) => {
     </Card>
   );
 };
+
+export default BookForm;
