@@ -9,7 +9,6 @@ export const getMembers = () => {
 
 export const generateMemberId = () => {
   let id = parseInt(JSON.parse(localStorage.getItem("memberId")));
-  console.log(id);
   if (!id) {
     id = 1;
 

@@ -11,10 +11,12 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { getBooks } from "../../utils/Books";
 import { useEffect, useState } from "react";
+import Loading from "../../components/Elements/Loading";
 
 const BookList = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   //DELETE BOOK
   const onDelete = (id) => {
@@ -28,6 +30,18 @@ const BookList = () => {
   useEffect(() => {
     setList(getBooks());
   }, []);
+
+  useEffect(() => {
+    if (list) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, [list]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Card>
@@ -61,7 +75,7 @@ const BookList = () => {
                       <ButtonGroup aria-label="Basic example">
                         <Button
                           as={Link}
-                          variant="secondary"
+                          variant="dark"
                           size="sm"
                           to={`/books/${val.id}`}
                         >
@@ -76,7 +90,7 @@ const BookList = () => {
                           Edit
                         </Button>
                         <Button
-                          variant="dark"
+                          variant="danger"
                           size="sm"
                           onClick={() => onDelete(val.id)}
                         >

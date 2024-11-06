@@ -15,6 +15,15 @@ const initialValue = {
   isAvailable: false,
 };
 
+const initialError = {
+  title: "",
+  author: "",
+  year: "",
+  isbn: "",
+  category: "",
+  isAvailable: "",
+};
+
 const BookForm = ({ type }) => {
   const navigate = useNavigate();
   const inputFocus = useRef(null);
@@ -26,14 +35,7 @@ const BookForm = ({ type }) => {
   const { id } = useParams();
 
   const [list, setList] = useState([]);
-  const [errors, setErrors] = useState({
-    title: "",
-    author: "",
-    year: "",
-    isbn: "",
-    category: "",
-    isAvailable: "",
-  });
+  const [errors, setErrors] = useState(initialError);
 
   const [newBook, setNewBook] = useState(initialValue);
 

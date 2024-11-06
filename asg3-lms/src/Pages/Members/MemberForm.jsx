@@ -15,6 +15,14 @@ const initialValue = {
   address: "",
 };
 
+const initialError = {
+  fullName: "",
+  email: "",
+  gender: "",
+  phone: "",
+  address: "",
+};
+
 const MemberForm = ({ type }) => {
   const navigate = useNavigate();
   const inputFocus = useRef(null);
@@ -27,13 +35,7 @@ const MemberForm = ({ type }) => {
   const { id } = useParams();
 
   const [list, setList] = useState([]);
-  const [errors, setErrors] = useState({
-    fullName: "",
-    email: "",
-    gender: "",
-    phone: "",
-    address: "",
-  });
+  const [errors, setErrors] = useState(initialError);
 
   const [newMember, setNewMember] = useState(initialValue);
 
@@ -50,6 +52,10 @@ const MemberForm = ({ type }) => {
 
   useEffect(() => {
     setList(getMembers());
+
+    return () => {
+      clearForm();
+    };
   }, []);
 
   //ADD MEMBER
@@ -64,7 +70,6 @@ const MemberForm = ({ type }) => {
       localStorage.setItem("members", JSON.stringify(newData));
       alert("Member Added!");
       navigate("/members");
-      clearForm();
     } else {
       localStorage.setItem("memberId", newId - 1);
     }
@@ -97,6 +102,13 @@ const MemberForm = ({ type }) => {
       errorMessages.phone = `Phone must be filled!`;
     }
 
+    //-- address
+    if (!member.address) {
+      errorMessages.address = `Address must be filled!`;
+    } else if (member.address.length > 200) {
+      errorMessages.address = `Address must be 200 characters minimum!`;
+    }
+
     setErrors(errorMessages);
 
     let formValid = true;
@@ -121,19 +133,15 @@ const MemberForm = ({ type }) => {
     localStorage.setItem("members", JSON.stringify(newData));
     alert("Member Updated!");
     navigate("/members");
-    clearForm();
   };
 
   //ON CHANGE VALUE
   const onChangeValue = (key, e) => {
-    console.log(e);
     setNewMember({
       ...newMember,
       [key]: e.target.value,
     });
   };
-
-  console.log(newMember);
 
   //ON CANCEL
   const onCancel = () => {
@@ -221,8 +229,23 @@ const MemberForm = ({ type }) => {
             </Col>
           </Row>
           <Row className="mb-3">
-            <Col></Col>
-            <Col></Col>
+            <Col>
+              <Form.Group controlId="formFullNama">
+                <Form.Label className="fw-semibold">Address</Form.Label>
+                <Form.Control
+                  as={"textarea"}
+                  rows={4}
+                  value={newMember.address}
+                  size="sm"
+                  onChange={(e) => onChangeValue("address", e)}
+                  isInvalid={errors.address}
+                />
+                <p style={{ fontSize: "12px" }}>
+                  {newMember.address.length}/200
+                </p>
+                {errors.address && <small>{errors.address}</small>}
+              </Form.Group>
+            </Col>
           </Row>
         </Card.Body>
         <Card.Footer className="text-muted">

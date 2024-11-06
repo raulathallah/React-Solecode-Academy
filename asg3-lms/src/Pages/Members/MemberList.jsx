@@ -11,10 +11,12 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { getMembers } from "../../utils/Members";
 import { useEffect, useState } from "react";
+import Loading from "../../components/Elements/Loading";
 
 const MemberList = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   //DELETE MEMBER
   const onDelete = (id) => {
@@ -27,6 +29,18 @@ const MemberList = () => {
   useEffect(() => {
     setList(getMembers());
   }, []);
+
+  useEffect(() => {
+    if (list) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, [list]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Card>
@@ -44,8 +58,6 @@ const MemberList = () => {
               <th>Full Name</th>
               <th>Email</th>
               <th>Gender</th>
-              <th>Phone</th>
-              <th>Address</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -56,15 +68,13 @@ const MemberList = () => {
                 <td>{val.fullName}</td>
                 <td>{val.email}</td>
                 <td>{val.gender}</td>
-                <td>{val.phone}</td>
-                <td>{val.address}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
                       <ButtonGroup aria-label="Basic example">
                         <Button
                           as={Link}
-                          variant="secondary"
+                          variant="dark"
                           size="sm"
                           to={`/members/${val.id}`}
                         >
@@ -79,7 +89,7 @@ const MemberList = () => {
                           Edit
                         </Button>
                         <Button
-                          variant="dark"
+                          variant="danger"
                           size="sm"
                           onClick={() => onDelete(val.id)}
                         >

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { getBooks } from "../../utils/Books";
+import { getMembers } from "../../utils/Members";
 import Loading from "../../components/Elements/Loading";
 
-const BookDetail = () => {
+const MemberDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [detail, setDetail] = useState({});
@@ -12,8 +12,8 @@ const BookDetail = () => {
 
   useEffect(() => {
     if (id) {
-      let book = getBooks().find((val) => val.id === parseInt(id));
-      setDetail(book);
+      let member = getMembers().find((val) => val.id === parseInt(id));
+      setDetail(member);
     }
   }, [id]);
   //ON CANCEL
@@ -34,48 +34,38 @@ const BookDetail = () => {
   }
   return (
     <Card>
-      <Card.Header>Book Details</Card.Header>
+      <Card.Header>Member Details</Card.Header>
       <Card.Body className="d-grid gap-4">
         <Row className="mb-3">
           <Col>
-            <Card.Subtitle>Book ID</Card.Subtitle>
+            <Card.Subtitle>Member ID</Card.Subtitle>
             <Card.Text>{detail.id}</Card.Text>
           </Col>
         </Row>
         <Row className="mb-3">
           <Col>
-            <Card.Subtitle>Title</Card.Subtitle>
-            <Card.Text>{detail.title}</Card.Text>
+            <Card.Subtitle>Full Name</Card.Subtitle>
+            <Card.Text>{detail.fullName}</Card.Text>
           </Col>
           <Col>
-            <Card.Subtitle>Author</Card.Subtitle>
-            <Card.Text>{detail.author}</Card.Text>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <Card.Subtitle>Category</Card.Subtitle>
-            <Card.Text>{detail.author}</Card.Text>
-          </Col>
-          <Col>
-            <Card.Subtitle>Publication Year</Card.Subtitle>
-            <Card.Text>{detail.year}</Card.Text>
+            <Card.Subtitle>Email</Card.Subtitle>
+            <Card.Text>{detail.email}</Card.Text>
           </Col>
         </Row>
         <Row className="mb-3">
           <Col>
-            <Card.Subtitle>ISBN</Card.Subtitle>
-            <Card.Text>{detail.isbn}</Card.Text>
+            <Card.Subtitle>Gender</Card.Subtitle>
+            <Card.Text>{detail.gender}</Card.Text>
           </Col>
           <Col>
-            <Card.Subtitle>Availability</Card.Subtitle>
-            <Card.Text className="mt-1">
-              {detail.isAvailable ? (
-                <Badge bg="success">Available</Badge>
-              ) : (
-                <Badge bg="secondary">Not Available</Badge>
-              )}
-            </Card.Text>
+            <Card.Subtitle>Phone</Card.Subtitle>
+            <Card.Text>{detail.phone}</Card.Text>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col>
+            <Card.Subtitle>Address</Card.Subtitle>
+            <Card.Text>{detail.address}</Card.Text>
           </Col>
         </Row>
       </Card.Body>
@@ -90,4 +80,4 @@ const BookDetail = () => {
   );
 };
 
-export default BookDetail;
+export default MemberDetail;
