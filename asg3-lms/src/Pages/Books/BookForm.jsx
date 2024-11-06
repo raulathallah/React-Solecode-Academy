@@ -5,6 +5,16 @@ import { useNavigate, useParams } from "react-router";
 import { generateBookId, getBooks } from "../../utils/Books";
 import { categories } from "../../utils/Categories";
 
+const initialValue = {
+  id: 0,
+  title: "",
+  author: "",
+  category: categories[0],
+  year: new Date().getFullYear(),
+  isbn: "",
+  isAvailable: false,
+};
+
 const BookForm = ({ type }) => {
   const navigate = useNavigate();
   const inputFocus = useRef(null);
@@ -14,11 +24,8 @@ const BookForm = ({ type }) => {
     }
   }, [type]);
   const { id } = useParams();
-  useEffect(() => {
-    if (id) {
-      setNewBook(getBooks().find((val) => val.id === parseInt(id)));
-    }
-  }, [id]);
+
+  const [list, setList] = useState([]);
   const [errors, setErrors] = useState({
     title: "",
     author: "",
@@ -28,31 +35,25 @@ const BookForm = ({ type }) => {
     isAvailable: "",
   });
 
-  const [newBook, setNewBook] = useState({
-    id: 0,
-    title: "",
-    author: "",
-    category: categories[0],
-    year: new Date().getFullYear(),
-    isbn: "",
-    isAvailable: false,
-  });
+  const [newBook, setNewBook] = useState(initialValue);
+
+  useEffect(() => {
+    if (id) {
+      setNewBook(getBooks().find((val) => val.id === parseInt(id)));
+    }
+  }, [id]);
+
+  useEffect(() => {
+    setList(getBooks());
+  }, []);
 
   //CLEAR FORM
   const clearForm = () => {
-    setNewBook({
-      id: 0,
-      title: "",
-      author: "",
-      category: categories[0],
-      year: new Date().getFullYear(),
-      isbn: "",
-      isAvailable: false,
-    });
+    setNewBook(initialValue);
   };
 
   //ADD BOOK
-  const onAddBook = (e) => {
+  const onAdd = (e) => {
     e.preventDefault();
     let newId = generateBookId();
     let bookAddId = { ...newBook, id: newId };
@@ -123,13 +124,13 @@ const BookForm = ({ type }) => {
 
     return formValid;
   };
+
   //EDIT BOOK
-  const onEditBook = (e) => {
+  const onEdit = (e) => {
     e.preventDefault();
-    let oldData = getBooks();
+    let oldData = list;
     let updatedBook = { ...newBook, id: parseInt(id) };
 
-    console.log(updatedBook);
     let newData = oldData.map((val) =>
       val.id === parseInt(id) ? updatedBook : val
     );
@@ -138,6 +139,7 @@ const BookForm = ({ type }) => {
     navigate("/books");
     clearForm();
   };
+
   //ON CHANGE VALUE
   const onChangeValue = (key, e) => {
     if (e.target.type === "checkbox") {
@@ -159,7 +161,7 @@ const BookForm = ({ type }) => {
   };
   return (
     <Card>
-      <Form onSubmit={type === "add" ? onAddBook : onEditBook}>
+      <Form onSubmit={type === "add" ? onAdd : onEdit}>
         <Card.Header>{type === "add" ? "Add Book" : "Edit Book"}</Card.Header>
         <Card.Body>
           <Row className="mb-3">

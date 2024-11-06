@@ -10,9 +10,11 @@ import {
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { getMembers } from "../../utils/Members";
+import { useEffect, useState } from "react";
 
 const MemberList = () => {
   const navigate = useNavigate();
+  const [list, setList] = useState([]);
 
   //DELETE MEMBER
   const onDelete = (id) => {
@@ -22,6 +24,10 @@ const MemberList = () => {
     alert("Member Deleted!");
     navigate("/members");
   };
+  useEffect(() => {
+    setList(getMembers());
+  }, []);
+
   return (
     <Card>
       <Card.Header>Member List</Card.Header>
@@ -44,7 +50,7 @@ const MemberList = () => {
             </tr>
           </thead>
           <tbody>
-            {getMembers().map((val, key) => (
+            {list.map((val, key) => (
               <tr key={key}>
                 <td>{key + 1}</td>
                 <td>{val.fullName}</td>

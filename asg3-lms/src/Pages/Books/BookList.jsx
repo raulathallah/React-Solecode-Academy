@@ -10,9 +10,11 @@ import {
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { getBooks } from "../../utils/Books";
+import { useEffect, useState } from "react";
 
 const BookList = () => {
   const navigate = useNavigate();
+  const [list, setList] = useState([]);
 
   //DELETE BOOK
   const onDelete = (id) => {
@@ -22,6 +24,11 @@ const BookList = () => {
     alert("Book Deleted!");
     navigate("/books");
   };
+
+  useEffect(() => {
+    setList(getBooks());
+  }, []);
+
   return (
     <Card>
       <Card.Header>Book List</Card.Header>
@@ -42,7 +49,7 @@ const BookList = () => {
             </tr>
           </thead>
           <tbody>
-            {getBooks().map((val, key) => (
+            {list.map((val, key) => (
               <tr key={key}>
                 <td>{key + 1}</td>
                 <td>{val.title}</td>
