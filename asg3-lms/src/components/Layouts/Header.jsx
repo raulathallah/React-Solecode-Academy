@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <Navbar bg="dark" data-bs-theme="dark" className="p-4">
       <Container>
-        <Navbar.Brand href="#home">{NAMA_WEBSITE}</Navbar.Brand>
+        <Navbar.Brand href="/">{NAMA_WEBSITE}</Navbar.Brand>
         <Nav className="me-auto">
           <Nav.Link href="/">Home</Nav.Link>
           <Nav.Link href="/books">Books</Nav.Link>
