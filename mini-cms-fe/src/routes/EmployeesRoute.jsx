@@ -1,5 +1,5 @@
-import EmployeeForm from "../pages/Employees/EmployeeForm";
-import Employees from "../pages/Employees/Employees";
+import EmployeeForm from "../pages/EmployeePages/EmployeeForm";
+import Employees from "../pages/EmployeePages/Employees";
 
 const EmployeesRoute = [
   {
@@ -16,7 +16,7 @@ const EmployeesRoute = [
   },
   {
     path: "/employees/:id/edit",
-    element: null,
+    element: <EmployeeForm type={"edit"} />,
   },
 ];
 

@@ -230,7 +230,7 @@ const MemberForm = ({ type }) => {
           </Row>
           <Row className="mb-3">
             <Col>
-              <Form.Group controlId="formFullNama">
+              <Form.Group controlId="formAddress">
                 <Form.Label className="fw-semibold">Address</Form.Label>
                 <Form.Control
                   as={"textarea"}

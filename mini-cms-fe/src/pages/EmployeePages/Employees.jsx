@@ -13,21 +13,44 @@ import { getEmployees } from "../../utils/Employees";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { getDepartments } from "../../utils/Departments";
+import Swal from "sweetalert2";
 
 const Employees = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
+  const [listDepartment, setListDepartment] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  //DELETE EMPLOYEE
+  const onDelete = (empNo) => {
+    let oldData = list;
+    let newData = oldData.filter((val) => val.empNo !== empNo);
+    localStorage.setItem("employees", JSON.stringify(newData));
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Employee deleted!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    setTimeout(() => {
+      setList(getEmployees());
+      navigate("/employees");
+    }, 1500);
+  };
 
   useEffect(() => {
     setList(getEmployees());
+    setListDepartment(getDepartments());
   }, []);
 
   useEffect(() => {
     if (list) {
       setTimeout(() => {
         setLoading(false);
-      }, 2000);
+      }, 1500);
     }
   }, [list]);
 
@@ -52,7 +75,6 @@ const Employees = () => {
         <Table striped bordered hover responsive="sm">
           <thead>
             <tr>
-              <th style={{ width: "5%" }}>No.</th>
               <th>Employee Number</th>
               <th>Name</th>
               <th>Department</th>
@@ -62,10 +84,15 @@ const Employees = () => {
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>{key + 1}</td>
-                <td>{val.title}</td>
-                <td>{val.author}</td>
-                <td>{val.category}</td>
+                <td>{val.empNo}</td>
+                <td>{`${val.fName}, ${val.lName}`}</td>
+                <td>
+                  {/** {val.deptNo
+                    ? listDepartment.find((ld) => ld.deptNo === val.deptNo)
+                        .deptName
+                    : "-"} */}
+                  {val.deptNo ? val.deptNo : "-"}
+                </td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -74,7 +101,7 @@ const Employees = () => {
                           as={Link}
                           variant="dark"
                           size="sm"
-                          to={`/employees/${val.id}`}
+                          to={`/employees/${val.empNo}`}
                         >
                           Details
                         </Button>
@@ -82,14 +109,14 @@ const Employees = () => {
                           as={Link}
                           variant="primary"
                           size="sm"
-                          to={`/employees/${val.id}/edit`}
+                          to={`/employees/${val.empNo}/edit`}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="danger"
                           size="sm"
-                          //onClick={() => onDelete(val.id)}
+                          onClick={() => onDelete(val.empNo)}
                         >
                           Delete
                         </Button>

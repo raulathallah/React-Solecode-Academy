@@ -36,7 +36,6 @@ const BookForm = ({ type }) => {
 
   const [list, setList] = useState([]);
   const [errors, setErrors] = useState(initialError);
-
   const [newBook, setNewBook] = useState(initialValue);
 
   useEffect(() => {
