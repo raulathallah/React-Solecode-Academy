@@ -14,52 +14,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getEmployees } from "../../utils/api/Employees";
+import { getProjects } from "../../utils/api/Projects";
+import { getWorksOn } from "../../utils/api/WorksOns";
 
-const Employees = () => {
+const Assignments = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
-  //const [listDepartment, setListDepartment] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const onTryDelete = (empNo) => {
-    Swal.fire({
-      title: `Are you sure want to delete Employee ${empNo}?`,
-      showDenyButton: true,
-      showCancelButton: false,
-      confirmButtonText: "Yes",
-      denyButtonText: `Cancel`,
-      customClass: {
-        confirmButton: "btn btn-primary",
-        denyButton: "btn btn-danger",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        onDelete(empNo);
-      }
-    });
-  };
-  //DELETE EMPLOYEE
-  const onDelete = (empNo) => {
+  //DELETE WORKS ON
+  const onDelete = (empNo, projNo) => {
     let oldData = list;
-    let newData = oldData.filter((val) => val.empNo !== empNo);
-    localStorage.setItem("employees", JSON.stringify(newData));
+    let newData = oldData.filter((val) => val.projNo !== projNo);
+    localStorage.setItem("worksOns", JSON.stringify(newData));
     Swal.fire({
       position: "center",
       icon: "success",
-      title: "Employee deleted!",
+      title: "Assignment deleted!",
       showConfirmButton: false,
       timer: 1500,
     });
 
     setTimeout(() => {
-      setList(getEmployees());
-      navigate("/employees");
+      setList(getWorksOn());
+      navigate("/assignments");
     }, 1500);
   };
 
   useEffect(() => {
-    setList(getEmployees());
-    //setListDepartment(getDepartments());
+    setList(getWorksOn());
   }, []);
 
   useEffect(() => {
@@ -76,39 +59,34 @@ const Employees = () => {
 
   return (
     <Card>
-      <Card.Header>Employee List</Card.Header>
+      <Card.Header>Assignment List</Card.Header>
       <Card.Body className="d-grid gap-2">
         <div>
           <ButtonCustom
             icon={<FontAwesomeIcon icon={faPlus} />}
             as={Link}
-            to={"/employees/new"}
+            to={"/assignments/new"}
             size="sm"
           >
-            Add Employee
+            Add Assignments
           </ButtonCustom>
         </div>
         <Table striped bordered hover responsive="sm">
           <thead>
             <tr>
               <th>Employee Number</th>
-              <th>Name</th>
-              <th>Department</th>
-              <th>Address</th>
+              <th>Project Number</th>
+              <th>Date Worked</th>
+              <th>Hours Worked</th>
             </tr>
           </thead>
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
                 <td>{val.empNo}</td>
-                <td>{`${val.fName}, ${val.lName}`}</td>
-                <td>
-                  {/** {val.deptNo
-                    ? listDepartment.find((ld) => ld.deptNo === val.deptNo)
-                        .deptName
-                    : "-"} */}
-                  {val.deptNo ? val.deptNo : "-"}
-                </td>
+                <td>{val.projNo}</td>
+                <td>{val.dateWorked}</td>
+                <td>{val.hoursWorked}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -117,7 +95,7 @@ const Employees = () => {
                           as={Link}
                           variant="dark"
                           size="sm"
-                          to={`/employees/${val.empNo}`}
+                          to={`/assignments/${val.empNo}/${val.projNo}`}
                         >
                           Details
                         </Button>
@@ -125,14 +103,14 @@ const Employees = () => {
                           as={Link}
                           variant="primary"
                           size="sm"
-                          to={`/employees/${val.empNo}/edit`}
+                          to={`/assignments/${val.empNo}/${val.projNo}/edit`}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="danger"
                           size="sm"
-                          onClick={() => onTryDelete(val.empNo)}
+                          onClick={() => onDelete(val.empNo, val.projNo)}
                         >
                           Delete
                         </Button>
@@ -149,4 +127,4 @@ const Employees = () => {
   );
 };
 
-export default Employees;
+export default Assignments;

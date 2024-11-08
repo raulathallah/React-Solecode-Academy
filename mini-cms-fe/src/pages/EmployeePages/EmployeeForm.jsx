@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Card, Col, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
-import { generateEmpNo, getEmployees } from "../../utils/Employees";
-import { getDepartments } from "../../utils/Departments";
+import { generateEmpNo, getEmployees } from "../../utils/api/Employees";
+import { getDepartments } from "../../utils/api/Departments";
 import Swal from "sweetalert2";
 
 const initialValue = {
@@ -57,10 +57,10 @@ const EmployeeForm = ({ type }) => {
   useEffect(() => {
     if (isSuccess) {
       let alertMessage = "";
-      if (type !== "add") {
-        alertMessage = "Employee updated!";
-      } else {
+      if (type === "add") {
         alertMessage = "Employee added!";
+      } else {
+        alertMessage = "Employee updated!";
       }
 
       Swal.fire({
@@ -140,7 +140,7 @@ const EmployeeForm = ({ type }) => {
       let departmentData = listDepartment.find(
         (val) => val.mgrEmpNo === parseInt(empNo)
       );
-      console.log(departmentData);
+
       if (departmentData) {
         let updatedDept = { ...departmentData, mgrEmpNo: null };
         let newData = listDepartment.map((val) =>

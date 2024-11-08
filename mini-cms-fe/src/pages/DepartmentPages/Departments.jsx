@@ -12,14 +12,13 @@ import Loading from "../../components/Elements/Loading";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { getDepartments } from "../../utils/Departments";
 import Swal from "sweetalert2";
-import { getEmployees } from "../../utils/Employees";
+import { getDepartments } from "../../utils/api/Departments";
 
 const Departments = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
-  const [listEmployee, setListEmployee] = useState([]);
+  //const [listEmployee, setListEmployee] = useState([]);
   const [loading, setLoading] = useState(true);
 
   //DELETE DEPARTMENTS
@@ -43,7 +42,7 @@ const Departments = () => {
 
   useEffect(() => {
     setList(getDepartments());
-    setListEmployee(getEmployees());
+    //setListEmployee(getEmployees());
   }, []);
 
   useEffect(() => {

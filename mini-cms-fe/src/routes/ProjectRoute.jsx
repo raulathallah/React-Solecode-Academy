@@ -1,11 +1,14 @@
+import ProjectForm from "../pages/ProjectPages/ProjectForm";
+import Projects from "../pages/ProjectPages/Projects";
+
 const ProjectRoute = [
   {
     path: "/projects",
-    element: null,
+    element: <Projects />,
   },
   {
     path: "/projects/new",
-    element: null,
+    element: <ProjectForm type={"add"} />,
   },
   {
     path: "/projects/:id",
@@ -13,7 +16,7 @@ const ProjectRoute = [
   },
   {
     path: "/projects/:id/edit",
-    element: null,
+    element: <ProjectForm type={"edit"} />,
   },
 ];
 

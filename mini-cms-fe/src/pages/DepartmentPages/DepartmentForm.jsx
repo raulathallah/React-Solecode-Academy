@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Card, Col, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
-import { getEmployees } from "../../utils/Employees";
-import { generateDeptNo, getDepartments } from "../../utils/Departments";
+import { getEmployees } from "../../utils/api/Employees";
+import { generateDeptNo, getDepartments } from "../../utils/api/Departments";
 import Swal from "sweetalert2";
 
 const initialValue = {
@@ -49,10 +49,10 @@ const DepartmentForm = ({ type }) => {
   useEffect(() => {
     if (isSuccess) {
       let alertMessage = "";
-      if (type !== "add") {
-        alertMessage = "Department updated!";
-      } else {
+      if (type === "add") {
         alertMessage = "Department added!";
+      } else {
+        alertMessage = "Department updated!";
       }
 
       Swal.fire({
@@ -117,7 +117,7 @@ const DepartmentForm = ({ type }) => {
       mgrEmpNo: manager,
     };
 
-    let valid = Validate(departmentData);
+    let valid = Validate(departmentDataAddId);
 
     if (valid) {
       let newData = [...listDepartment, departmentDataAddId];
@@ -233,7 +233,7 @@ const DepartmentForm = ({ type }) => {
                       </option>
                     ))}
                 </Form.Select>
-                {errors.deptNo && <small>{errors.deptNo}</small>}
+                {errors.mgrEmpNo && <small>{errors.mgrEmpNo}</small>}
               </Form.Group>
             </Col>
           </Row>
