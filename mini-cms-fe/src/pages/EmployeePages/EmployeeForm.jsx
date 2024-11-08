@@ -311,7 +311,7 @@ const EmployeeForm = ({ type }) => {
                   value={employeeData.deptNo}
                   size="sm"
                 >
-                  <option disabled value={0} />
+                  <option disabled value={0} hidden />
                   {listDepartment.map((val) => (
                     <option key={val.deptNo} value={val.deptNo}>
                       {val.deptName}

@@ -4,21 +4,29 @@ import {
   ButtonGroup,
   Card,
   Container,
+  OverlayTrigger,
   Row,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/Elements/Loading";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faHistory,
+  faList,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getEmployees } from "../../utils/api/Employees";
+import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
 
 const Employees = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
-  //const [listDepartment, setListDepartment] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const onTryDelete = (empNo) => {
@@ -59,7 +67,6 @@ const Employees = () => {
 
   useEffect(() => {
     setList(getEmployees());
-    //setListDepartment(getDepartments());
   }, []);
 
   useEffect(() => {
@@ -94,7 +101,7 @@ const Employees = () => {
               <th>Employee Number</th>
               <th>Name</th>
               <th>Department</th>
-              <th>Address</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -102,40 +109,48 @@ const Employees = () => {
               <tr key={key}>
                 <td>{val.empNo}</td>
                 <td>{`${val.fName}, ${val.lName}`}</td>
-                <td>
-                  {/** {val.deptNo
-                    ? listDepartment.find((ld) => ld.deptNo === val.deptNo)
-                        .deptName
-                    : "-"} */}
-                  {val.deptNo ? val.deptNo : "-"}
-                </td>
+                <td>{getDepartmentName(val.deptNo)}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
                       <ButtonGroup aria-label="Basic example">
-                        <Button
-                          as={Link}
-                          variant="dark"
-                          size="sm"
-                          to={`/employees/${val.empNo}`}
+                        <OverlayTrigger overlay={<Tooltip>Details</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="dark"
+                            to={`/employees/${val.empNo}`}
+                          >
+                            <FontAwesomeIcon icon={faList} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          overlay={<Tooltip>Work History</Tooltip>}
                         >
-                          Details
-                        </Button>
-                        <Button
-                          as={Link}
-                          variant="primary"
-                          size="sm"
-                          to={`/employees/${val.empNo}/edit`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => onTryDelete(val.empNo)}
-                        >
-                          Delete
-                        </Button>
+                          <Button
+                            as={Link}
+                            variant="secondary"
+                            to={`/employees/${val.empNo}/history`}
+                          >
+                            <FontAwesomeIcon icon={faHistory} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            to={`/employees/${val.empNo}/edit`}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                          <Button
+                            variant="danger"
+                            onClick={() => onTryDelete(val.empNo)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </OverlayTrigger>
                       </ButtonGroup>
                     </Row>
                   </Container>

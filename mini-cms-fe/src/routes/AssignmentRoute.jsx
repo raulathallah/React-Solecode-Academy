@@ -1,5 +1,6 @@
-import AssignmentForm from "../pages/Assignments/AssignmentForm";
-import Assignments from "../pages/Assignments/Assignments";
+import AssignmentDetail from "../pages/AssignmentPages/AssignmentDetail";
+import AssignmentForm from "../pages/AssignmentPages/AssignmentForm";
+import Assignments from "../pages/AssignmentPages/Assignments";
 
 const AssignmentRoute = [
   {
@@ -11,8 +12,8 @@ const AssignmentRoute = [
     element: <AssignmentForm type={"add"} />,
   },
   {
-    path: "/assignments/:empNo/:projNo",
-    element: null,
+    path: "/assignments/:empNo/:projNo/:dateWorked",
+    element: <AssignmentDetail />,
   },
   {
     path: "/assignments/:empNo/:projNo/edit",

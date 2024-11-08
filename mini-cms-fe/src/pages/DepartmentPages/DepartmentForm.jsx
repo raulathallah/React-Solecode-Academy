@@ -70,9 +70,20 @@ const DepartmentForm = ({ type }) => {
 
   useEffect(() => {
     if (deptNo) {
-      setDepartmentData(
-        getDepartments().find((val) => val.deptNo === parseInt(deptNo))
+      let deptData = getDepartments().find(
+        (val) => val.deptNo === parseInt(deptNo)
       );
+
+      if (deptData) {
+        let empData = getEmployees().find(
+          (val) => val.empNo === deptData.mgrEmpNo
+        );
+        if (empData) {
+          setDepartmentData(deptData);
+        } else {
+          setDepartmentData({ ...deptData, mgrEmpNo: null });
+        }
+      }
     }
   }, [deptNo]);
 
@@ -218,15 +229,10 @@ const DepartmentForm = ({ type }) => {
                   value={departmentData.mgrEmpNo ? departmentData.mgrEmpNo : 0}
                   size="sm"
                 >
-                  <option disabled value={0} />
+                  <option disabled value={0} hidden />
                   {listEmployee
-                    .filter(
-                      (x) =>
-                        x.position.toLowerCase() === "manager" &&
-                        !listDepartment
-                          .map((ld) => ld.mgrEmpNo)
-                          .find((y) => y === x.empNo)
-                    )
+                    .filter((x) => x.position.toLowerCase() === "manager")
+                    .filter((x) => x.deptNo === departmentData.deptNo)
                     .map((val) => (
                       <option key={val.empNo} value={val.empNo}>
                         {`${val.fName}, ${val.lName}`}

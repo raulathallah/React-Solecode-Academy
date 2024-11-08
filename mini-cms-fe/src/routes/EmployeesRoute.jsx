@@ -1,5 +1,7 @@
+import EmployeeDetail from "../pages/EmployeePages/EmployeeDetail";
 import EmployeeForm from "../pages/EmployeePages/EmployeeForm";
 import Employees from "../pages/EmployeePages/Employees";
+import EmployeeWorkHistory from "../pages/EmployeePages/EmployeeWorkHistory";
 
 const EmployeesRoute = [
   {
@@ -12,7 +14,11 @@ const EmployeesRoute = [
   },
   {
     path: "/employees/:id",
-    element: null,
+    element: <EmployeeDetail />,
+  },
+  {
+    path: "/employees/:id/history",
+    element: <EmployeeWorkHistory />,
   },
   {
     path: "/employees/:id/edit",

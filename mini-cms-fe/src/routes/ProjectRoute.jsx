@@ -1,5 +1,7 @@
+import ProjectDetail from "../pages/ProjectPages/ProjectDetail";
 import ProjectForm from "../pages/ProjectPages/ProjectForm";
 import Projects from "../pages/ProjectPages/Projects";
+import ProjectWorkHistory from "../pages/ProjectPages/ProjectWorkHistory";
 
 const ProjectRoute = [
   {
@@ -12,7 +14,11 @@ const ProjectRoute = [
   },
   {
     path: "/projects/:id",
-    element: null,
+    element: <ProjectDetail />,
+  },
+  {
+    path: "/projects/:id/history",
+    element: <ProjectWorkHistory />,
   },
   {
     path: "/projects/:id/edit",

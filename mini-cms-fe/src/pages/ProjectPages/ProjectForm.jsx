@@ -99,7 +99,7 @@ const ProjectForm = ({ type }) => {
     navigate(-1);
   };
 
-  //ADD DEPARTMENT
+  //ADD PROJECT
   const onAdd = (e) => {
     e.preventDefault();
     let newId = generateProjNo();
@@ -120,7 +120,7 @@ const ProjectForm = ({ type }) => {
     }
   };
 
-  //EDIT DEPARTMENT
+  //EDIT PROJECT
   const onEdit = (e) => {
     e.preventDefault();
 
@@ -139,11 +139,19 @@ const ProjectForm = ({ type }) => {
     }
   };
 
-  //VALIDATE DEPARTMENT
+  //VALIDATE PROJECT
   const Validate = (newProj) => {
     let errorMessages = {};
-    console.log(newProj);
 
+    //-- projName
+    if (!newProj.projName) {
+      errorMessages.projName = `Project name must be filled!`;
+    }
+
+    //-- deptNo
+    if (!newProj.deptNo) {
+      errorMessages.deptNo = `Department must be filled!`;
+    }
     setErrors(errorMessages);
 
     let formValid = true;

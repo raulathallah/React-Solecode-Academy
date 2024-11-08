@@ -4,21 +4,28 @@ import {
   ButtonGroup,
   Card,
   Container,
+  OverlayTrigger,
   Row,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/Elements/Loading";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faList,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getDepartments } from "../../utils/api/Departments";
+import { getEmployeeName } from "../../utils/helpers/HelperFunctions";
 
 const Departments = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
-  //const [listEmployee, setListEmployee] = useState([]);
   const [loading, setLoading] = useState(true);
 
   //DELETE DEPARTMENTS
@@ -42,7 +49,6 @@ const Departments = () => {
 
   useEffect(() => {
     setList(getDepartments());
-    //setListEmployee(getEmployees());
   }, []);
 
   useEffect(() => {
@@ -77,6 +83,7 @@ const Departments = () => {
               <th>Department Number</th>
               <th>Department Name</th>
               <th>Manager</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -84,48 +91,38 @@ const Departments = () => {
               <tr key={key}>
                 <td>{val.deptNo}</td>
                 <td>{val.deptName}</td>
-                <td>
-                  {/** 
-                   * {val.mgrEmpNo
-                    ? `${
-                        listEmployee.find((ld) => ld.empNo === val.mgrEmpNo)
-                          .fName
-                      }, ${
-                        listEmployee.find((ld) => ld.empNo === val.mgrEmpNo)
-                          .lName
-                      } `
-                    : "-"} 
-                  */}
-                  {val.mgrEmpNo ? val.mgrEmpNo : "-"}
-                </td>
+                <td>{getEmployeeName(val.mgrEmpNo)}</td>
 
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
                       <ButtonGroup aria-label="Basic example">
-                        <Button
-                          as={Link}
-                          variant="dark"
-                          size="sm"
-                          to={`/departments/${val.deptNo}`}
-                        >
-                          Details
-                        </Button>
-                        <Button
-                          as={Link}
-                          variant="primary"
-                          size="sm"
-                          to={`/departments/${val.deptNo}/edit`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => onDelete(val.deptNo)}
-                        >
-                          Delete
-                        </Button>
+                        <OverlayTrigger overlay={<Tooltip>Details</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="dark"
+                            to={`/departments/${val.deptNo}`}
+                          >
+                            <FontAwesomeIcon icon={faList} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            to={`/departments/${val.deptNo}/edit`}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                          <Button
+                            variant="danger"
+                            onClick={() => onDelete(val.deptNo)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </OverlayTrigger>
                       </ButtonGroup>
                     </Row>
                   </Container>

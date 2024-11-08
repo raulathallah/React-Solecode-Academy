@@ -4,16 +4,25 @@ import {
   ButtonGroup,
   Card,
   Container,
+  OverlayTrigger,
   Row,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/Elements/Loading";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faHistory,
+  faList,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getProjects } from "../../utils/api/Projects";
+import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -75,6 +84,7 @@ const Projects = () => {
               <th>Project Number</th>
               <th>Project Name</th>
               <th>Department</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -82,34 +92,48 @@ const Projects = () => {
               <tr key={key}>
                 <td>{val.projNo}</td>
                 <td>{val.projName}</td>
-                <td>{val.deptNo ? val.deptNo : "-"}</td>
+                <td>{getDepartmentName(val.deptNo)}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
                       <ButtonGroup aria-label="Basic example">
-                        <Button
-                          as={Link}
-                          variant="dark"
-                          size="sm"
-                          to={`/projects/${val.projNo}`}
+                        <OverlayTrigger overlay={<Tooltip>Details</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="dark"
+                            to={`/projects/${val.projNo}`}
+                          >
+                            <FontAwesomeIcon icon={faList} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          overlay={<Tooltip>Work History</Tooltip>}
                         >
-                          Details
-                        </Button>
-                        <Button
-                          as={Link}
-                          variant="primary"
-                          size="sm"
-                          to={`/projects/${val.projNo}/edit`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => onDelete(val.projNo)}
-                        >
-                          Delete
-                        </Button>
+                          <Button
+                            as={Link}
+                            variant="secondary"
+                            to={`/projects/${val.projNo}/history`}
+                          >
+                            <FontAwesomeIcon icon={faHistory} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            to={`/projects/${val.projNo}/edit`}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                          <Button
+                            variant="danger"
+                            onClick={() => onDelete(val.projNo)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </OverlayTrigger>
                       </ButtonGroup>
                     </Row>
                   </Container>

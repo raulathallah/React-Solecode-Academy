@@ -139,6 +139,25 @@ const AssignmentForm = ({ type }) => {
   const Validate = (newWorksOn) => {
     let errorMessages = {};
 
+    //-- empNo
+    if (!newWorksOn.empNo) {
+      errorMessages.empNo = `Employee must be filled!`;
+    }
+
+    //-- projNo
+    if (!newWorksOn.projNo) {
+      errorMessages.projNo = `Project must be filled!`;
+    }
+
+    //-- dateWorked
+    if (!newWorksOn.dateWorked) {
+      errorMessages.dateWorked = `Date worked must be filled!`;
+    }
+
+    //-- hoursWorked
+    if (!newWorksOn.hoursWorked || newWorksOn.hoursWorked === 0) {
+      errorMessages.hoursWorked = `Hours worked must be greater than 0!`;
+    }
     setErrors(errorMessages);
 
     let formValid = true;
@@ -173,7 +192,7 @@ const AssignmentForm = ({ type }) => {
                   value={worksOnData.empNo ? worksOnData.empNo : 0}
                   size="sm"
                 >
-                  <option disabled value={0} />
+                  <option disabled value={0} hidden />
                   {listEmployee.map((val) => (
                     <option key={val.empNo} value={val.empNo}>
                       {`${val.fName}, ${val.lName}`}
@@ -197,7 +216,7 @@ const AssignmentForm = ({ type }) => {
                   value={worksOnData.projNo ? worksOnData.projNo : 0}
                   size="sm"
                 >
-                  <option disabled value={0} />
+                  <option disabled value={0} hidden />
                   {listProject.map((val) => (
                     <option key={val.projNo} value={val.projNo}>
                       {val.projName}

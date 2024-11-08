@@ -4,18 +4,27 @@ import {
   ButtonGroup,
   Card,
   Container,
+  OverlayTrigger,
   Row,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../components/Elements/Loading";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faList,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getEmployees } from "../../utils/api/Employees";
-import { getProjects } from "../../utils/api/Projects";
 import { getWorksOn } from "../../utils/api/WorksOns";
+import {
+  getEmployeeName,
+  getProjectName,
+} from "../../utils/helpers/HelperFunctions";
 
 const Assignments = () => {
   const navigate = useNavigate();
@@ -23,9 +32,8 @@ const Assignments = () => {
   const [loading, setLoading] = useState(true);
 
   //DELETE WORKS ON
-  const onDelete = (empNo, projNo) => {
-    let oldData = list;
-    let newData = oldData.filter((val) => val.projNo !== projNo);
+  const onDelete = (worksOn) => {
+    let newData = list.filter((val) => val !== worksOn);
     localStorage.setItem("worksOns", JSON.stringify(newData));
     Swal.fire({
       position: "center",
@@ -74,46 +82,47 @@ const Assignments = () => {
         <Table striped bordered hover responsive="sm">
           <thead>
             <tr>
-              <th>Employee Number</th>
-              <th>Project Number</th>
+              <th>Employee</th>
+              <th>Project</th>
               <th>Date Worked</th>
-              <th>Hours Worked</th>
             </tr>
           </thead>
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>{val.empNo}</td>
-                <td>{val.projNo}</td>
+                <td>{getEmployeeName(val.empNo)}</td>
+                <td>{getProjectName(val.projNo)}</td>
                 <td>{val.dateWorked}</td>
-                <td>{val.hoursWorked}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
                       <ButtonGroup aria-label="Basic example">
-                        <Button
-                          as={Link}
-                          variant="dark"
-                          size="sm"
-                          to={`/assignments/${val.empNo}/${val.projNo}`}
-                        >
-                          Details
-                        </Button>
-                        <Button
-                          as={Link}
-                          variant="primary"
-                          size="sm"
-                          to={`/assignments/${val.empNo}/${val.projNo}/edit`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => onDelete(val.empNo, val.projNo)}
-                        >
-                          Delete
-                        </Button>
+                        <OverlayTrigger overlay={<Tooltip>Detail</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="dark"
+                            to={`/assignments/${val.empNo}/${val.projNo}/${val.dateWorked}`}
+                          >
+                            <FontAwesomeIcon icon={faList} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            to={`/assignments/${val.empNo}/${val.projNo}/edit`}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                          <Button
+                            variant="danger"
+                            onClick={() => onDelete(val)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </OverlayTrigger>
                       </ButtonGroup>
                     </Row>
                   </Container>
