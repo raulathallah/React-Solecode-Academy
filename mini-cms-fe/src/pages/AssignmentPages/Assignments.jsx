@@ -31,6 +31,24 @@ const Assignments = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const onTryDelete = (worksOn) => {
+    Swal.fire({
+      title: `Are you sure want to delete assigments?`,
+      text: `Employee Number: ${worksOn.empNo}, Project Number: ${worksOn.projNo}`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "Yes",
+      denyButtonText: `Cancel`,
+      customClass: {
+        confirmButton: "btn btn-primary",
+        denyButton: "btn btn-danger",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete(worksOn);
+      }
+    });
+  };
   //DELETE WORKS ON
   const onDelete = (worksOn) => {
     let newData = list.filter((val) => val !== worksOn);
@@ -118,7 +136,7 @@ const Assignments = () => {
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
                           <Button
                             variant="danger"
-                            onClick={() => onDelete(val)}
+                            onClick={() => onTryDelete(val)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>

@@ -29,6 +29,24 @@ const Projects = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const onTryDelete = (projNo) => {
+    Swal.fire({
+      title: `Are you sure want to delete project?`,
+      text: `Project Number: ${projNo}`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "Yes",
+      denyButtonText: `Cancel`,
+      customClass: {
+        confirmButton: "btn btn-primary",
+        denyButton: "btn btn-danger",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete(projNo);
+      }
+    });
+  };
   //DELETE PROJECT
   const onDelete = (projNo) => {
     let oldData = list;
@@ -129,7 +147,7 @@ const Projects = () => {
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
                           <Button
                             variant="danger"
-                            onClick={() => onDelete(val.projNo)}
+                            onClick={() => onTryDelete(val.projNo)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>

@@ -31,7 +31,8 @@ const Employees = () => {
 
   const onTryDelete = (empNo) => {
     Swal.fire({
-      title: `Are you sure want to delete Employee ${empNo}?`,
+      title: `Are you sure want to delete Employee?`,
+      text: `Employee Number: ${empNo}`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: "Yes",

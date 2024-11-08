@@ -28,6 +28,24 @@ const Departments = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const onTryDelete = (deptNo) => {
+    Swal.fire({
+      title: `Are you sure want to delete Department?`,
+      text: `Department Number: ${deptNo}`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "Yes",
+      denyButtonText: `Cancel`,
+      customClass: {
+        confirmButton: "btn btn-primary",
+        denyButton: "btn btn-danger",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete(deptNo);
+      }
+    });
+  };
   //DELETE DEPARTMENTS
   const onDelete = (deptNo) => {
     let oldData = list;
@@ -118,7 +136,7 @@ const Departments = () => {
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
                           <Button
                             variant="danger"
-                            onClick={() => onDelete(val.deptNo)}
+                            onClick={() => onTryDelete(val.deptNo)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
