@@ -166,14 +166,14 @@ const Home = () => {
       <button onClick={updateUser}>UPDATE USER</button>
       <button onClick={deleteUser}>DELETE USER</button>
 
-      {/* <p className="d-flex gap-2">
+      <p className="d-flex gap-2">
         Total Books available:
         <span className="fw-bold">{getBooks().length}</span>
       </p>
       <p className="d-flex gap-2">
         Total Member available:
         <span className="fw-bold">{getMembers().length}</span>
-      </p> */}
+      </p>
     </div>
   );
 };
