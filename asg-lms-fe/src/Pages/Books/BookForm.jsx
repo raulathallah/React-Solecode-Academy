@@ -3,25 +3,20 @@ import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { generateBookId, getBooks } from "../../utils/Books";
-import { categories } from "../../utils/Categories";
+import { getBook, updateBook } from "../../api/Books";
 
 const initialValue = {
-  id: 0,
   title: "",
   author: "",
-  category: categories[0],
-  year: new Date().getFullYear(),
+  publicationyear: new Date().getFullYear(),
   isbn: "",
-  isAvailable: false,
 };
 
 const initialError = {
   title: "",
   author: "",
-  year: "",
+  publicationyear: "",
   isbn: "",
-  category: "",
-  isAvailable: "",
 };
 
 const BookForm = ({ type }) => {
@@ -34,19 +29,23 @@ const BookForm = ({ type }) => {
   }, [type]);
   const { id } = useParams();
 
-  const [list, setList] = useState([]);
   const [errors, setErrors] = useState(initialError);
   const [newBook, setNewBook] = useState(initialValue);
 
+  //GET BOOK
   useEffect(() => {
     if (id) {
-      setNewBook(getBooks().find((val) => val.id === parseInt(id)));
+      getBook(
+        id,
+        (res) => {
+          setNewBook(res.data);
+        },
+        (err) => {
+          console.log(err.message);
+        }
+      );
     }
   }, [id]);
-
-  useEffect(() => {
-    setList(getBooks());
-  }, []);
 
   //CLEAR FORM
   const clearForm = () => {
@@ -129,13 +128,12 @@ const BookForm = ({ type }) => {
   //EDIT BOOK
   const onEdit = (e) => {
     e.preventDefault();
-    let oldData = list;
-    let updatedBook = { ...newBook, id: parseInt(id) };
-
-    let newData = oldData.map((val) =>
-      val.id === parseInt(id) ? updatedBook : val
+    updateBook(
+      id,
+      newBook,
+      (res) => console.log(res),
+      (err) => console.log(err)
     );
-    localStorage.setItem("books", JSON.stringify(newData));
     alert("Book Updated!");
     navigate("/books");
     clearForm();
@@ -196,37 +194,20 @@ const BookForm = ({ type }) => {
           </Row>
           <Row className="mb-3">
             <Col>
-              <Form.Group controlId="formCategory">
-                <Form.Label className="fw-semibold">Category</Form.Label>
-
-                <Form.Select
-                  onChange={(e) => onChangeValue("category", e)}
-                  isInvalid={errors.category}
-                >
-                  {categories.map((val) => (
-                    <option key={val} value={val}>
-                      {val}
-                    </option>
-                  ))}
-                </Form.Select>
-                {errors.category && <small>{errors.category}</small>}
-              </Form.Group>
-            </Col>
-            <Col>
               <Form.Group controlId="formYear">
                 <Form.Label className="fw-semibold">Year</Form.Label>
                 <Form.Control
                   type="number"
-                  value={newBook.year}
+                  value={newBook.publicationyear}
                   size="sm"
                   onChange={(e) => onChangeValue("year", e)}
-                  isInvalid={errors.year}
+                  isInvalid={errors.publicationyear}
                 />
-                {errors.year && <small>{errors.year}</small>}
+                {errors.publicationyear && (
+                  <small>{errors.publicationyear}</small>
+                )}
               </Form.Group>
             </Col>
-          </Row>
-          <Row className="mb-3">
             <Col>
               <Form.Group controlId="formIsbn">
                 <Form.Label className="fw-semibold">ISBN</Form.Label>
@@ -240,25 +221,8 @@ const BookForm = ({ type }) => {
                 {errors.isbn && <small>{errors.isbn}</small>}
               </Form.Group>
             </Col>
-            <Col>
-              <Form.Group
-                controlId="formIsAvailable"
-                className="d-grid align-items-center"
-              >
-                <Form.Label className="fw-semibold">Availability</Form.Label>
-                <Form.Check
-                  inline
-                  label="Available"
-                  name="group1"
-                  type="checkbox"
-                  checked={newBook.isAvailable}
-                  id={`checkbox-1`}
-                  onChange={(e) => onChangeValue("isAvailable", e)}
-                />
-                {errors.isAvailable && <small>{errors.isAvailable}</small>}
-              </Form.Group>
-            </Col>
           </Row>
+          <Row className="mb-3"></Row>
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
