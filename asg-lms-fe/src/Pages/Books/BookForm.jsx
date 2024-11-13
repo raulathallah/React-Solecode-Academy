@@ -2,8 +2,8 @@
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { generateBookId, getBooks } from "../../utils/Books";
-import { getBook, updateBook } from "../../api/Books";
+import { addBook, getAllBook, getBook, updateBook } from "../../api/Books";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   title: "",
@@ -31,6 +31,8 @@ const BookForm = ({ type }) => {
 
   const [errors, setErrors] = useState(initialError);
   const [newBook, setNewBook] = useState(initialValue);
+  const [loading, setLoading] = useState(true);
+  const [list, setList] = useState([]);
 
   //GET BOOK
   useEffect(() => {
@@ -47,6 +49,18 @@ const BookForm = ({ type }) => {
     }
   }, [id]);
 
+  //GET BOOKS
+  useEffect(() => {
+    getAllBook(
+      (res) => {
+        setList(res.data);
+      },
+      (err) => {
+        console.log(err.message);
+      }
+    );
+  }, []);
+
   //CLEAR FORM
   const clearForm = () => {
     setNewBook(initialValue);
@@ -55,20 +69,16 @@ const BookForm = ({ type }) => {
   //ADD BOOK
   const onAdd = (e) => {
     e.preventDefault();
-    let newId = generateBookId();
-    let bookAddId = { ...newBook, id: newId };
-    let oldData = getBooks();
-    let newData = [...oldData, bookAddId];
-
-    let valid = ValidateBook(oldData, newBook);
-
+    let valid = ValidateBook(list, newBook);
     if (valid) {
-      localStorage.setItem("books", JSON.stringify(newData));
+      addBook(
+        newBook,
+        (res) => console.log(res),
+        (err) => console.log(err)
+      );
       alert("Book Added!");
       navigate("/books");
       clearForm();
-    } else {
-      localStorage.setItem("bookId", newId - 1);
     }
   };
 
@@ -97,20 +107,15 @@ const BookForm = ({ type }) => {
     }
 
     //-- year
-    if (!book.year) {
-      errorMessages.year = "Publication year must be filled!";
-    } else if (book.year < 1900 || book.year > yearNow) {
-      errorMessages.year = `Must be a valid year! (1900-${yearNow})`;
+    if (!book.publicationyear) {
+      errorMessages.publicationyear = "Publication year must be filled!";
+    } else if (book.publicationyear < 1900 || book.publicationyear > yearNow) {
+      errorMessages.publicationyear = `Must be a valid year! (1900-${yearNow})`;
     }
 
     //-- author
     if (!book.author) {
       errorMessages.author = "Author must be filled!";
-    }
-
-    //-- category
-    if (!book.category) {
-      errorMessages.category = "Category must be choosen!";
     }
 
     setErrors(errorMessages);
@@ -158,72 +163,86 @@ const BookForm = ({ type }) => {
   const onCancel = () => {
     navigate(-1);
   };
+
+  //SET LOADING STATE
+  useEffect(() => {
+    if (newBook || list) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    }
+  }, [newBook, list]);
+
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
         <Card.Header>{type === "add" ? "Add Book" : "Edit Book"}</Card.Header>
-        <Card.Body>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group controlId="formTitle">
-                <Form.Label className="fw-semibold">Title</Form.Label>
-                <Form.Control
-                  ref={inputFocus}
-                  type="text"
-                  value={newBook.title}
-                  size="sm"
-                  onChange={(e) => onChangeValue("title", e)}
-                  isInvalid={errors.title}
-                />
-                {errors.title && <small>{errors.title}</small>}
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="formAuthor">
-                <Form.Label className="fw-semibold">Author</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newBook.author}
-                  size="sm"
-                  onChange={(e) => onChangeValue("author", e)}
-                  isInvalid={errors.author}
-                />
-                {errors.author && <small>{errors.author}</small>}
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group controlId="formYear">
-                <Form.Label className="fw-semibold">Year</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={newBook.publicationyear}
-                  size="sm"
-                  onChange={(e) => onChangeValue("year", e)}
-                  isInvalid={errors.publicationyear}
-                />
-                {errors.publicationyear && (
-                  <small>{errors.publicationyear}</small>
-                )}
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="formIsbn">
-                <Form.Label className="fw-semibold">ISBN</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newBook.isbn}
-                  size="sm"
-                  onChange={(e) => onChangeValue("isbn", e)}
-                  isInvalid={errors.isbn}
-                />
-                {errors.isbn && <small>{errors.isbn}</small>}
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3"></Row>
-        </Card.Body>
+        {loading ? (
+          <Loading />
+        ) : (
+          <Card.Body>
+            <Row className="mb-3">
+              <Col>
+                <Form.Group controlId="formTitle">
+                  <Form.Label className="fw-semibold">Title</Form.Label>
+                  <Form.Control
+                    ref={inputFocus}
+                    type="text"
+                    value={newBook.title}
+                    size="sm"
+                    onChange={(e) => onChangeValue("title", e)}
+                    isInvalid={errors.title}
+                  />
+                  {errors.title && <small>{errors.title}</small>}
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group controlId="formAuthor">
+                  <Form.Label className="fw-semibold">Author</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={newBook.author}
+                    size="sm"
+                    onChange={(e) => onChangeValue("author", e)}
+                    isInvalid={errors.author}
+                  />
+                  {errors.author && <small>{errors.author}</small>}
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col>
+                <Form.Group controlId="formYear">
+                  <Form.Label className="fw-semibold">Year</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={newBook.publicationyear}
+                    size="sm"
+                    onChange={(e) => onChangeValue("publicationyear", e)}
+                    isInvalid={errors.publicationyear}
+                  />
+                  {errors.publicationyear && (
+                    <small>{errors.publicationyear}</small>
+                  )}
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group controlId="formIsbn">
+                  <Form.Label className="fw-semibold">ISBN</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={newBook.isbn}
+                    size="sm"
+                    onChange={(e) => onChangeValue("isbn", e)}
+                    isInvalid={errors.isbn}
+                  />
+                  {errors.isbn && <small>{errors.isbn}</small>}
+                </Form.Group>
+              </Col>
+            </Row>
+          </Card.Body>
+        )}
+
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
             {type !== "edit" ? (

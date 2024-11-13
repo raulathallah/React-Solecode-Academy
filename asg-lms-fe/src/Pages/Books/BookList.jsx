@@ -11,7 +11,7 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Elements/Loading";
-import { getAllBook } from "../../api/Books";
+import { deleteBook, getAllBook } from "../../api/Books";
 
 const BookList = () => {
   const navigate = useNavigate();
@@ -20,9 +20,21 @@ const BookList = () => {
 
   //DELETE BOOK
   const onDelete = (id) => {
-    //let oldData = getBooks();
-    //let newData = oldData.filter((val) => val.id !== id);
-    //localStorage.setItem("books", JSON.stringify(newData));
+    deleteBook(
+      id,
+      (res) => console.log(res),
+      (err) => console.log(err)
+    );
+    setTimeout(() => {
+      getAllBook(
+        (res) => {
+          setList(res.data);
+        },
+        (err) => {
+          console.log(err.message);
+        }
+      );
+    }, 1500);
     alert("Book Deleted!");
     navigate("/books");
   };

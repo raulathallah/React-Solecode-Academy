@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const getAllBook = (callback, errorcallback, config) => {
+const getAllUser = (callback, errorcallback, config) => {
   axios
-    .get(`http://localhost/api/books`, config)
+    .get(`http://localhost/api/users`, config)
     .then((res) => {
       if (callback != null) {
         callback(res);
@@ -15,9 +15,9 @@ const getAllBook = (callback, errorcallback, config) => {
     });
 };
 
-const getBook = (id, callback, errorcallback, config) => {
+const getUser = (id, callback, errorcallback, config) => {
   axios
-    .get(`http://localhost/api/books/${id}`, config)
+    .get(`http://localhost/api/users/${id}`, config)
     .then((res) => {
       if (callback != null) {
         callback(res);
@@ -30,9 +30,9 @@ const getBook = (id, callback, errorcallback, config) => {
     });
 };
 
-const updateBook = (id, body, callback, errorcallback, config) => {
+const updateUser = (id, body, callback, errorcallback, config) => {
   axios
-    .put(`http://localhost/api/books/${id}`, body, config)
+    .put(`http://localhost/api/users/${id}`, body, config)
     .then((res) => {
       if (callback != null) {
         callback(res);
@@ -45,9 +45,9 @@ const updateBook = (id, body, callback, errorcallback, config) => {
     });
 };
 
-const addBook = (body, callback, errorcallback, config) => {
+const addUser = (body, callback, errorcallback, config) => {
   axios
-    .post(`http://localhost/api/books`, body, config)
+    .post(`http://localhost/api/users`, body, config)
     .then((res) => {
       if (callback != null) {
         callback(res);
@@ -60,9 +60,9 @@ const addBook = (body, callback, errorcallback, config) => {
     });
 };
 
-const deleteBook = (id, callback, errorcallback, config) => {
+const deleteUser = (id, callback, errorcallback, config) => {
   axios
-    .delete(`http://localhost/api/books/${id}`, config)
+    .delete(`http://localhost/api/users/${id}`, config)
     .then((res) => {
       if (callback != null) {
         callback(res);
@@ -75,4 +75,4 @@ const deleteBook = (id, callback, errorcallback, config) => {
     });
 };
 
-export { getAllBook, getBook, updateBook, addBook, deleteBook };
+export { getAllUser, getUser, updateUser, addUser, deleteUser };

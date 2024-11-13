@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { getMembers } from "../../utils/Members";
 import Loading from "../../components/Elements/Loading";
+import { getUser } from "../../api/Users";
 
 const MemberDetail = () => {
   const { id } = useParams();
@@ -10,12 +10,21 @@ const MemberDetail = () => {
   const [detail, setDetail] = useState({});
   const [loading, setLoading] = useState(true);
 
+  //GET USER
   useEffect(() => {
     if (id) {
-      let member = getMembers().find((val) => val.id === parseInt(id));
-      setDetail(member);
+      getUser(
+        id,
+        (res) => {
+          setDetail(res.data);
+        },
+        (err) => {
+          console.log(err.message);
+        }
+      );
     }
   }, [id]);
+
   //ON CANCEL
   const onCancel = () => {
     navigate(-1);
@@ -25,50 +34,37 @@ const MemberDetail = () => {
     if (detail) {
       setTimeout(() => {
         setLoading(false);
-      }, 2000);
+      }, 1500);
     }
   }, [detail]);
 
-  if (loading) {
-    return <Loading />;
-  }
   return (
     <Card>
       <Card.Header>Member Details</Card.Header>
-      <Card.Body className="d-grid gap-4">
-        <Row className="mb-3">
-          <Col>
-            <Card.Subtitle>Member ID</Card.Subtitle>
-            <Card.Text>{detail.id}</Card.Text>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <Card.Subtitle>Full Name</Card.Subtitle>
-            <Card.Text>{detail.fullName}</Card.Text>
-          </Col>
-          <Col>
-            <Card.Subtitle>Email</Card.Subtitle>
-            <Card.Text>{detail.email}</Card.Text>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <Card.Subtitle>Gender</Card.Subtitle>
-            <Card.Text>{detail.gender}</Card.Text>
-          </Col>
-          <Col>
-            <Card.Subtitle>Phone</Card.Subtitle>
-            <Card.Text>{detail.phone}</Card.Text>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <Card.Subtitle>Address</Card.Subtitle>
-            <Card.Text>{detail.address}</Card.Text>
-          </Col>
-        </Row>
-      </Card.Body>
+
+      {loading ? (
+        <Loading />
+      ) : (
+        <Card.Body className="d-grid gap-4">
+          <Row className="mb-3">
+            <Col>
+              <Card.Subtitle>Member ID</Card.Subtitle>
+              <Card.Text>{detail.userid}</Card.Text>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col>
+              <Card.Subtitle>Username</Card.Subtitle>
+              <Card.Text>{detail.username}</Card.Text>
+            </Col>
+            <Col>
+              <Card.Subtitle>Phone</Card.Subtitle>
+              <Card.Text>{detail.phonenumber}</Card.Text>
+            </Col>
+          </Row>
+        </Card.Body>
+      )}
+
       <Card.Footer className="text-muted">
         <div className="d-flex justify-content-start">
           <Button variant="secondary" onClick={onCancel}>

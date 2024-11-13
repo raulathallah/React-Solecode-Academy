@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { getBooks } from "../../utils/Books";
 import Loading from "../../components/Elements/Loading";
 import { getBook } from "../../api/Books";
 
