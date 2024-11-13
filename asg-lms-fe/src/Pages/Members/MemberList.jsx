@@ -56,7 +56,7 @@ const MemberList = () => {
     if (list) {
       setTimeout(() => {
         setLoading(false);
-      }, 2000);
+      }, 1500);
     }
   }, [list]);
 

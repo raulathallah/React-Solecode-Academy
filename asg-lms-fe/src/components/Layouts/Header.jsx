@@ -1,4 +1,11 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
+import {
+  Container,
+  Dropdown,
+  Nav,
+  Navbar,
+  NavItem,
+  NavLink,
+} from "react-bootstrap";
 import { options } from "../../utils/DateOptions";
 const Header = () => {
   const header = {
@@ -7,14 +14,19 @@ const Header = () => {
   };
 
   let { title: NAMA_WEBSITE, dateNow: WAKTU_SEKARANG } = header;
-
   return (
     <Navbar bg="dark" data-bs-theme="dark" className="p-4">
+      <Navbar.Brand href="/">{NAMA_WEBSITE}</Navbar.Brand>
       <Container>
-        <Navbar.Brand href="/">{NAMA_WEBSITE}</Navbar.Brand>
-        <Nav className="me-auto">
-          <Nav.Link href="/">Home</Nav.Link>
-          <Nav.Link href="/books">Books</Nav.Link>
+        <Nav className="me-auto d-flex gap-4">
+          <Dropdown as={NavItem}>
+            <Dropdown.Toggle as={NavLink}>Books</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Nav.Link href="/books">Books</Nav.Link>
+              <Nav.Link href="/transactions">Borrow</Nav.Link>
+            </Dropdown.Menu>
+          </Dropdown>
+
           <Nav.Link href="/members">Members</Nav.Link>
         </Nav>
         <Navbar.Collapse className="justify-content-end">

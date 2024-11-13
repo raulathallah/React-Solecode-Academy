@@ -64,7 +64,7 @@ const BookList = () => {
     <Card>
       <Card.Header>Book List</Card.Header>
       <Card.Body className="d-grid gap-3">
-        <div>
+        <div className="d-flex gap-2">
           <Button variant="primary" as={Link} to={"/books/add"}>
             Add Book
           </Button>

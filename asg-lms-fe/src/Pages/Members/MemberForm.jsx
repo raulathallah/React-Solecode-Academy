@@ -150,6 +150,7 @@ const MemberForm = ({ type }) => {
       clearForm();
     };
   }, []);
+
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
