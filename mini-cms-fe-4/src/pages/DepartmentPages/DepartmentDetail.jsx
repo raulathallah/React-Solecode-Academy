@@ -21,8 +21,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { getDepartment } from "../../api/Department";
 import Swal from "sweetalert2";
-import { getAllEmployee } from "../../api/Employee";
+import { getAllEmployee, getEmployeePaginate } from "../../api/Employee";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
+import { getManagerName } from "../../utils/helpers/HelperFunctions";
 
 const initialValue = {
   deptno: null,
@@ -36,9 +37,18 @@ const DepartmentDetail = () => {
   const navigate = useNavigate();
 
   const [departmentData, setDepartmentData] = useState(initialValue);
+  const [listEmployeePaginate, setListEmployeePaginate] = useState([]);
   const [listEmployee, setListEmployee] = useState([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
+
+  useEffect(() => {
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (deptNo) {
@@ -52,13 +62,13 @@ const DepartmentDetail = () => {
 
   useEffect(() => {
     if (deptNo) {
-      getAllEmployee(page, perPage).then((res) => {
+      getEmployeePaginate(page, perPage).then((res) => {
         if (res.status === 200) {
           let filtered = res.data.filter(
             (val) => val.deptno === parseInt(deptNo)
           );
           if (filtered.length !== 0) {
-            setListEmployee(filtered);
+            setListEmployeePaginate(filtered);
           } else {
             Swal.fire({
               position: "center",
@@ -128,7 +138,9 @@ const DepartmentDetail = () => {
               >
                 <div className="ms-2 me-auto">
                   <div className="fw-bold">Department Manager</div>
-                  {departmentData.mgrempno}
+                  {departmentData.mgrempno
+                    ? getManagerName(listEmployee, departmentData.mgrempno)
+                    : "-"}
                 </div>
               </ListGroup.Item>
             </ListGroup>
@@ -144,7 +156,7 @@ const DepartmentDetail = () => {
                 </tr>
               </thead>
               <tbody>
-                {listEmployee.map((val, key) => (
+                {listEmployeePaginate.map((val, key) => (
                   <tr key={key}>
                     <td>{val.empno}</td>
                     <td>{val.fname}</td>

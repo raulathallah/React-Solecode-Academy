@@ -1,35 +1,3 @@
-export const getEmployeeName = (empNo) => {
-  let employees = JSON.parse(localStorage.getItem("employees"));
-
-  if (!empNo) {
-    return "-";
-  }
-
-  let data = employees.find((val) => val.empNo === empNo);
-
-  if (!data) {
-    return "DELETED EMPLOYEE";
-  }
-
-  return `${data.fName} ${data.lName}`;
-};
-
-export const getDepartmentName = (deptNo) => {
-  let departments = JSON.parse(localStorage.getItem("departments"));
-
-  if (!deptNo) {
-    return "-";
-  }
-
-  let data = departments.find((val) => val.deptNo === deptNo);
-
-  if (!data) {
-    return "DELETED DEPARTMENT";
-  }
-
-  return `${data.deptName}`;
-};
-
 export const getProjectName = (projNo) => {
   let projects = JSON.parse(localStorage.getItem("projects"));
 
@@ -44,4 +12,26 @@ export const getProjectName = (projNo) => {
   }
 
   return `${data.projName}`;
+};
+
+export const getManagerName = (data, empNo) => {
+  if (data && empNo) {
+    let employee = data.find((x) => x.empno === empNo);
+    if (employee) {
+      return `${employee.fname} ${employee.lname}`;
+    }
+  }
+
+  return "-";
+};
+
+export const getDepartmentName = (data, deptNo) => {
+  if (data && deptNo) {
+    let dept = data.find((x) => x.deptno === deptNo);
+    if (dept) {
+      return `${dept.deptname}`;
+    }
+  }
+
+  return "-";
 };

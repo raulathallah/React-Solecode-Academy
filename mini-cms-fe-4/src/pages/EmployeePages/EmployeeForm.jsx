@@ -43,7 +43,7 @@ const initialError = {
   emailAddress: "",
   phoneNumber: "",
   position: "",
-  deptNo: "",
+  deptno: "",
   empType: "",
   empLevel: "",
   directSupervisor: "",
@@ -348,11 +348,11 @@ const EmployeeForm = ({ type }) => {
                   onChange={(e) =>
                     setEmployeeData({
                       ...employeeData,
-                      deptNo: parseInt(e.target.value),
+                      deptno: parseInt(e.target.value),
                     })
                   }
-                  isInvalid={errors.deptNo}
-                  value={employeeData.deptNo}
+                  isInvalid={errors.deptno}
+                  value={employeeData.deptno}
                   size="sm"
                 >
                   <option disabled value={0} hidden />
@@ -387,7 +387,7 @@ const EmployeeForm = ({ type }) => {
                       <option disabled value={0} hidden />
                       {listEmployee.map((val) => (
                         <option key={val.empno} value={val.empno}>
-                          {val.fname}
+                          {`${val.fname} ${val.lname}`}
                         </option>
                       ))}
                     </Form.Select>

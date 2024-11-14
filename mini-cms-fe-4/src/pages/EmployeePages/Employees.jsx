@@ -21,13 +21,16 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getEmployeePaginate } from "../../api/Employee";
+import { deleteEmployee, getEmployeePaginate } from "../../api/Employee";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
+import { getAllDepartment } from "../../api/Department";
+import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
 
 const Employees = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [listDepartment, setListDepartment] = useState(true);
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -52,21 +55,33 @@ const Employees = () => {
   };
   //DELETE EMPLOYEE
   const onDelete = (empNo) => {
-    let oldData = list;
-    let newData = oldData.filter((val) => val.empNo !== empNo);
-    localStorage.setItem("employees", JSON.stringify(newData));
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Employee deleted!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-
-    setTimeout(() => {
-      navigate("/employees");
-    }, 1500);
+    deleteEmployee(empNo)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Employee deleted!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          navigate("/employees");
+        }, 1500);
+      });
   };
+
+  useEffect(() => {
+    getAllDepartment().then((res) => {
+      if (res.status === 200) {
+        setListDepartment(res.data);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     getEmployeePaginate(page, perPage)
@@ -137,7 +152,7 @@ const Employees = () => {
                 <td>{val.empno}</td>
                 <td>{val.fname}</td>
                 <td>{val.lname}</td>
-                <td>{val.deptno ? val.deptno : "--NULL--"}</td>
+                <td>{getDepartmentName(listDepartment, val.deptno)}</td>
                 <td>{val.emailAddress}</td>
                 <td style={{ width: "20px" }}>
                   <Container>

@@ -47,8 +47,6 @@ const DepartmentForm = ({ type }) => {
         setListEmployee(filtered);
       }
     });
-
-    //console.log(departmentData);
     return () => {
       clearForm();
       setIsSuccess(false);

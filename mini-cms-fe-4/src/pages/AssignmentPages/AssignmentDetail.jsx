@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Card, ListGroup } from "react-bootstrap";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
-import {
-  getEmployeeName,
-  getProjectName,
-} from "../../utils/helpers/HelperFunctions";
+
 import { getWorksOn } from "../../utils/api/WorksOns";
 
 const initialValue = {

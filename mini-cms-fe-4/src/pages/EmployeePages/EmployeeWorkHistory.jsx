@@ -16,10 +16,6 @@ import { faArrowLeft, faList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { Link } from "react-router-dom";
-import {
-  getEmployeeName,
-  getProjectName,
-} from "../../utils/helpers/HelperFunctions";
 
 const EmployeeWorkHistory = () => {
   const navigate = useNavigate();

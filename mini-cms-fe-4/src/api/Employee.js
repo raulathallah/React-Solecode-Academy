@@ -42,10 +42,19 @@ const updateEmployee = async (empNo, body) => {
   }
 };
 
+const deleteEmployee = async (empNo) => {
+  try {
+    return await axios.delete(`/api/v1/Employees/${empNo}`);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export {
   getEmployeePaginate,
   getAllEmployee,
   getEmployee,
   addEmployee,
   updateEmployee,
+  deleteEmployee,
 };

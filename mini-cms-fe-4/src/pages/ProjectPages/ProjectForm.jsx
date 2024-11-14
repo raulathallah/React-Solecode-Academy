@@ -4,17 +4,19 @@ import { Card, Col, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import Swal from "sweetalert2";
-import { generateProjNo, getProjects } from "../../utils/api/Projects";
+import { addProject, getProject, updateProject } from "../../api/Project";
+import { getAllDepartment } from "../../api/Department";
 
 const initialValue = {
-  projNo: 0,
-  projName: "",
-  deptNo: 0,
+  projname: "",
+  projLocation: 0,
+  deptno: 0,
 };
 
 const initialError = {
-  projName: "",
-  deptNo: "",
+  projname: "",
+  projLocation: "",
+  deptno: "",
 };
 
 const ProjectForm = ({ type }) => {
@@ -23,9 +25,9 @@ const ProjectForm = ({ type }) => {
   const [errors, setErrors] = useState(initialError);
   const [projectData, setProjectData] = useState(initialValue);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [listProject, setListProject] = useState([]);
   const [listDepartment, setListDepartment] = useState([]);
 
+  const [location, setLocation] = useState([1, 2, 3]);
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -34,14 +36,14 @@ const ProjectForm = ({ type }) => {
   }, [type]);
 
   useEffect(() => {
-    setListProject(getProjects());
-    setListDepartment(getDepartments());
+    //setListProject(getProjects());
+    //setListDepartment(getDepartments());
+
     return () => {
       clearForm();
       setIsSuccess(false);
     };
   }, []);
-
   //ALERT FEEDBACK
   useEffect(() => {
     if (isSuccess) {
@@ -67,11 +69,21 @@ const ProjectForm = ({ type }) => {
 
   useEffect(() => {
     if (projNo) {
-      setProjectData(
-        getDepartments().find((val) => val.projNo === parseInt(projNo))
-      );
+      getProject(projNo).then((res) => {
+        if (res.status === 200) {
+          setProjectData(res.data);
+        }
+      });
     }
   }, [projNo]);
+
+  useEffect(() => {
+    getAllDepartment().then((res) => {
+      if (res.status === 200) {
+        setListDepartment(res.data);
+      }
+    });
+  }, []);
 
   //ON CHANGE VALUE
   const onChangeValue = (key, e) => {
@@ -101,40 +113,26 @@ const ProjectForm = ({ type }) => {
   //ADD PROJECT
   const onAdd = (e) => {
     e.preventDefault();
-    let newId = generateProjNo();
-
-    let projectDataAddId = {
-      ...projectData,
-      projNo: newId,
-    };
-
-    let valid = Validate(projectDataAddId);
-
+    let valid = Validate(projectData);
     if (valid) {
-      let newData = [...listProject, projectDataAddId];
-      localStorage.setItem("projects", JSON.stringify(newData));
-      setIsSuccess(true);
-    } else {
-      localStorage.setItem("projNo", newId - 1);
+      addProject(projectData).then((res) => {
+        if (res.status === 200) {
+          setIsSuccess(true);
+        }
+      });
     }
   };
 
   //EDIT PROJECT
   const onEdit = (e) => {
     e.preventDefault();
-
-    let updatedProj = {
-      ...projectData,
-      deptNo: parseInt(projNo),
-    };
-    let valid = Validate(updatedProj);
+    let valid = Validate(projectData);
     if (valid) {
-      let newData = listProject.map((val) =>
-        val.deptNo === parseInt(projNo) ? updatedProj : val
-      );
-
-      localStorage.setItem("projects", JSON.stringify(newData));
-      setIsSuccess(true);
+      updateProject(projNo, projectData).then((res) => {
+        if (res.status === 200) {
+          setIsSuccess(true);
+        }
+      });
     }
   };
 
@@ -143,14 +141,15 @@ const ProjectForm = ({ type }) => {
     let errorMessages = {};
 
     //-- projName
-    if (!newProj.projName) {
-      errorMessages.projName = `Project name must be filled!`;
+    if (!newProj.projname) {
+      errorMessages.projname = `Project name must be filled!`;
     }
 
     //-- deptNo
-    if (!newProj.deptNo) {
-      errorMessages.deptNo = `Department must be filled!`;
+    if (!newProj.deptno) {
+      errorMessages.deptno = `Department must be filled!`;
     }
+
     setErrors(errorMessages);
 
     let formValid = true;
@@ -177,12 +176,12 @@ const ProjectForm = ({ type }) => {
                 <Form.Control
                   ref={inputFocus}
                   type="text"
-                  value={projectData.projName}
+                  value={projectData.projname}
                   size="sm"
-                  onChange={(e) => onChangeValue("projName", e)}
-                  isInvalid={errors.projName}
+                  onChange={(e) => onChangeValue("projname", e)}
+                  isInvalid={errors.projname}
                 />
-                {errors.projName && <small>{errors.projName}</small>}
+                {errors.projname && <small>{errors.projname}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -192,23 +191,53 @@ const ProjectForm = ({ type }) => {
                   onChange={(e) =>
                     setProjectData({
                       ...projectData,
-                      deptNo: parseInt(e.target.value),
+                      deptno: parseInt(e.target.value),
                     })
                   }
-                  isInvalid={errors.deptNo}
-                  value={projectData.deptNo ? projectData.deptNo : 0}
+                  isInvalid={errors.deptno}
+                  value={projectData.deptno ? projectData.deptno : 0}
                   size="sm"
                 >
-                  <option disabled value={0} />
+                  <option disabled value={0} hidden />
                   {listDepartment.map((val) => (
-                    <option key={val.deptNo} value={val.deptNo}>
-                      {val.deptName}
+                    <option key={val.deptno} value={val.deptno}>
+                      {val.deptname}
                     </option>
                   ))}
                 </Form.Select>
-                {errors.deptNo && <small>{errors.deptNo}</small>}
+                {errors.deptno && <small>{errors.deptno}</small>}
               </Form.Group>
             </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <Form.Group controlId="formDeptNo">
+                <Form.Label className="fw-semibold">Location</Form.Label>
+                <Form.Select
+                  onChange={(e) =>
+                    setProjectData({
+                      ...projectData,
+                      projLocation: parseInt(e.target.value),
+                    })
+                  }
+                  isInvalid={errors.projLocation}
+                  value={
+                    projectData.projLocation ? projectData.projLocation : 0
+                  }
+                  size="sm"
+                >
+                  <option value={0} disabled hidden></option>
+                  {location.map((val) => (
+                    <option key={val} value={val}>
+                      {val}
+                    </option>
+                  ))}
+                </Form.Select>
+                {errors.projLocation && <small>{errors.projLocation}</small>}
+              </Form.Group>
+            </Col>
+            <Col></Col>
           </Row>
         </Card.Body>
         <Card.Footer className="text-muted">

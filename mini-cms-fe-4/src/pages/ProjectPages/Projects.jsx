@@ -21,18 +21,24 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getProjects } from "../../utils/api/Projects";
 import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
+import { getProjectPaginate } from "../../api/Project";
+import { getAllDepartment } from "../../api/Department";
+import PaginationCustom from "../../components/Elements/PaginationCustom";
 
 const Projects = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const onTryDelete = (projNo) => {
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
+
+  const [listDepartment, setListDepartment] = useState();
+  const onTryDelete = (proj) => {
     Swal.fire({
       title: `Are you sure want to delete project?`,
-      text: `Project Number: ${projNo}`,
+      text: `Project: ${proj.projname}`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: "Yes",
@@ -43,7 +49,7 @@ const Projects = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        onDelete(projNo);
+        onDelete(proj.projno);
       }
     });
   };
@@ -61,26 +67,55 @@ const Projects = () => {
     });
 
     setTimeout(() => {
-      setList(getProjects());
       navigate("/projects");
     }, 1500);
   };
 
   useEffect(() => {
-    setList(getProjects());
-  }, []);
+    getProjectPaginate(page, perPage)
+      .then((res) => {
+        if (res.status === 200) {
+          if (res.data.length !== 0) {
+            setList(res.data);
+          } else {
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "No more data!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setPage(page - 1);
+          }
+        }
+      })
+      .finally(() =>
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500)
+      );
+  }, [page, perPage]);
 
   useEffect(() => {
-    if (list) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  }, [list]);
+    getAllDepartment().then((res) => {
+      if (res.status === 200) {
+        setListDepartment(res.data);
+      }
+    });
+  }, []);
 
   if (loading) {
     return <Loading />;
   }
+
+  const onChangePage = (action) => {
+    let result = page + action;
+    if (result < 1) {
+      setPage(1);
+    } else {
+      setPage(page + action);
+    }
+  };
 
   return (
     <Card>
@@ -108,9 +143,9 @@ const Projects = () => {
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>{val.projNo}</td>
-                <td>{val.projName}</td>
-                <td>{getDepartmentName(val.deptNo)}</td>
+                <td>{val.projno}</td>
+                <td>{val.projname}</td>
+                <td>{getDepartmentName(listDepartment, val.deptno)}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -119,7 +154,7 @@ const Projects = () => {
                           <Button
                             as={Link}
                             variant="dark"
-                            to={`/projects/${val.projNo}`}
+                            to={`/projects/${val.projno}`}
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
@@ -130,7 +165,7 @@ const Projects = () => {
                           <Button
                             as={Link}
                             variant="secondary"
-                            to={`/projects/${val.projNo}/history`}
+                            to={`/projects/${val.projno}/history`}
                           >
                             <FontAwesomeIcon icon={faHistory} />
                           </Button>
@@ -139,7 +174,7 @@ const Projects = () => {
                           <Button
                             as={Link}
                             variant="primary"
-                            to={`/projects/${val.projNo}/edit`}
+                            to={`/projects/${val.projno}/edit`}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>
@@ -147,7 +182,7 @@ const Projects = () => {
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
                           <Button
                             variant="danger"
-                            onClick={() => onTryDelete(val.projNo)}
+                            onClick={() => onTryDelete(val)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
@@ -160,6 +195,11 @@ const Projects = () => {
             ))}
           </tbody>
         </Table>
+        <PaginationCustom
+          page={page}
+          onChangePage={onChangePage}
+          onChangePerPage={(e) => setPerPage(e.target.value)}
+        />
       </Card.Body>
     </Card>
   );

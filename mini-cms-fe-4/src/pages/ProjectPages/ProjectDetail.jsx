@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Card, ListGroup } from "react-bootstrap";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
-import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
-import { getProjects } from "../../utils/api/Projects";
+import { getProject } from "../../api/Project";
+import { getDepartment } from "../../api/Department";
 
 const initialValue = {
-  projNo: 0,
-  projName: "",
-  deptNo: 0,
+  projno: 0,
+  projname: "",
+  projLocation: 0,
+  deptno: 0,
 };
 
 const ProjectDetail = () => {
@@ -16,20 +17,32 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
 
   const [projectData, setProjectData] = useState(initialValue);
+  const [deptName, setDeptName] = useState("");
 
   useEffect(() => {
     if (projNo) {
-      setProjectData(
-        getProjects().find((val) => val.projNo === parseInt(projNo))
-      );
+      getProject(projNo).then((res) => {
+        if (res.status === 200) {
+          setProjectData(res.data);
+        }
+      });
     }
   }, [projNo]);
+
+  useEffect(() => {
+    if (projectData && projectData.deptno !== 0) {
+      getDepartment(projectData.deptno).then((res) => {
+        if (res.status === 200) {
+          setDeptName(res.data.deptname);
+        }
+      });
+    }
+  }, [projectData]);
 
   //ON CANCEL
   const onCancel = () => {
     navigate(-1);
   };
-
   return (
     <Card className="w-50">
       <Card.Header>Project Detail</Card.Header>
@@ -43,7 +56,7 @@ const ProjectDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Project Number</div>
-                {projectData.projNo}
+                {projectData.projno}
               </div>
             </ListGroup.Item>
             <ListGroup.Item
@@ -51,8 +64,19 @@ const ProjectDetail = () => {
               className="d-flex justify-content-between align-items-start"
             >
               <div className="ms-2 me-auto">
+                <div className="fw-bold">Project Location</div>
+                {projectData.projLocation}
+              </div>
+            </ListGroup.Item>
+          </ListGroup>
+          <ListGroup as="ol" className="list-group-flush border-0">
+            <ListGroup.Item
+              as="li"
+              className="d-flex justify-content-between align-items-start"
+            >
+              <div className="ms-2 me-auto">
                 <div className="fw-bold">Project Name</div>
-                {projectData.projName}
+                {projectData.projname}
               </div>
             </ListGroup.Item>
             <ListGroup.Item
@@ -61,7 +85,7 @@ const ProjectDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Department</div>
-                {getDepartmentName(projectData.deptNo)}
+                {deptName}
               </div>
             </ListGroup.Item>
           </ListGroup>

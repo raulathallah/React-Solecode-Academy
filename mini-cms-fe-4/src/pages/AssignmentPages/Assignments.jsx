@@ -21,10 +21,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getWorksOn } from "../../utils/api/WorksOns";
-import {
-  getEmployeeName,
-  getProjectName,
-} from "../../utils/helpers/HelperFunctions";
 
 const Assignments = () => {
   const navigate = useNavigate();
@@ -108,8 +104,8 @@ const Assignments = () => {
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>{getEmployeeName(val.empNo)}</td>
-                <td>{getProjectName(val.projNo)}</td>
+                <td>-</td>
+                <td>-</td>
                 <td>{val.dateWorked}</td>
                 <td style={{ width: "20px" }}>
                   <Container>

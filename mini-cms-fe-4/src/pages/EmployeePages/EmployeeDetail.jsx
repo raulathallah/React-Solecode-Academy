@@ -67,7 +67,8 @@ const EmployeeDetail = () => {
       if (employeeData.directSupervisor) {
         getEmployee(employeeData.directSupervisor).then((res) => {
           if (res.status === 200) {
-            setSupervisor(res.data.name);
+            let name = res.data.fname + " " + res.data.lname;
+            setSupervisor(name);
           }
         });
       }

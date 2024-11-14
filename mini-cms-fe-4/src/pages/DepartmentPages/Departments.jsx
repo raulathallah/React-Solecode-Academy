@@ -22,6 +22,8 @@ import {
 import Swal from "sweetalert2";
 import { deleteDepartment, getDepartmentPaginate } from "../../api/Department";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
+import { getAllEmployee } from "../../api/Employee";
+import { getManagerName } from "../../utils/helpers/HelperFunctions";
 
 const Departments = () => {
   const navigate = useNavigate();
@@ -31,10 +33,12 @@ const Departments = () => {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
 
-  const onTryDelete = (deptNo) => {
+  const [listEmployee, setListEmployee] = useState([]);
+
+  const onTryDelete = (dept) => {
     Swal.fire({
       title: `Are you sure want to delete Department?`,
-      text: `Department Number: ${deptNo}`,
+      text: `Department ${dept.deptname}`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: "Yes",
@@ -45,41 +49,47 @@ const Departments = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        onDelete(deptNo);
+        onDelete(dept.deptno);
       }
     });
   };
   //DELETE DEPARTMENTS
   const onDelete = (deptNo) => {
-    deleteDepartment(deptNo, (res) => {
-      if (res.status === 200) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Department deleted!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+    deleteDepartment(deptNo)
+      .then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Department deleted!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .finally(() =>
         setTimeout(() => {
-          getDepartmentPaginate(
-            page,
-            perPage,
-            (res) => {
-              if (res.status === 200) {
-                if (res.data.length !== 0) {
-                  setList(res.data);
-                } else {
-                  setPage(page - 1);
-                }
+          getDepartmentPaginate(page, perPage).then((res) => {
+            if (res.status === 200) {
+              if (res.data.length !== 0) {
+                setList(res.data);
+              } else {
+                setPage(page - 1);
               }
-            },
-            (err) => console.log(err.message)
-          );
+            }
+          });
           navigate("/departments");
-        }, 1500);
+        }, 1500)
+      );
+  };
+
+  useEffect(() => {
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
       }
     });
-  };
+  }, []);
 
   useEffect(() => {
     getDepartmentPaginate(page, perPage)
@@ -140,7 +150,11 @@ const Departments = () => {
               <tr key={key}>
                 <td style={{ width: "10%" }}>{val.deptno}</td>
                 <td>{val.deptname}</td>
-                <td>{val.mgrempno ? val.mgrempno : "None"}</td>
+                <td>
+                  {val.mgrempno
+                    ? getManagerName(listEmployee, val.mgrempno)
+                    : "None"}
+                </td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -166,7 +180,7 @@ const Departments = () => {
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
                           <Button
                             variant="danger"
-                            onClick={() => onTryDelete(val.deptno)}
+                            onClick={() => onTryDelete(val)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
