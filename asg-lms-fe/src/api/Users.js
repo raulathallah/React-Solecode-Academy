@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const getAllUser = (callback, errorcallback, config) => {
-  axios
+const getAllUser = async (callback, errorcallback, config) => {
+  await axios
     .get(`http://localhost/api/users`, config)
     .then((res) => {
       if (callback != null) {
@@ -15,8 +15,8 @@ const getAllUser = (callback, errorcallback, config) => {
     });
 };
 
-const getUser = (id, callback, errorcallback, config) => {
-  axios
+const getUser = async (id, callback, errorcallback, config) => {
+  await axios
     .get(`http://localhost/api/users/${id}`, config)
     .then((res) => {
       if (callback != null) {
@@ -30,8 +30,8 @@ const getUser = (id, callback, errorcallback, config) => {
     });
 };
 
-const updateUser = (id, body, callback, errorcallback, config) => {
-  axios
+const updateUser = async (id, body, callback, errorcallback, config) => {
+  await axios
     .put(`http://localhost/api/users/${id}`, body, config)
     .then((res) => {
       if (callback != null) {
@@ -45,8 +45,8 @@ const updateUser = (id, body, callback, errorcallback, config) => {
     });
 };
 
-const addUser = (body, callback, errorcallback, config) => {
-  axios
+const addUser = async (body, callback, errorcallback, config) => {
+  await axios
     .post(`http://localhost/api/users`, body, config)
     .then((res) => {
       if (callback != null) {
@@ -60,8 +60,8 @@ const addUser = (body, callback, errorcallback, config) => {
     });
 };
 
-const deleteUser = (id, callback, errorcallback, config) => {
-  axios
+const deleteUser = async (id, callback, errorcallback, config) => {
+  await axios
     .delete(`http://localhost/api/users/${id}`, config)
     .then((res) => {
       if (callback != null) {

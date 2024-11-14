@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const borrowBook = (body, callback, errorcallback, config) => {
-  axios
+const borrowBook = async (body, callback, errorcallback, config) => {
+  await axios
     .post(`http://localhost/api/transactions/borrow`, body, config)
     .then((res) => {
       if (callback != null) {
@@ -14,8 +14,24 @@ const borrowBook = (body, callback, errorcallback, config) => {
       }
     });
 };
-const getAllBorrow = (callback, errorcallback, config) => {
-  axios
+
+const returnBook = async (body, callback, errorcallback, config) => {
+  await axios
+    .post(`http://localhost/api/transactions/return`, body, config)
+    .then((res) => {
+      if (callback != null) {
+        callback(res);
+      }
+    })
+    .catch((err) => {
+      if (errorcallback != null) {
+        errorcallback(err);
+      }
+    });
+};
+
+const getAllBorrow = async (callback, errorcallback, config) => {
+  await axios
     .get(`http://localhost/api/transactions`, config)
     .then((res) => {
       if (callback != null) {
@@ -29,4 +45,4 @@ const getAllBorrow = (callback, errorcallback, config) => {
     });
 };
 
-export { borrowBook, getAllBorrow };
+export { borrowBook, getAllBorrow, returnBook };

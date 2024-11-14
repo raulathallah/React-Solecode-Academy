@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { addBook, getAllBook, getBook, updateBook } from "../../api/Books";
 import Loading from "../../components/Elements/Loading";
+import Swal from "sweetalert2";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   title: "",
@@ -73,11 +75,24 @@ const BookForm = ({ type }) => {
     if (valid) {
       addBook(
         newBook,
-        (res) => console.log(res),
-        (err) => console.log(err)
+        (res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Book added!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/books");
+            }, 1500);
+          }
+        },
+        (err) => {
+          ErrorMessage(err.message);
+        }
       );
-      alert("Book Added!");
-      navigate("/books");
       clearForm();
     }
   };
@@ -136,11 +151,24 @@ const BookForm = ({ type }) => {
     updateBook(
       id,
       newBook,
-      (res) => console.log(res),
-      (err) => console.log(err)
+      (res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Book updated!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            navigate("/books");
+          }, 1500);
+        }
+      },
+      (err) => {
+        ErrorMessage(err.message);
+      }
     );
-    alert("Book Updated!");
-    navigate("/books");
     clearForm();
   };
 

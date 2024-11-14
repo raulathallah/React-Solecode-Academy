@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const getAllBook = (callback, errorcallback, config) => {
-  axios
+const getAllBook = async (callback, errorcallback, config) => {
+  await axios
     .get(`http://localhost/api/books`, config)
     .then((res) => {
       if (callback != null) {
@@ -15,8 +15,8 @@ const getAllBook = (callback, errorcallback, config) => {
     });
 };
 
-const getBook = (id, callback, errorcallback, config) => {
-  axios
+const getBook = async (id, callback, errorcallback, config) => {
+  await axios
     .get(`http://localhost/api/books/${id}`, config)
     .then((res) => {
       if (callback != null) {
@@ -30,8 +30,8 @@ const getBook = (id, callback, errorcallback, config) => {
     });
 };
 
-const updateBook = (id, body, callback, errorcallback, config) => {
-  axios
+const updateBook = async (id, body, callback, errorcallback, config) => {
+  await axios
     .put(`http://localhost/api/books/${id}`, body, config)
     .then((res) => {
       if (callback != null) {
@@ -45,8 +45,8 @@ const updateBook = (id, body, callback, errorcallback, config) => {
     });
 };
 
-const addBook = (body, callback, errorcallback, config) => {
-  axios
+const addBook = async (body, callback, errorcallback, config) => {
+  await axios
     .post(`http://localhost/api/books`, body, config)
     .then((res) => {
       if (callback != null) {
@@ -60,8 +60,8 @@ const addBook = (body, callback, errorcallback, config) => {
     });
 };
 
-const deleteBook = (id, callback, errorcallback, config) => {
-  axios
+const deleteBook = async (id, callback, errorcallback, config) => {
+  await axios
     .delete(`http://localhost/api/books/${id}`, config)
     .then((res) => {
       if (callback != null) {

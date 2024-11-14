@@ -14,7 +14,9 @@ import { useNavigate } from "react-router";
 import { getAllUser } from "../../api/Users";
 import { getAllBook } from "../../api/Books";
 import { Link } from "react-router-dom";
-import { borrowBook, getAllBorrow } from "../../api/Transactions";
+import { borrowBook, getAllBorrow, returnBook } from "../../api/Transactions";
+import Swal from "sweetalert2";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   userId: 0,
@@ -27,7 +29,7 @@ const initialError = {
 
 const TransactionForm = ({ type }) => {
   const inputFocus = useRef(null);
-  const [borrow, setBorrow] = useState(initialValue);
+  const [borrowReturn, setBorrowReturn] = useState(initialValue);
   const [errors, setErrors] = useState(initialError);
   const [listUser, setListUser] = useState([]);
   const [listBook, setListBook] = useState([]);
@@ -74,7 +76,7 @@ const TransactionForm = ({ type }) => {
         }
       );
     }
-  }, [borrow.userId, type]);
+  }, [borrowReturn.userId, type]);
 
   //ON CANCEL
   const onCancel = () => {
@@ -82,19 +84,60 @@ const TransactionForm = ({ type }) => {
   };
   const onBorrow = (e) => {
     e.preventDefault();
-    let valid = ValidateBorrow(borrow);
+    let valid = Validate(borrowReturn);
     if (valid) {
-      console.log(borrow);
       borrowBook(
-        borrow,
-        (res) => console.log(res),
-        (err) => console.log(err)
+        borrowReturn,
+        (res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Book borrowed!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/transactions");
+            }, 1500);
+          }
+        },
+        (err) => {
+          ErrorMessage(err.message);
+        }
+      );
+    }
+  };
+
+  const onReturn = (e) => {
+    e.preventDefault();
+    let valid = Validate(borrowReturn);
+    if (valid) {
+      returnBook(
+        borrowReturn,
+        (res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Book returned!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/transactions");
+            }, 1500);
+          }
+        },
+        (err) => {
+          ErrorMessage(err.message);
+        }
       );
     }
   };
 
   //VALIDATION BOOK
-  const ValidateBorrow = (body) => {
+  const Validate = (body) => {
     let errorMessages = {};
 
     //-- member
@@ -122,11 +165,11 @@ const TransactionForm = ({ type }) => {
   const onAddBookId = (value, checked) => {
     let books = [];
     if (checked) {
-      books = [...borrow.bookId, value.bookid];
+      books = [...borrowReturn.bookId, value.bookid];
     } else {
-      books = borrow.bookId.filter((x) => x !== value.bookid);
+      books = borrowReturn.bookId.filter((x) => x !== value.bookid);
     }
-    setBorrow({ ...borrow, bookId: books });
+    setBorrowReturn({ ...borrowReturn, bookId: books });
   };
   const displayBookName = (bookId) => {
     let book = listBook.find((x) => x.bookid === bookId);
@@ -149,7 +192,7 @@ const TransactionForm = ({ type }) => {
   };
   return (
     <Card>
-      <Form onSubmit={onBorrow}>
+      <Form onSubmit={type === "borrow" ? onBorrow : onReturn}>
         <Card.Header>
           {type === "borrow" ? "Book Borrow" : "Book Return"}
         </Card.Header>
@@ -161,14 +204,19 @@ const TransactionForm = ({ type }) => {
                 <Form.Select
                   ref={inputFocus}
                   type="text"
-                  value={borrow.userId}
+                  value={borrowReturn.userId}
                   size="sm"
                   onChange={(e) =>
-                    setBorrow({ ...borrow, userId: parseInt(e.target.value) })
+                    setBorrowReturn({
+                      ...borrowReturn,
+                      userId: parseInt(e.target.value),
+                    })
                   }
                   isInvalid={errors.userId}
                 >
-                  <option disabled hidden value={0}></option>
+                  <option disabled hidden value={0}>
+                    --- select user ---
+                  </option>
                   {listUser.map((val) => (
                     <option key={val.userid} value={val.userid}>
                       {val.username}
@@ -200,7 +248,7 @@ const TransactionForm = ({ type }) => {
                 </thead>
                 <tbody>
                   {listBorrow
-                    .filter((x) => x.userid === borrow.userId)
+                    .filter((x) => x.userid === borrowReturn.userId)
                     .filter((x) => !x.isreturned)
                     .map((val, key) => (
                       <tr key={key}>
@@ -242,8 +290,9 @@ const TransactionForm = ({ type }) => {
                         <Form.Check
                           inline
                           disabled={
-                            !borrow.bookId.find((x) => x === val.bookid) &&
-                            borrow.bookId.length >= 3
+                            !borrowReturn.bookId.find(
+                              (x) => x === val.bookid
+                            ) && borrowReturn.bookId.length >= 3
                           }
                           name="group1"
                           type={"checkbox"}
@@ -283,7 +332,7 @@ const TransactionForm = ({ type }) => {
           <div className="d-flex justify-content-end">
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit">
-                Submit
+                Submit {type === "borrow" ? "Borrow" : "Return"}
               </Button>
               <Button variant="danger" onClick={onCancel}>
                 Cancel

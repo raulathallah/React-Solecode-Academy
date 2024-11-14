@@ -5,6 +5,8 @@ import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { addUser, getAllUser, getUser, updateUser } from "../../api/Users";
+import Swal from "sweetalert2";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   username: "",
@@ -70,11 +72,24 @@ const MemberForm = ({ type }) => {
     if (valid) {
       addUser(
         newMember,
-        (res) => console.log(res),
-        (err) => console.log(err)
+        (res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Member added!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/members");
+            }, 1500);
+          }
+        },
+        (err) => {
+          ErrorMessage(err.message);
+        }
       );
-      alert("Member Added!");
-      navigate("/members");
     }
   };
 
@@ -124,11 +139,24 @@ const MemberForm = ({ type }) => {
       updateUser(
         id,
         newMember,
-        (res) => console.log(res),
-        (err) => console.log(err)
+        (res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Member updated!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/members");
+            }, 1500);
+          }
+        },
+        (err) => {
+          ErrorMessage(err.message);
+        }
       );
-      alert("Member Updated!");
-      navigate("/members");
     }
   };
 
