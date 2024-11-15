@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Form, Pagination } from "react-bootstrap";
 
-const PaginationCustom = ({ page, onChangePage, onChangePerPage }) => {
+const PaginationCustom = ({ page, perPage, onChangePage, onChangePerPage }) => {
   return (
     <div className="tw-flex gap-2">
       <Pagination>
@@ -10,7 +10,7 @@ const PaginationCustom = ({ page, onChangePage, onChangePerPage }) => {
         <Pagination.Next onClick={() => onChangePage(+1)} />
       </Pagination>
       <Pagination className="gap-1">
-        <Form.Select onChange={onChangePerPage}>
+        <Form.Select onChange={onChangePerPage} value={perPage}>
           <option value={5}>5</option>
           <option value={10}>10</option>
           <option value={20}>20</option>
