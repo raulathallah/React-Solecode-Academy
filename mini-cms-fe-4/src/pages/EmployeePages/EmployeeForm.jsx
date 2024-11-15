@@ -13,6 +13,7 @@ import {
 } from "../../api/Employee";
 import { getAllDepartment } from "../../api/Department";
 import ErrorMessage from "../../utils/ErrorMessage";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   fname: "",
@@ -58,6 +59,7 @@ const EmployeeForm = ({ type }) => {
   const [listEmployee, setListEmployee] = useState([]);
   const [listDepartment, setListDepartment] = useState([]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const inputFocus = useRef(null);
   useEffect(() => {
@@ -79,16 +81,22 @@ const EmployeeForm = ({ type }) => {
 
   useEffect(() => {
     if (empNo) {
+      setLoading(true);
       getEmployee(empNo)
         .then((res) => {
           if (res.status === 200) {
-            console.log(res.data);
             setEmployeeData(res.data);
           }
         })
-        .catch((err) => ErrorMessage(err.message));
+        .finally(() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        );
     }
   }, [empNo]);
+
+  console.log(employeeData);
 
   useEffect(() => {
     if (employeeData.deptno) {
@@ -153,7 +161,6 @@ const EmployeeForm = ({ type }) => {
   //ADD EMPLOYEE
   const onAdd = (e) => {
     e.preventDefault();
-    console.log(employeeData);
     let valid = Validate(employeeData);
     if (valid) {
       addEmployee(employeeData)
@@ -257,6 +264,10 @@ const EmployeeForm = ({ type }) => {
 
     return formValid;
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Card>
@@ -418,7 +429,11 @@ const EmployeeForm = ({ type }) => {
                         })
                       }
                       isInvalid={errors.directSupervisor}
-                      value={employeeData.directSupervisor}
+                      value={
+                        employeeData.directSupervisor
+                          ? employeeData.directSupervisor
+                          : 0
+                      }
                       size="sm"
                       disabled={!employeeData.deptno}
                     >

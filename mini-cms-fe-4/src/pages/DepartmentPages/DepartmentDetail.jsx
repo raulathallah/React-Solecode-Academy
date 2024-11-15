@@ -19,11 +19,14 @@ import {
   faHistory,
   faList,
 } from "@fortawesome/free-solid-svg-icons";
-import { getDepartment } from "../../api/Department";
-import Swal from "sweetalert2";
+import { getAllDepartment, getDepartment } from "../../api/Department";
 import { getAllEmployee, getEmployeePaginate } from "../../api/Employee";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
-import { getEmployeeName } from "../../utils/helpers/HelperFunctions";
+import {
+  getDepartmentName,
+  getEmployeeName,
+} from "../../utils/helpers/HelperFunctions";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   deptno: null,
@@ -39,8 +42,11 @@ const DepartmentDetail = () => {
   const [departmentData, setDepartmentData] = useState(initialValue);
   const [listEmployeePaginate, setListEmployeePaginate] = useState([]);
   const [listEmployee, setListEmployee] = useState([]);
+  const [listDepartment, setListDepartment] = useState([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllEmployee().then((res) => {
@@ -48,15 +54,26 @@ const DepartmentDetail = () => {
         setListEmployee(res.data);
       }
     });
+    getAllDepartment().then((res) => {
+      if (res.status === 200) {
+        setListDepartment(res.data);
+      }
+    });
   }, []);
 
   useEffect(() => {
     if (deptNo) {
-      getDepartment(deptNo).then((res) => {
-        if (res.status === 200) {
-          setDepartmentData(res.data);
-        }
-      });
+      getDepartment(deptNo)
+        .then((res) => {
+          if (res.status === 200) {
+            setDepartmentData(res.data);
+          }
+        })
+        .finally(() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        );
     }
   }, [deptNo]);
 
@@ -70,13 +87,6 @@ const DepartmentDetail = () => {
           if (filtered.length !== 0) {
             setListEmployeePaginate(filtered);
           } else {
-            Swal.fire({
-              position: "center",
-              icon: "warning",
-              title: "No more data!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
             setPage(page - 1);
           }
         }
@@ -97,6 +107,11 @@ const DepartmentDetail = () => {
       setPage(page + action);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <>
       <div className="d-flex mb-2">
@@ -108,103 +123,113 @@ const DepartmentDetail = () => {
           Back
         </ButtonCustom>
       </div>
-      <Card className="">
-        <Card.Header>Department Detail</Card.Header>
-        <Card.Body className="tw-grid tw-gap-10">
-          <div className="tw-grid tw-grid-cols-2">
-            {/**LEFT */}
-            <ListGroup as="ol" className="list-group-flush border-0">
-              <ListGroup.Item
-                as="li"
-                className="d-flex justify-content-between align-items-start"
-              >
-                <div className="ms-2 me-auto">
-                  <div className="fw-bold">Department Number</div>
-                  {departmentData.deptno}
-                </div>
-              </ListGroup.Item>{" "}
-              <ListGroup.Item
-                as="li"
-                className="d-flex justify-content-between align-items-start"
-              >
-                <div className="ms-2 me-auto">
-                  <div className="fw-bold">Department Name</div>
-                  {departmentData.deptname}
-                </div>
-              </ListGroup.Item>
-              <ListGroup.Item
-                as="li"
-                className="d-flex justify-content-between align-items-start"
-              >
-                <div className="ms-2 me-auto">
-                  <div className="fw-bold">Department Manager</div>
-                  {departmentData.mgrempno
-                    ? getEmployeeName(listEmployee, departmentData.mgrempno)
-                    : "-"}
-                </div>
-              </ListGroup.Item>
-            </ListGroup>
-          </div>
-          <div>
-            <Table striped bordered hover responsive="sm">
-              <thead>
-                <tr>
-                  <th>Employee Number</th>
-                  <th>Name</th>
-                  <th>Department</th>
-                  <th>Address</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listEmployeePaginate.map((val, key) => (
-                  <tr key={key}>
-                    <td>{val.empno}</td>
-                    <td>{val.fname}</td>
-                    <td>{val.lname}</td>
-                    <td>{val.deptno ? val.deptno : "--NULL--"}</td>
-                    <td>{val.emailAddress}</td>
-                    <td style={{ width: "20px" }}>
-                      <Container>
-                        <Row>
-                          <ButtonGroup aria-label="Basic example">
-                            <OverlayTrigger
-                              overlay={<Tooltip>Details</Tooltip>}
-                            >
-                              <Button
-                                as={Link}
-                                variant="dark"
-                                to={`/employees/${val.empno}`}
-                              >
-                                <FontAwesomeIcon icon={faList} />
-                              </Button>
-                            </OverlayTrigger>
-                            <OverlayTrigger
-                              overlay={<Tooltip>Work History</Tooltip>}
-                            >
-                              <Button
-                                as={Link}
-                                variant="secondary"
-                                to={`/employees/${val.empno}/history`}
-                              >
-                                <FontAwesomeIcon icon={faHistory} />
-                              </Button>
-                            </OverlayTrigger>
-                          </ButtonGroup>
-                        </Row>
-                      </Container>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            <PaginationCustom
-              page={page}
-              onChangePage={onChangePage}
-              onChangePerPage={(e) => setPerPage(e.target.value)}
-            />
-          </div>
-        </Card.Body>
-      </Card>
+      <div className="d-grid gap-3">
+        <Card className="">
+          <Card.Header>Department Detail</Card.Header>
+          <Card.Body className="tw-grid tw-gap-10">
+            <div className="tw-grid tw-grid-cols-2">
+              {/**LEFT */}
+              <ListGroup as="ol" className="list-group-flush border-0">
+                <ListGroup.Item
+                  as="li"
+                  className="d-flex justify-content-between align-items-start"
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">Department Number</div>
+                    {departmentData.deptno}
+                  </div>
+                </ListGroup.Item>{" "}
+                <ListGroup.Item
+                  as="li"
+                  className="d-flex justify-content-between align-items-start"
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">Department Name</div>
+                    {departmentData.deptname}
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item
+                  as="li"
+                  className="d-flex justify-content-between align-items-start"
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">Department Manager</div>
+                    {departmentData.mgrempno
+                      ? getEmployeeName(listEmployee, departmentData.mgrempno)
+                      : "-"}
+                  </div>
+                </ListGroup.Item>
+              </ListGroup>
+            </div>
+          </Card.Body>
+        </Card>
+        <Card className="">
+          <Card.Header>Employee in Department</Card.Header>
+          <Card.Body>
+            {listEmployeePaginate.length !== 0 ? (
+              <>
+                <Table striped bordered hover responsive="sm">
+                  <thead>
+                    <tr>
+                      <th>Employee Number</th>
+                      <th>Name</th>
+                      <th>Department</th>
+                      <th>Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listEmployeePaginate.map((val, key) => (
+                      <tr key={key}>
+                        <td>{val.empno}</td>
+                        <td>{`${val.fname} ${val.lname}`}</td>
+                        <td>{getDepartmentName(listDepartment, val.deptno)}</td>
+                        <td>{val.emailAddress}</td>
+                        <td style={{ width: "20px" }}>
+                          <Container>
+                            <Row>
+                              <ButtonGroup aria-label="Basic example">
+                                <OverlayTrigger
+                                  overlay={<Tooltip>Details</Tooltip>}
+                                >
+                                  <Button
+                                    as={Link}
+                                    variant="dark"
+                                    to={`/employees/${val.empno}`}
+                                  >
+                                    <FontAwesomeIcon icon={faList} />
+                                  </Button>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                  overlay={<Tooltip>Work History</Tooltip>}
+                                >
+                                  <Button
+                                    as={Link}
+                                    variant="secondary"
+                                    to={`/employees/${val.empno}/history`}
+                                  >
+                                    <FontAwesomeIcon icon={faHistory} />
+                                  </Button>
+                                </OverlayTrigger>
+                              </ButtonGroup>
+                            </Row>
+                          </Container>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+                <PaginationCustom
+                  page={page}
+                  onChangePage={onChangePage}
+                  onChangePerPage={(e) => setPerPage(e.target.value)}
+                />
+              </>
+            ) : (
+              <p className="text-center tw-text-gray-400">Employee Empty</p>
+            )}
+          </Card.Body>
+        </Card>
+      </div>
     </>
   );
 };

@@ -33,7 +33,7 @@ const Employees = () => {
   const [listDepartment, setListDepartment] = useState(true);
 
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
+  const [perPage, setPerPage] = useState(10);
 
   const onTryDelete = (empNo) => {
     Swal.fire({
@@ -74,6 +74,13 @@ const Employees = () => {
             .then((res) => {
               if (res.status === 200) {
                 setList(res.data);
+              } else {
+                Swal.fire({
+                  position: "center",
+                  icon: "error",
+                  title: res.message,
+                  showConfirmButton: true,
+                });
               }
             })
             .finally(() => setLoading(false));
@@ -97,15 +104,15 @@ const Employees = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
-            Swal.fire({
-              position: "center",
-              icon: "warning",
-              title: "No more data!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
             setPage(page - 1);
           }
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: res.message,
+            showConfirmButton: true,
+          });
         }
       })
       .finally(() =>
@@ -212,6 +219,7 @@ const Employees = () => {
         </Table>
         <PaginationCustom
           page={page}
+          perPage={perPage}
           onChangePage={onChangePage}
           onChangePerPage={(e) => setPerPage(e.target.value)}
         />

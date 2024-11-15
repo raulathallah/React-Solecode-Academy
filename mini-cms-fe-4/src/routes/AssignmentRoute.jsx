@@ -12,11 +12,11 @@ const AssignmentRoute = [
     element: <AssignmentForm type={"add"} />,
   },
   {
-    path: "/assignments/:projNo/:empNo",
+    path: "/assignments/:empNo/:projNo",
     element: <AssignmentDetail />,
   },
   {
-    path: "/assignments/:projNo/:empNo/edit",
+    path: "/assignments/:empNo/:projNo/edit",
     element: <AssignmentForm type={"edit"} />,
   },
 ];

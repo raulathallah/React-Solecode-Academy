@@ -13,6 +13,7 @@ import {
   updateWorksOn,
 } from "../../api/WorksOn";
 import ErrorMessage from "../../utils/ErrorMessage";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   empno: 0,
@@ -37,6 +38,8 @@ const AssignmentForm = ({ type }) => {
   const [listProject, setListProject] = useState([]);
   const [listEmployee, setListEmployee] = useState([]);
   const [listWorksOn, setListWorksOn] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   const inputFocus = useRef(null);
   useEffect(() => {
@@ -93,11 +96,18 @@ const AssignmentForm = ({ type }) => {
 
   useEffect(() => {
     if (projNo && empNo) {
-      getWorksOn(projNo, empNo).then((res) => {
-        if (res.status === 200) {
-          setWorksOnData(res.data);
-        }
-      });
+      setLoading(true);
+      getWorksOn(projNo, empNo)
+        .then((res) => {
+          if (res.status === 200) {
+            setWorksOnData(res.data);
+          }
+        })
+        .finally(() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        );
     }
   }, [projNo, empNo]);
 
@@ -203,7 +213,9 @@ const AssignmentForm = ({ type }) => {
 
     return formValid;
   };
-
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
@@ -230,7 +242,7 @@ const AssignmentForm = ({ type }) => {
                   <option disabled value={0} hidden />
                   {listEmployee.map((val) => (
                     <option key={val.empno} value={val.empno}>
-                      {`${val.fname} ${val.lname}`}
+                      {`${val.empno} - ${val.fname} ${val.lname}`}
                     </option>
                   ))}
                 </Form.Select>
@@ -255,7 +267,7 @@ const AssignmentForm = ({ type }) => {
                   <option disabled value={0} hidden />
                   {listProject.map((val) => (
                     <option key={val.projno} value={val.projno}>
-                      {val.projname}
+                      {`${val.projno} - ${val.projname}`}
                     </option>
                   ))}
                 </Form.Select>

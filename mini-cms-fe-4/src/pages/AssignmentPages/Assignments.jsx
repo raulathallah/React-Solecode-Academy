@@ -22,7 +22,7 @@ import {
 import Swal from "sweetalert2";
 import { deleteWorksOn, getWorksOnPaginate } from "../../api/WorksOn";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
-import { getAllProject, getProject } from "../../api/Project";
+import { getAllProject } from "../../api/Project";
 import { getAllEmployee } from "../../api/Employee";
 import {
   getEmployeeName,
@@ -91,6 +91,13 @@ const Assignments = () => {
             .then((res) => {
               if (res.status === 200) {
                 setList(res.data);
+              } else {
+                Swal.fire({
+                  position: "center",
+                  icon: "error",
+                  title: res.message,
+                  showConfirmButton: true,
+                });
               }
             })
             .finally(() => setLoading(false));
@@ -106,15 +113,15 @@ const Assignments = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
-            Swal.fire({
-              position: "center",
-              icon: "warning",
-              title: "No more data!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
             setPage(page - 1);
           }
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: res.message,
+            showConfirmButton: true,
+          });
         }
       })
       .finally(() =>
@@ -172,7 +179,7 @@ const Assignments = () => {
                           <Button
                             as={Link}
                             variant="dark"
-                            to={`/assignments/${val.projno}/${val.empno}`}
+                            to={`/assignments/${val.empno}/${val.projno}`}
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
@@ -181,7 +188,7 @@ const Assignments = () => {
                           <Button
                             as={Link}
                             variant="primary"
-                            to={`/assignments/${val.projno}/${val.empno}/edit`}
+                            to={`/assignments/${val.empno}/${val.projno}/edit`}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>

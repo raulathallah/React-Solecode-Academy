@@ -15,6 +15,14 @@ import { faArrowLeft, faList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { Link } from "react-router-dom";
+import { getAllWorksOn } from "../../api/WorksOn";
+import {
+  getEmployeeName,
+  getProjectName,
+} from "../../utils/helpers/HelperFunctions";
+import { getAllProject } from "../../api/Project";
+import { getAllEmployee } from "../../api/Employee";
+import Swal from "sweetalert2";
 
 const EmployeeWorkHistory = () => {
   const navigate = useNavigate();
@@ -22,13 +30,48 @@ const EmployeeWorkHistory = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  //const [page, setPage] = useState(1);
+  //const [perPage, setPerPage] = useState(5);
+
+  const [listEmployee, setListEmployee] = useState([]);
+  const [listProject, setListProject] = useState([]);
+
   useEffect(() => {
-    if (list) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  }, [list]);
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
+      }
+    });
+    getAllProject().then((res) => {
+      if (res.status === 200) {
+        setListProject(res.data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    getAllWorksOn()
+      .then((res) => {
+        if (res.status === 200) {
+          let filtered = res.data.filter(
+            (val) => val.empno === parseInt(empNo)
+          );
+          setList(filtered);
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: res.message,
+            showConfirmButton: true,
+          });
+        }
+      })
+      .finally(() =>
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500)
+      );
+  }, [empNo]);
 
   if (loading) {
     return <Loading />;
@@ -38,6 +81,15 @@ const EmployeeWorkHistory = () => {
   const onCancel = () => {
     navigate(-1);
   };
+
+  //const onChangePage = (action) => {
+  //  let result = page + action;
+  //  if (result < 1) {
+  //    setPage(1);
+  //  } else {
+  //    setPage(page + action);
+  //  }
+  //};
 
   return (
     <Card>
@@ -60,15 +112,14 @@ const EmployeeWorkHistory = () => {
               <th>Employee</th>
               <th>Project</th>
               <th>Date Worked</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>{getEmployeeName(val.empNo)}</td>
-                <td>{getProjectName(val.projNo)}</td>
-                <td>{val.dateWorked}</td>
+                <td>{getEmployeeName(listEmployee, val.empno)}</td>
+                <td>{getProjectName(listProject, val.projno)}</td>
+                <td>{val.dateworked}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -77,7 +128,7 @@ const EmployeeWorkHistory = () => {
                           <Button
                             as={Link}
                             variant="dark"
-                            to={`/assignments/${val.empNo}/${val.projNo}/${val.dateWorked}`}
+                            to={`/assignments/${val.empno}/${val.projno}`}
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
@@ -90,6 +141,11 @@ const EmployeeWorkHistory = () => {
             ))}
           </tbody>
         </Table>
+        {/** <PaginationCustom
+          page={page}
+          onChangePage={onChangePage}
+          onChangePerPage={(e) => setPerPage(e.target.value)}
+        /> */}
       </Card.Body>
     </Card>
   );

@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { addProject, getProject, updateProject } from "../../api/Project";
 import { getAllDepartment } from "../../api/Department";
 import ErrorMessage from "../../utils/ErrorMessage";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   projname: "",
@@ -27,8 +28,9 @@ const ProjectForm = ({ type }) => {
   const [projectData, setProjectData] = useState(initialValue);
   const [isSuccess, setIsSuccess] = useState(false);
   const [listDepartment, setListDepartment] = useState([]);
-
   const [location] = useState([1, 2, 3]);
+  const [loading, setLoading] = useState(false);
+
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -37,14 +39,12 @@ const ProjectForm = ({ type }) => {
   }, [type]);
 
   useEffect(() => {
-    //setListProject(getProjects());
-    //setListDepartment(getDepartments());
-
     return () => {
       clearForm();
       setIsSuccess(false);
     };
   }, []);
+
   //ALERT FEEDBACK
   useEffect(() => {
     if (isSuccess) {
@@ -70,11 +70,18 @@ const ProjectForm = ({ type }) => {
 
   useEffect(() => {
     if (projNo) {
-      getProject(projNo).then((res) => {
-        if (res.status === 200) {
-          setProjectData(res.data);
-        }
-      });
+      setLoading(true);
+      getProject(projNo)
+        .then((res) => {
+          if (res.status === 200) {
+            setProjectData(res.data);
+          }
+        })
+        .finally(() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        );
     }
   }, [projNo]);
 
@@ -166,6 +173,10 @@ const ProjectForm = ({ type }) => {
 
     return formValid;
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Card>

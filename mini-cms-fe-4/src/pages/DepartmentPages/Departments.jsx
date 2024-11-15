@@ -76,6 +76,13 @@ const Departments = () => {
                 if (res.data.length !== 0) {
                   setList(res.data);
                 }
+              } else {
+                Swal.fire({
+                  position: "center",
+                  icon: "error",
+                  title: res.message,
+                  showConfirmButton: true,
+                });
               }
             })
             .finally(() => setLoading(false));
@@ -100,15 +107,15 @@ const Departments = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
-            Swal.fire({
-              position: "center",
-              icon: "warning",
-              title: "No more data!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
             setPage(page - 1);
           }
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: res.message,
+            showConfirmButton: true,
+          });
         }
       })
       .finally(() =>

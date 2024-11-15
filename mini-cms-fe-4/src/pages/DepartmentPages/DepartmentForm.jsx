@@ -10,10 +10,12 @@ import {
   updateDepartment,
 } from "../../api/Department";
 import { getAllEmployee } from "../../api/Employee";
+import Loading from "../../components/Elements/Loading";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   deptname: "",
-  mgrempno: null,
+  mgrempno: 0,
   location: [],
 };
 
@@ -30,7 +32,9 @@ const DepartmentForm = ({ type }) => {
   const [departmentData, setDepartmentData] = useState(initialValue);
   const [isSuccess, setIsSuccess] = useState(false);
   const [listEmployee, setListEmployee] = useState([]);
-  const [location] = useState([1, 2, 3]);
+  //const [location] = useState([1, 2, 3]);
+  const [loading, setLoading] = useState(false);
+
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -47,6 +51,9 @@ const DepartmentForm = ({ type }) => {
         setListEmployee(filtered);
       }
     });
+  }, [deptNo]);
+
+  useEffect(() => {
     return () => {
       clearForm();
       setIsSuccess(false);
@@ -78,11 +85,18 @@ const DepartmentForm = ({ type }) => {
 
   useEffect(() => {
     if (deptNo) {
-      getDepartment(deptNo).then((res) => {
-        if (res.status === 200) {
-          setDepartmentData(res.data);
-        }
-      });
+      setLoading(true);
+      getDepartment(deptNo)
+        .then((res) => {
+          if (res.status === 200) {
+            setDepartmentData({ ...res.data, location: res.data.locationId });
+          }
+        })
+        .finally(() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        );
     }
   }, [deptNo]);
 
@@ -114,28 +128,47 @@ const DepartmentForm = ({ type }) => {
   //ADD DEPARTMENT
   const onAdd = (e) => {
     e.preventDefault();
-
     let valid = Validate(departmentData);
 
     if (valid) {
-      addDepartment(departmentData).finally(() => setIsSuccess(true));
+      const body = {
+        ...departmentData,
+        mgrempno:
+          departmentData.mgrempno === 0 ? null : departmentData.mgrempno,
+      };
+      addDepartment(body).then((res) => {
+        if (res.response) {
+          let r = res.response.data;
+          if (r.status === "Error") {
+            ErrorMessage(r.message);
+          }
+        } else {
+          setIsSuccess(true);
+        }
+      });
     }
   };
-
   //EDIT DEPARTMENT
   const onEdit = (e) => {
     e.preventDefault();
 
-    if (departmentData.mgrempno === 0) {
-      setDepartmentData({ ...departmentData, mgrempno: null });
-    }
-
     let valid = Validate(departmentData);
     if (valid) {
-      updateDepartment(deptNo, departmentData).then((res) =>
-        console.log(res.data)
-      );
-      navigate("/departments");
+      const body = {
+        ...departmentData,
+        mgrempno:
+          departmentData.mgrempno === 0 ? null : departmentData.mgrempno,
+      };
+      updateDepartment(deptNo, body).then((res) => {
+        if (res.response) {
+          let r = res.response.data;
+          if (r.status === "Error") {
+            ErrorMessage(r.message);
+          }
+        } else {
+          setIsSuccess(true);
+        }
+      });
     }
   };
 
@@ -159,6 +192,11 @@ const DepartmentForm = ({ type }) => {
 
     return formValid;
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
@@ -204,7 +242,7 @@ const DepartmentForm = ({ type }) => {
                     .filter((x) => x.deptno === departmentData.deptno)
                     .map((val) => (
                       <option key={val.empno} value={val.empno}>
-                        {`${val.fname} ${val.lname}`}
+                        {`${val.empno} - ${val.fname} ${val.lname}`}
                       </option>
                     ))}
                 </Form.Select>
@@ -213,7 +251,8 @@ const DepartmentForm = ({ type }) => {
             </Col>
           </Row>
           <Row>
-            <Col>
+            {/**
+              <Col>
               <Form.Group controlId="formDeptNo">
                 <Form.Label className="fw-semibold">Location</Form.Label>
                 <Form.Select
@@ -237,6 +276,8 @@ const DepartmentForm = ({ type }) => {
                 {errors.location && <small>{errors.location}</small>}
               </Form.Group>
             </Col>
+             */}
+
             <Col></Col>
           </Row>
         </Card.Body>

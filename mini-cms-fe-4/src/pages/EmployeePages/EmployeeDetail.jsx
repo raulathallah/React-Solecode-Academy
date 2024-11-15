@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import TextDetail from "../../components/Elements/TextDetail";
 import { getDepartment } from "../../api/Department";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
   fname: "",
@@ -45,13 +46,20 @@ const EmployeeDetail = () => {
   const [departmentData, setDepartmentData] = useState(initialValueDept);
   const [supervisor, setSupervisor] = useState("");
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    getEmployee(empNo).then((res) => {
-      console.log(res.data);
-      if (res.status === 200) {
-        setEmployeeData(res.data);
-      }
-    });
+    getEmployee(empNo)
+      .then((res) => {
+        if (res.status === 200) {
+          setEmployeeData(res.data);
+        }
+      })
+      .finally(() =>
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500)
+      );
   }, [empNo]);
 
   useEffect(() => {
@@ -79,6 +87,10 @@ const EmployeeDetail = () => {
   const onCancel = () => {
     navigate(-1);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
