@@ -23,7 +23,7 @@ import Swal from "sweetalert2";
 import { deleteDepartment, getDepartmentPaginate } from "../../api/Department";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
 import { getAllEmployee } from "../../api/Employee";
-import { getManagerName } from "../../utils/helpers/HelperFunctions";
+import { getEmployeeName } from "../../utils/helpers/HelperFunctions";
 
 const Departments = () => {
   const navigate = useNavigate();
@@ -65,19 +65,21 @@ const Departments = () => {
             showConfirmButton: false,
             timer: 1500,
           });
+          setLoading(true);
         }
       })
       .finally(() =>
         setTimeout(() => {
-          getDepartmentPaginate(page, perPage).then((res) => {
-            if (res.status === 200) {
-              if (res.data.length !== 0) {
-                setList(res.data);
-              } else {
-                setPage(page - 1);
+          getDepartmentPaginate(page, perPage)
+            .then((res) => {
+              if (res.status === 200) {
+                if (res.data.length !== 0) {
+                  setList(res.data);
+                }
               }
-            }
-          });
+            })
+            .finally(() => setLoading(false));
+
           navigate("/departments");
         }, 1500)
       );
@@ -98,6 +100,13 @@ const Departments = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "No more data!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             setPage(page - 1);
           }
         }
@@ -152,7 +161,7 @@ const Departments = () => {
                 <td>{val.deptname}</td>
                 <td>
                   {val.mgrempno
-                    ? getManagerName(listEmployee, val.mgrempno)
+                    ? getEmployeeName(listEmployee, val.mgrempno)
                     : "None"}
                 </td>
                 <td style={{ width: "20px" }}>

@@ -20,17 +20,42 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getWorksOn } from "../../utils/api/WorksOns";
+import { deleteWorksOn, getWorksOnPaginate } from "../../api/WorksOn";
+import PaginationCustom from "../../components/Elements/PaginationCustom";
+import { getAllProject, getProject } from "../../api/Project";
+import { getAllEmployee } from "../../api/Employee";
+import {
+  getEmployeeName,
+  getProjectName,
+} from "../../utils/helpers/HelperFunctions";
 
 const Assignments = () => {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
+
+  const [listEmployee, setListEmployee] = useState([]);
+  const [listProject, setListProject] = useState([]);
+
+  useEffect(() => {
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
+      }
+    });
+    getAllProject().then((res) => {
+      if (res.status === 200) {
+        setListProject(res.data);
+      }
+    });
+  }, []);
 
   const onTryDelete = (worksOn) => {
     Swal.fire({
       title: `Are you sure want to delete assigments?`,
-      text: `Employee Number: ${worksOn.empNo}, Project Number: ${worksOn.projNo}`,
+      text: `Employee Number: ${worksOn.empno}, Project Number: ${worksOn.projno}`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: "Yes",
@@ -47,38 +72,70 @@ const Assignments = () => {
   };
   //DELETE WORKS ON
   const onDelete = (worksOn) => {
-    let newData = list.filter((val) => val !== worksOn);
-    localStorage.setItem("worksOns", JSON.stringify(newData));
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Assignment deleted!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-
-    setTimeout(() => {
-      setList(getWorksOn());
-      navigate("/assignments");
-    }, 1500);
+    deleteWorksOn(worksOn.projno, worksOn.empno)
+      .then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Assignment deleted!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setLoading(true);
+        }
+      })
+      .finally(() =>
+        setTimeout(() => {
+          getWorksOnPaginate(page, perPage)
+            .then((res) => {
+              if (res.status === 200) {
+                setList(res.data);
+              }
+            })
+            .finally(() => setLoading(false));
+          navigate("/assignments");
+        }, 1500)
+      );
   };
 
   useEffect(() => {
-    setList(getWorksOn());
-  }, []);
-
-  useEffect(() => {
-    if (list) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  }, [list]);
+    getWorksOnPaginate(page, perPage)
+      .then((res) => {
+        if (res.status === 200) {
+          if (res.data.length !== 0) {
+            setList(res.data);
+          } else {
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "No more data!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setPage(page - 1);
+          }
+        }
+      })
+      .finally(() =>
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500)
+      );
+  }, [page, perPage]);
 
   if (loading) {
     return <Loading />;
   }
 
+  const onChangePage = (action) => {
+    let result = page + action;
+    if (result < 1) {
+      setPage(1);
+    } else {
+      setPage(page + action);
+    }
+  };
   return (
     <Card>
       <Card.Header>Assignment List</Card.Header>
@@ -104,9 +161,9 @@ const Assignments = () => {
           <tbody>
             {list.map((val, key) => (
               <tr key={key}>
-                <td>-</td>
-                <td>-</td>
-                <td>{val.dateWorked}</td>
+                <td>{getEmployeeName(listEmployee, val.empno)}</td>
+                <td>{getProjectName(listProject, val.projno)}</td>
+                <td>{val.dateworked}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -115,7 +172,7 @@ const Assignments = () => {
                           <Button
                             as={Link}
                             variant="dark"
-                            to={`/assignments/${val.empNo}/${val.projNo}/${val.dateWorked}`}
+                            to={`/assignments/${val.projno}/${val.empno}`}
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
@@ -124,7 +181,7 @@ const Assignments = () => {
                           <Button
                             as={Link}
                             variant="primary"
-                            to={`/assignments/${val.empNo}/${val.projNo}/edit`}
+                            to={`/assignments/${val.projno}/${val.empno}/edit`}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>
@@ -145,6 +202,11 @@ const Assignments = () => {
             ))}
           </tbody>
         </Table>
+        <PaginationCustom
+          page={page}
+          onChangePage={onChangePage}
+          onChangePerPage={(e) => setPerPage(e.target.value)}
+        />
       </Card.Body>
     </Card>
   );

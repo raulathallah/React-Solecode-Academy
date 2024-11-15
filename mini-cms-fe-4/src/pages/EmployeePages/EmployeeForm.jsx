@@ -33,8 +33,8 @@ const initialValue = {
 };
 
 const initialError = {
-  fName: "",
-  lName: "",
+  fname: "",
+  lname: "",
   address: "",
   dob: "",
   sex: "",
@@ -191,6 +191,21 @@ const EmployeeForm = ({ type }) => {
       errorMessages.fname = `First name must be filled!`;
     }
 
+    //-- sex
+    if (!newEmp.sex) {
+      errorMessages.sex = `Sex name must be filled!`;
+    }
+
+    //-- email
+    if (!newEmp.emailAddress) {
+      errorMessages.emailAddress = `Email must be filled!`;
+    }
+
+    //-- phone
+    if (!newEmp.phoneNumber) {
+      errorMessages.phoneNumber = `Phone number must be filled!`;
+    }
+
     //-- dob
     if (!newEmp.dob) {
       errorMessages.dob = `Date of birth must be filled!`;
@@ -204,6 +219,26 @@ const EmployeeForm = ({ type }) => {
     //-- position
     if (!newEmp.position) {
       errorMessages.position = `Position must be filled!`;
+    }
+
+    //-- salary
+    if (!newEmp.salary) {
+      errorMessages.salary = `Salary must be filled!`;
+    }
+
+    //-- ssn
+    if (!newEmp.ssn) {
+      errorMessages.ssn = `Ssn must be filled!`;
+    }
+
+    //-- emptype
+    if (!newEmp.empType) {
+      errorMessages.empType = `Employee type must be filled!`;
+    }
+
+    //-- emplevel
+    if (!newEmp.empLevel) {
+      errorMessages.empLevel = `Employee level must be filled!`;
     }
 
     //-- address
@@ -278,6 +313,7 @@ const EmployeeForm = ({ type }) => {
                     checked={employeeData.sex === "Male"}
                     onChange={(e) => onChangeValue("sex", e)}
                     id={`checkbox-1`}
+                    isInvalid={errors.sex}
                   />
                   <Form.Check
                     inline
@@ -288,6 +324,7 @@ const EmployeeForm = ({ type }) => {
                     checked={employeeData.sex === "Female"}
                     id={`checkbox-1`}
                     onChange={(e) => onChangeValue("sex", e)}
+                    isInvalid={errors.sex}
                   />
                 </div>
 
@@ -335,6 +372,7 @@ const EmployeeForm = ({ type }) => {
                   onChange={(e) =>
                     setEmployeeData({ ...employeeData, phoneNumber: e })
                   }
+                  isValid={!errors.phoneNumber}
                 />
                 {errors.phoneNumber && <small>{errors.phoneNumber}</small>}
               </Form.Group>
@@ -362,7 +400,7 @@ const EmployeeForm = ({ type }) => {
                     </option>
                   ))}
                 </Form.Select>
-                {errors.deptNo && <small>{errors.deptNo}</small>}
+                {errors.deptno && <small>{errors.deptno}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -470,7 +508,7 @@ const EmployeeForm = ({ type }) => {
               <Form.Group controlId="formEmpLevel">
                 <Form.Label className="fw-semibold">Employee Level</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="number"
                   onChange={(e) =>
                     setEmployeeData({
                       ...employeeData,
@@ -507,25 +545,20 @@ const EmployeeForm = ({ type }) => {
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
-            {type !== "edit" ? (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+            <div className="d-flex gap-2">
+              <ButtonCustom variant="primary" type="submit">
+                Submit
+              </ButtonCustom>
+              {type !== "edit" ? (
                 <ButtonCustom variant="secondary" onClick={onCancel}>
                   Back
                 </ButtonCustom>
-              </div>
-            ) : (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+              ) : (
                 <ButtonCustom variant="danger" onClick={onCancel}>
                   Cancel
                 </ButtonCustom>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </Card.Footer>
       </Form>

@@ -23,7 +23,7 @@ import { getDepartment } from "../../api/Department";
 import Swal from "sweetalert2";
 import { getAllEmployee, getEmployeePaginate } from "../../api/Employee";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
-import { getManagerName } from "../../utils/helpers/HelperFunctions";
+import { getEmployeeName } from "../../utils/helpers/HelperFunctions";
 
 const initialValue = {
   deptno: null,
@@ -139,7 +139,7 @@ const DepartmentDetail = () => {
                 <div className="ms-2 me-auto">
                   <div className="fw-bold">Department Manager</div>
                   {departmentData.mgrempno
-                    ? getManagerName(listEmployee, departmentData.mgrempno)
+                    ? getEmployeeName(listEmployee, departmentData.mgrempno)
                     : "-"}
                 </div>
               </ListGroup.Item>

@@ -57,7 +57,6 @@ const Employees = () => {
   const onDelete = (empNo) => {
     deleteEmployee(empNo)
       .then((res) => {
-        console.log(res);
         if (res.status === 200) {
           Swal.fire({
             position: "center",
@@ -66,10 +65,18 @@ const Employees = () => {
             showConfirmButton: false,
             timer: 1500,
           });
+          setLoading(true);
         }
       })
       .finally(() => {
         setTimeout(() => {
+          getEmployeePaginate(page, perPage)
+            .then((res) => {
+              if (res.status === 200) {
+                setList(res.data);
+              }
+            })
+            .finally(() => setLoading(false));
           navigate("/employees");
         }, 1500);
       });

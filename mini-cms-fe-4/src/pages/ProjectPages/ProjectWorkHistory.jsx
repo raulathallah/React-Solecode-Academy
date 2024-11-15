@@ -10,7 +10,6 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { getWorksOn } from "../../utils/api/WorksOns";
 import Loading from "../../components/Elements/Loading";
 import { faArrowLeft, faList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,9 +21,7 @@ const ProjectWorkHistory = () => {
   const { id: projNo } = useParams();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    setList(getWorksOn().filter((val) => val.projNo === parseInt(projNo)));
-  }, []);
+
   useEffect(() => {
     if (list) {
       setTimeout(() => {

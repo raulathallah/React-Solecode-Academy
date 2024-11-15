@@ -2,34 +2,52 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Card, ListGroup } from "react-bootstrap";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
-
-import { getWorksOn } from "../../utils/api/WorksOns";
+import { getWorksOn } from "../../api/WorksOn";
+import {
+  getEmployeeName,
+  getProjectName,
+} from "../../utils/helpers/HelperFunctions";
+import { getAllEmployee } from "../../api/Employee";
+import { getAllProject } from "../../api/Project";
 
 const initialValue = {
-  empNo: 0,
-  projNo: 0,
-  dateWorked: "",
-  hoursWorked: 0,
+  empno: 0,
+  projno: 0,
+  dateworked: "",
+  hoursworked: 0,
 };
 
 const AssignmentDetail = () => {
-  const { empNo, projNo, dateWorked } = useParams();
+  const { empNo, projNo } = useParams();
   const navigate = useNavigate();
 
   const [worksOnData, setWorksOnData] = useState(initialValue);
 
   useEffect(() => {
-    if (projNo) {
-      setWorksOnData(
-        getWorksOn().find(
-          (val) =>
-            val.projNo === parseInt(projNo) &&
-            val.empNo === parseInt(empNo) &&
-            val.dateWorked === dateWorked
-        )
-      );
+    if (projNo && empNo) {
+      getWorksOn(projNo, empNo).then((res) => {
+        if (res.status === 200) {
+          setWorksOnData(res.data);
+        }
+      });
     }
-  }, [projNo, empNo, dateWorked]);
+  }, [projNo, empNo]);
+
+  const [listEmployee, setListEmployee] = useState([]);
+  const [listProject, setListProject] = useState([]);
+
+  useEffect(() => {
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
+      }
+    });
+    getAllProject().then((res) => {
+      if (res.status === 200) {
+        setListProject(res.data);
+      }
+    });
+  }, []);
 
   //ON CANCEL
   const onCancel = () => {
@@ -49,7 +67,7 @@ const AssignmentDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Employee</div>
-                {getEmployeeName(worksOnData.empNo)}
+                {getEmployeeName(listEmployee, worksOnData.empno)}
               </div>
             </ListGroup.Item>
             <ListGroup.Item
@@ -58,7 +76,7 @@ const AssignmentDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Date Worked</div>
-                {worksOnData.dateWorked}
+                {worksOnData.dateworked}
               </div>
             </ListGroup.Item>
           </ListGroup>
@@ -71,7 +89,7 @@ const AssignmentDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Project</div>
-                {getProjectName(worksOnData.projNo)}
+                {getProjectName(listProject, worksOnData.projno)}
               </div>
             </ListGroup.Item>
             <ListGroup.Item
@@ -80,7 +98,7 @@ const AssignmentDetail = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">Hours Worked</div>
-                {worksOnData.hoursWorked}
+                {worksOnData.hoursworked}
               </div>
             </ListGroup.Item>
           </ListGroup>

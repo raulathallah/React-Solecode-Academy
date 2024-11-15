@@ -30,7 +30,7 @@ const DepartmentForm = ({ type }) => {
   const [departmentData, setDepartmentData] = useState(initialValue);
   const [isSuccess, setIsSuccess] = useState(false);
   const [listEmployee, setListEmployee] = useState([]);
-
+  const [location] = useState([1, 2, 3]);
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -208,32 +208,54 @@ const DepartmentForm = ({ type }) => {
                       </option>
                     ))}
                 </Form.Select>
-                {errors.mgrEmpNo && <small>{errors.mgrEmpNo}</small>}
+                {errors.mgrempno && <small>{errors.mgrempno}</small>}
               </Form.Group>
             </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Group controlId="formDeptNo">
+                <Form.Label className="fw-semibold">Location</Form.Label>
+                <Form.Select
+                  onChange={(e) =>
+                    setDepartmentData({
+                      ...departmentData,
+                      location: parseInt(e.target.value),
+                    })
+                  }
+                  isInvalid={errors.location}
+                  value={departmentData.location ? departmentData.location : 0}
+                  size="sm"
+                >
+                  <option value={0} disabled hidden></option>
+                  {location.map((val) => (
+                    <option key={val} value={val}>
+                      {val}
+                    </option>
+                  ))}
+                </Form.Select>
+                {errors.location && <small>{errors.location}</small>}
+              </Form.Group>
+            </Col>
+            <Col></Col>
           </Row>
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
-            {type !== "edit" ? (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+            <div className="d-flex gap-2">
+              <ButtonCustom variant="primary" type="submit">
+                Submit
+              </ButtonCustom>
+              {type !== "edit" ? (
                 <ButtonCustom variant="secondary" onClick={onCancel}>
                   Back
                 </ButtonCustom>
-              </div>
-            ) : (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+              ) : (
                 <ButtonCustom variant="danger" onClick={onCancel}>
                   Cancel
                 </ButtonCustom>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </Card.Footer>
       </Form>

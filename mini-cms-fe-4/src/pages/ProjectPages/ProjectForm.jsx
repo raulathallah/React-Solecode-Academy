@@ -6,6 +6,7 @@ import ButtonCustom from "../../components/Elements/ButtonCustom";
 import Swal from "sweetalert2";
 import { addProject, getProject, updateProject } from "../../api/Project";
 import { getAllDepartment } from "../../api/Department";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   projname: "",
@@ -27,7 +28,7 @@ const ProjectForm = ({ type }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [listDepartment, setListDepartment] = useState([]);
 
-  const [location, setLocation] = useState([1, 2, 3]);
+  const [location] = useState([1, 2, 3]);
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -116,7 +117,9 @@ const ProjectForm = ({ type }) => {
     let valid = Validate(projectData);
     if (valid) {
       addProject(projectData).then((res) => {
-        if (res.status === 200) {
+        if (res.data.status === false) {
+          ErrorMessage(res.data.message);
+        } else {
           setIsSuccess(true);
         }
       });
@@ -129,7 +132,9 @@ const ProjectForm = ({ type }) => {
     let valid = Validate(projectData);
     if (valid) {
       updateProject(projNo, projectData).then((res) => {
-        if (res.status === 200) {
+        if (res.data.status === false) {
+          ErrorMessage(res.data.message);
+        } else {
           setIsSuccess(true);
         }
       });
@@ -242,25 +247,20 @@ const ProjectForm = ({ type }) => {
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
-            {type !== "edit" ? (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+            <div className="d-flex gap-2">
+              <ButtonCustom variant="primary" type="submit">
+                Submit
+              </ButtonCustom>
+              {type !== "edit" ? (
                 <ButtonCustom variant="secondary" onClick={onCancel}>
                   Back
                 </ButtonCustom>
-              </div>
-            ) : (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+              ) : (
                 <ButtonCustom variant="danger" onClick={onCancel}>
                   Cancel
                 </ButtonCustom>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </Card.Footer>
       </Form>

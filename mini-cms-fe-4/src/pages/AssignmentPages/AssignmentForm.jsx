@@ -4,19 +4,28 @@ import { Card, Col, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import ButtonCustom from "../../components/Elements/ButtonCustom";
 import Swal from "sweetalert2";
+import { getAllEmployee } from "../../api/Employee";
+import { getAllProject } from "../../api/Project";
+import {
+  addWorksOn,
+  getAllWorksOn,
+  getWorksOn,
+  updateWorksOn,
+} from "../../api/WorksOn";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
-  empNo: 0,
-  projNo: 0,
-  dateWorked: "",
-  hoursWorked: 0,
+  empno: 0,
+  projno: 0,
+  dateworked: "",
+  hoursworked: 0,
 };
 
 const initialError = {
-  empNo: "",
-  projNo: "",
-  dateWorked: "",
-  hoursWorked: "",
+  empno: "",
+  projno: "",
+  dateworked: "",
+  hoursworked: "",
 };
 
 const AssignmentForm = ({ type }) => {
@@ -37,6 +46,22 @@ const AssignmentForm = ({ type }) => {
   }, [type]);
 
   useEffect(() => {
+    getAllEmployee().then((res) => {
+      if (res.status === 200) {
+        setListEmployee(res.data);
+      }
+    });
+    getAllProject().then((res) => {
+      if (res.status === 200) {
+        setListProject(res.data);
+      }
+    });
+    getAllWorksOn().then((res) => {
+      if (res.status === 200) {
+        setListWorksOn(res.data);
+      }
+    });
+
     return () => {
       clearForm();
       setIsSuccess(false);
@@ -68,7 +93,11 @@ const AssignmentForm = ({ type }) => {
 
   useEffect(() => {
     if (projNo && empNo) {
-      setWorksOnData({});
+      getWorksOn(projNo, empNo).then((res) => {
+        if (res.status === 200) {
+          setWorksOnData(res.data);
+        }
+      });
     }
   }, [projNo, empNo]);
 
@@ -102,9 +131,13 @@ const AssignmentForm = ({ type }) => {
     e.preventDefault();
     let valid = Validate(worksOnData);
     if (valid) {
-      let newData = [...listWorksOn, worksOnData];
-      localStorage.setItem("worksOns", JSON.stringify(newData));
-      setIsSuccess(true);
+      addWorksOn(worksOnData)
+        .then((res) => {
+          if (res.status === 200) {
+            setIsSuccess(true);
+          }
+        })
+        .catch((err) => ErrorMessage(err));
     }
   };
 
@@ -113,14 +146,13 @@ const AssignmentForm = ({ type }) => {
     e.preventDefault();
     let valid = Validate(worksOnData);
     if (valid) {
-      let newData = listWorksOn.map((val) =>
-        val.projNo === parseInt(projNo) && val.empNo === parseInt(empNo)
-          ? worksOnData
-          : val
-      );
-
-      localStorage.setItem("worksOns", JSON.stringify(newData));
-      setIsSuccess(true);
+      updateWorksOn(projNo, empNo, worksOnData)
+        .then((res) => {
+          if (res.status === 200) {
+            setIsSuccess(true);
+          }
+        })
+        .catch((err) => ErrorMessage(err.message));
     }
   };
 
@@ -129,23 +161,36 @@ const AssignmentForm = ({ type }) => {
     let errorMessages = {};
 
     //-- empNo
-    if (!newWorksOn.empNo) {
-      errorMessages.empNo = `Employee must be filled!`;
+    if (!newWorksOn.empno) {
+      errorMessages.empno = `Employee must be filled!`;
     }
 
     //-- projNo
-    if (!newWorksOn.projNo) {
-      errorMessages.projNo = `Project must be filled!`;
+    if (!newWorksOn.projno) {
+      errorMessages.projno = `Project must be filled!`;
+    }
+
+    if (type === "add") {
+      if (
+        listWorksOn.find(
+          (val) =>
+            val.projno === newWorksOn.projno && val.empno === newWorksOn.empno
+        )
+      ) {
+        ErrorMessage("Employee already assign to the project!");
+        errorMessages.projno = `Employee already assign to the project!`;
+        errorMessages.empno = `Employee already assign to the project!`;
+      }
     }
 
     //-- dateWorked
-    if (!newWorksOn.dateWorked) {
-      errorMessages.dateWorked = `Date worked must be filled!`;
+    if (!newWorksOn.dateworked) {
+      errorMessages.dateworked = `Date worked must be filled!`;
     }
 
     //-- hoursWorked
-    if (!newWorksOn.hoursWorked || newWorksOn.hoursWorked === 0) {
-      errorMessages.hoursWorked = `Hours worked must be greater than 0!`;
+    if (!newWorksOn.hoursworked || newWorksOn.hoursworked === 0) {
+      errorMessages.hoursworked = `Hours worked must be greater than 0!`;
     }
     setErrors(errorMessages);
 
@@ -174,21 +219,22 @@ const AssignmentForm = ({ type }) => {
                   onChange={(e) =>
                     setWorksOnData({
                       ...worksOnData,
-                      empNo: parseInt(e.target.value),
+                      empno: parseInt(e.target.value),
                     })
                   }
-                  isInvalid={errors.empNo}
-                  value={worksOnData.empNo ? worksOnData.empNo : 0}
+                  isInvalid={errors.empno}
+                  disabled={type !== "add"}
+                  value={worksOnData.empno ? worksOnData.empno : 0}
                   size="sm"
                 >
                   <option disabled value={0} hidden />
                   {listEmployee.map((val) => (
-                    <option key={val.empNo} value={val.empNo}>
-                      {`${val.fName}, ${val.lName}`}
+                    <option key={val.empno} value={val.empno}>
+                      {`${val.fname} ${val.lname}`}
                     </option>
                   ))}
                 </Form.Select>
-                {errors.empNo && <small>{errors.empNo}</small>}
+                {errors.empno && <small>{errors.empno}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -198,21 +244,22 @@ const AssignmentForm = ({ type }) => {
                   onChange={(e) =>
                     setWorksOnData({
                       ...worksOnData,
-                      projNo: parseInt(e.target.value),
+                      projno: parseInt(e.target.value),
                     })
                   }
-                  isInvalid={errors.projNo}
-                  value={worksOnData.projNo ? worksOnData.projNo : 0}
+                  disabled={type !== "add"}
+                  isInvalid={errors.projno}
+                  value={worksOnData.projno ? worksOnData.projno : 0}
                   size="sm"
                 >
                   <option disabled value={0} hidden />
                   {listProject.map((val) => (
-                    <option key={val.projNo} value={val.projNo}>
-                      {val.projName}
+                    <option key={val.projno} value={val.projno}>
+                      {val.projname}
                     </option>
                   ))}
                 </Form.Select>
-                {errors.projNo && <small>{errors.projNo}</small>}
+                {errors.projno && <small>{errors.projno}</small>}
               </Form.Group>
             </Col>
           </Row>
@@ -223,12 +270,12 @@ const AssignmentForm = ({ type }) => {
                 <Form.Control
                   type="date"
                   max={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => onChangeValue("dateWorked", e)}
-                  isInvalid={errors.dateWorked}
-                  value={worksOnData.dateWorked}
+                  onChange={(e) => onChangeValue("dateworked", e)}
+                  isInvalid={errors.dateworked}
+                  value={worksOnData.dateworked}
                   size="sm"
                 />
-                {errors.dateWorked && <small>{errors.dateWorked}</small>}
+                {errors.dateworked && <small>{errors.dateworked}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -236,43 +283,38 @@ const AssignmentForm = ({ type }) => {
                 <Form.Label className="fw-semibold">Hours Worked</Form.Label>
                 <Form.Control
                   type="number"
-                  max={24}
+                  max={600}
                   onChange={(e) =>
                     setWorksOnData({
                       ...worksOnData,
-                      hoursWorked: parseInt(e.target.value),
+                      hoursworked: parseInt(e.target.value),
                     })
                   }
-                  isInvalid={errors.hoursWorked}
-                  value={worksOnData.hoursWorked}
+                  isInvalid={errors.hoursworked}
+                  value={worksOnData.hoursworked}
                   size="sm"
                 />
-                {errors.hoursWorked && <small>{errors.hoursWorked}</small>}
+                {errors.hoursworked && <small>{errors.hoursworked}</small>}
               </Form.Group>
             </Col>
           </Row>
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">
-            {type !== "edit" ? (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+            <div className="d-flex gap-2">
+              <ButtonCustom variant="primary" type="submit">
+                Submit
+              </ButtonCustom>
+              {type !== "edit" ? (
                 <ButtonCustom variant="secondary" onClick={onCancel}>
                   Back
                 </ButtonCustom>
-              </div>
-            ) : (
-              <div className="d-flex gap-2">
-                <ButtonCustom variant="primary" type="submit">
-                  Submit
-                </ButtonCustom>
+              ) : (
                 <ButtonCustom variant="danger" onClick={onCancel}>
                   Cancel
                 </ButtonCustom>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </Card.Footer>
       </Form>

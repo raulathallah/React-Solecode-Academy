@@ -22,7 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
-import { getProjectPaginate } from "../../api/Project";
+import { deleteProject, getProjectPaginate } from "../../api/Project";
 import { getAllDepartment } from "../../api/Department";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
 
@@ -55,20 +55,33 @@ const Projects = () => {
   };
   //DELETE PROJECT
   const onDelete = (projNo) => {
-    let oldData = list;
-    let newData = oldData.filter((val) => val.projNo !== projNo);
-    localStorage.setItem("projects", JSON.stringify(newData));
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Project deleted!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-
-    setTimeout(() => {
-      navigate("/projects");
-    }, 1500);
+    deleteProject(projNo)
+      .then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Project deleted!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setLoading(true);
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          getProjectPaginate(page, perPage)
+            .then((res) => {
+              if (res.status === 200) {
+                if (res.data.length !== 0) {
+                  setList(res.data);
+                }
+              }
+            })
+            .finally(() => setLoading(false));
+          navigate("/projects");
+        }, 1500);
+      });
   };
 
   useEffect(() => {
