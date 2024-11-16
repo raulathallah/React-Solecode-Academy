@@ -211,6 +211,7 @@ const Departments = () => {
         </Table>
         <PaginationCustom
           page={page}
+          perPage={perPage}
           onChangePage={onChangePage}
           onChangePerPage={(e) => setPerPage(e.target.value)}
         />
