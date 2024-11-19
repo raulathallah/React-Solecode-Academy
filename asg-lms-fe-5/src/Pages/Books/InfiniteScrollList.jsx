@@ -22,7 +22,7 @@ const InfiniteScrollList = () => {
       queryFn: fetchInfiniteBooks,
       initialPageParam: 1,
       getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.data || lastPage.data.length < PAGE_SIZE) {
+        if (lastPage.data.length < PAGE_SIZE) {
           return undefined;
         }
         return allPages.length + 1;
