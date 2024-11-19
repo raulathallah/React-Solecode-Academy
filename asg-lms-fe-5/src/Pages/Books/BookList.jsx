@@ -31,7 +31,6 @@ const fetchBooks = async ({ page, pageSize, searchQuery }) => {
 
 const searchParamList = ["Title", "Author", "ISBN", "Category"];
 const searchAndOrList = ["and", "or"];
-
 const BookList = () => {
   const [list, setList] = useState([]);
 
@@ -75,6 +74,7 @@ const BookList = () => {
       setPageCount(Math.ceil(data.total / pageSize));
     }
   }, [data, page, pageSize]);
+  console.log(list);
 
   //ON TRY DELETE
   const onTryDelete = (book) => {
@@ -170,309 +170,322 @@ const BookList = () => {
   }, [searchQuery.andor2]);
 
   return (
-    <Card>
-      <Card.Header>Book List</Card.Header>
-      <Card.Body className="d-grid gap-3">
-        <div className="d-flex justify-content-between align-items-center">
-          <Button variant="primary" as={Link} to={"/books/add"}>
-            Add Book
-          </Button>
-          <div className="d-flex gap-1">
-            <Form.Select
-              type="text"
-              value={pageSize}
-              size="sm"
-              onChange={onChangePageSize}
-            >
-              <option key={1} value={1}>
-                1
-              </option>
-              <option key={5} value={5}>
-                5
-              </option>
-              <option key={10} value={10}>
-                10
-              </option>
-              <option key={20} value={20}>
-                20
-              </option>
-            </Form.Select>
-            <Form.Label style={{ width: "100px" }}>/page</Form.Label>
+    <>
+      <Card>
+        <Card.Header>Book List</Card.Header>
+        <Card.Body className="d-grid gap-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <Button variant="primary" as={Link} to={"/books/add"}>
+              Add Book
+            </Button>
+            <div className="d-flex gap-1">
+              <Form.Select
+                type="text"
+                value={pageSize}
+                size="sm"
+                onChange={onChangePageSize}
+              >
+                <option key={1} value={1}>
+                  1
+                </option>
+                <option key={5} value={5}>
+                  5
+                </option>
+                <option key={10} value={10}>
+                  10
+                </option>
+                <option key={20} value={20}>
+                  20
+                </option>
+              </Form.Select>
+              <Form.Label style={{ width: "100px" }}>/page</Form.Label>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="" className="mx-2">
-            search ===
-          </label>
-          <div id="search1">
-            {/**SELECT */}
-            <select
-              style={{ width: "100px" }}
-              value={paramsKey1}
-              onChange={(e) => {
-                setParamsKey1(e.target.value);
-              }}
-            >
-              {searchParamList.map((val) => (
-                <option key={val} value={val.toLowerCase()}>
-                  {val}
-                </option>
-              ))}
-            </select>
-            {/**INPUT */}
-            <input
-              type="text"
-              value={searchQuery[paramsKey1]}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, [paramsKey1]: e.target.value })
-              }
-            />
-            {/**AND OR SELECT */}
-            <select
-              value={searchQuery.andor1}
-              onChange={(e) => {
-                setSearchQuery({ ...searchQuery, andor1: e.target.value });
-              }}
-            >
-              <option value={""}></option>
-              {searchAndOrList.map((val) => (
-                <option key={val} value={val.toLowerCase()}>
-                  {val}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div id="search2">
-            {/**SELECT */}
-            <select
-              style={{ width: "100px" }}
-              value={paramsKey2}
-              onChange={(e) => {
-                setParamsKey2(e.target.value);
-              }}
-              disabled={!searchQuery.andor1}
-            >
-              <option value={""} hidden disabled></option>
-              {searchParamList
-                .filter((x) => x.toLowerCase() !== paramsKey1.toLowerCase())
-                .map((val) => (
+          <div>
+            <label htmlFor="" className="mx-2">
+              search ===
+            </label>
+            <div id="search1">
+              {/**SELECT */}
+              <select
+                style={{ width: "100px" }}
+                value={paramsKey1}
+                onChange={(e) => {
+                  setParamsKey1(e.target.value);
+                }}
+              >
+                {searchParamList.map((val) => (
                   <option key={val} value={val.toLowerCase()}>
                     {val}
                   </option>
                 ))}
-            </select>
-            {/**INPUT */}
-            <input
-              type="text"
-              value={searchQuery[paramsKey2]}
-              disabled={!searchQuery.andor1}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, [paramsKey2]: e.target.value })
-              }
-            />
-            {/**AND OR SELECT */}
-            <select
-              value={searchQuery.andor2}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, andor2: e.target.value })
-              }
-              disabled={!searchQuery.andor1}
-            >
-              <option value={""}></option>
-              {searchAndOrList.map((val) => (
-                <option key={val} value={val.toLowerCase()}>
-                  {val}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div id="search3">
-            {/**SELECT */}
-            <select
-              style={{ width: "100px" }}
-              value={paramsKey3}
-              onChange={(e) => {
-                setParamsKey3(e.target.value);
-              }}
-              disabled={!searchQuery.andor2}
-            >
-              <option value={""} hidden disabled></option>
-              {searchParamList
-                .filter(
-                  (x) =>
-                    x.toLowerCase() !== paramsKey1.toLowerCase() &&
-                    x.toLowerCase() !== paramsKey2.toLowerCase()
-                )
-                .map((val) => (
+              </select>
+              {/**INPUT */}
+              <input
+                type="text"
+                value={searchQuery[paramsKey1]}
+                onChange={(e) =>
+                  setSearchQuery({
+                    ...searchQuery,
+                    [paramsKey1]: e.target.value,
+                  })
+                }
+              />
+              {/**AND OR SELECT */}
+              <select
+                value={searchQuery.andor1}
+                onChange={(e) => {
+                  setSearchQuery({ ...searchQuery, andor1: e.target.value });
+                }}
+              >
+                <option value={""}></option>
+                {searchAndOrList.map((val) => (
                   <option key={val} value={val.toLowerCase()}>
                     {val}
                   </option>
                 ))}
-            </select>
-            {/**INPUT */}
-            <input
-              type="text"
-              disabled={!searchQuery.andor2}
-              value={searchQuery[paramsKey3]}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, [paramsKey3]: e.target.value })
-              }
-            />
-            {/**AND OR SELECT */}
-            <select
-              value={searchQuery.andor3}
-              disabled={!searchQuery.andor2}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, andor3: e.target.value })
-              }
-            >
-              <option value={""}></option>
-              {searchAndOrList.map((val) => (
-                <option key={val} value={val.toLowerCase()}>
-                  {val}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div id="search4">
-            {/**SELECT */}
-            <select
-              style={{ width: "100px" }}
-              value={paramsKey4}
-              onChange={(e) => {
-                setParamsKey4(e.target.value);
-              }}
-              disabled={!searchQuery.andor3}
-            >
-              <option value={""} hidden disabled></option>
-              {searchParamList
-                .filter(
-                  (x) =>
-                    x.toLowerCase() !== paramsKey1.toLowerCase() &&
-                    x.toLowerCase() !== paramsKey2.toLowerCase() &&
-                    x.toLowerCase() !== paramsKey3.toLowerCase()
-                )
-                .map((val) => (
+              </select>
+            </div>
+            <div id="search2">
+              {/**SELECT */}
+              <select
+                style={{ width: "100px" }}
+                value={paramsKey2}
+                onChange={(e) => {
+                  setParamsKey2(e.target.value);
+                }}
+                disabled={!searchQuery.andor1}
+              >
+                <option value={""} hidden disabled></option>
+                {searchParamList
+                  .filter((x) => x.toLowerCase() !== paramsKey1.toLowerCase())
+                  .map((val) => (
+                    <option key={val} value={val.toLowerCase()}>
+                      {val}
+                    </option>
+                  ))}
+              </select>
+              {/**INPUT */}
+              <input
+                type="text"
+                value={searchQuery[paramsKey2]}
+                disabled={!searchQuery.andor1}
+                onChange={(e) =>
+                  setSearchQuery({
+                    ...searchQuery,
+                    [paramsKey2]: e.target.value,
+                  })
+                }
+              />
+              {/**AND OR SELECT */}
+              <select
+                value={searchQuery.andor2}
+                onChange={(e) =>
+                  setSearchQuery({ ...searchQuery, andor2: e.target.value })
+                }
+                disabled={!searchQuery.andor1}
+              >
+                <option value={""}></option>
+                {searchAndOrList.map((val) => (
                   <option key={val} value={val.toLowerCase()}>
                     {val}
                   </option>
                 ))}
-            </select>
-            {/**INPUT */}
-            <input
-              type="text"
-              disabled={!searchQuery.andor3}
-              value={searchQuery[paramsKey4]}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, [paramsKey4]: e.target.value })
-              }
-            />
-            <div></div>
+              </select>
+            </div>
+            <div id="search3">
+              {/**SELECT */}
+              <select
+                style={{ width: "100px" }}
+                value={paramsKey3}
+                onChange={(e) => {
+                  setParamsKey3(e.target.value);
+                }}
+                disabled={!searchQuery.andor2}
+              >
+                <option value={""} hidden disabled></option>
+                {searchParamList
+                  .filter(
+                    (x) =>
+                      x.toLowerCase() !== paramsKey1.toLowerCase() &&
+                      x.toLowerCase() !== paramsKey2.toLowerCase()
+                  )
+                  .map((val) => (
+                    <option key={val} value={val.toLowerCase()}>
+                      {val}
+                    </option>
+                  ))}
+              </select>
+              {/**INPUT */}
+              <input
+                type="text"
+                disabled={!searchQuery.andor2}
+                value={searchQuery[paramsKey3]}
+                onChange={(e) =>
+                  setSearchQuery({
+                    ...searchQuery,
+                    [paramsKey3]: e.target.value,
+                  })
+                }
+              />
+              {/**AND OR SELECT */}
+              <select
+                value={searchQuery.andor3}
+                disabled={!searchQuery.andor2}
+                onChange={(e) =>
+                  setSearchQuery({ ...searchQuery, andor3: e.target.value })
+                }
+              >
+                <option value={""}></option>
+                {searchAndOrList.map((val) => (
+                  <option key={val} value={val.toLowerCase()}>
+                    {val}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div id="search4">
+              {/**SELECT */}
+              <select
+                style={{ width: "100px" }}
+                value={paramsKey4}
+                onChange={(e) => {
+                  setParamsKey4(e.target.value);
+                }}
+                disabled={!searchQuery.andor3}
+              >
+                <option value={""} hidden disabled></option>
+                {searchParamList
+                  .filter(
+                    (x) =>
+                      x.toLowerCase() !== paramsKey1.toLowerCase() &&
+                      x.toLowerCase() !== paramsKey2.toLowerCase() &&
+                      x.toLowerCase() !== paramsKey3.toLowerCase()
+                  )
+                  .map((val) => (
+                    <option key={val} value={val.toLowerCase()}>
+                      {val}
+                    </option>
+                  ))}
+              </select>
+              {/**INPUT */}
+              <input
+                type="text"
+                disabled={!searchQuery.andor3}
+                value={searchQuery[paramsKey4]}
+                onChange={(e) =>
+                  setSearchQuery({
+                    ...searchQuery,
+                    [paramsKey4]: e.target.value,
+                  })
+                }
+              />
+              <div></div>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="" className="mx-2">
-            sort by
-          </label>
-          <select
-            style={{ width: "100px" }}
-            value={searchQuery.sortBy}
-            onChange={(e) => {
-              setSearchQuery({ ...searchQuery, sortBy: e.target.value });
-            }}
-          >
-            <option value=""></option>
-            <option value="title">Title</option>
-            <option value="author">Author</option>
-          </select>
-          <label htmlFor="" className="mx-2">
-            sort order
-          </label>
-          <select
-            style={{ width: "100px" }}
-            value={searchQuery.sortOrder}
-            onChange={(e) => {
-              setSearchQuery({ ...searchQuery, sortOrder: e.target.value });
-            }}
-          >
-            <option value="asc">Ascending</option>
-            <option value="dsc">Descending</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="" className="mx-2">
+              sort by
+            </label>
+            <select
+              style={{ width: "100px" }}
+              value={searchQuery.sortBy}
+              onChange={(e) => {
+                setSearchQuery({ ...searchQuery, sortBy: e.target.value });
+              }}
+            >
+              <option value="title">Title</option>
+              <option value="author">Author</option>
+            </select>
+            <label htmlFor="" className="mx-2">
+              sort order
+            </label>
+            <select
+              style={{ width: "100px" }}
+              value={searchQuery.sortOrder}
+              onChange={(e) => {
+                setSearchQuery({ ...searchQuery, sortOrder: e.target.value });
+              }}
+            >
+              <option value="asc">Ascending</option>
+              <option value="dsc">Descending</option>
+            </select>
+          </div>
 
-        <Table striped bordered hover responsive="sm">
-          <thead>
-            <tr>
-              <th style={{ width: "5%" }}>No.</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Category</th>
-              <th>ISBN</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((val, key) => (
-              <tr key={key}>
-                <td>{key + 1}</td>
-                <td>{val.title}</td>
-                <td>{val.author}</td>
-                <td>{val.category}</td>
-                <td>{val.isbn}</td>
-                <td style={{ width: "20px" }}>
-                  <Container>
-                    <Row>
-                      <ButtonGroup aria-label="Basic example">
-                        <Button
-                          as={Link}
-                          variant="dark"
-                          size="sm"
-                          to={`/books/${val.bookid}`}
-                        >
-                          Details
-                        </Button>
-                        <Button
-                          as={Link}
-                          variant="primary"
-                          size="sm"
-                          to={`/books/${val.bookid}/edit`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => onTryDelete(val)}
-                        >
-                          Delete
-                        </Button>
-                      </ButtonGroup>
-                    </Row>
-                  </Container>
-                </td>
+          <Table striped bordered hover responsive="sm">
+            <thead>
+              <tr>
+                <th style={{ width: "5%" }}>No.</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>ISBN</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {list.map((val, key) => (
+                <tr key={key}>
+                  <td>{key + 1}</td>
+                  <td>{val.title}</td>
+                  <td>{val.author}</td>
+                  <td>{val.category}</td>
+                  <td>{val.isbn}</td>
+                  <td style={{ width: "20px" }}>
+                    <Container>
+                      <Row>
+                        <ButtonGroup aria-label="Basic example">
+                          <Button
+                            as={Link}
+                            variant="dark"
+                            size="sm"
+                            to={`/books/${val.bookid}`}
+                          >
+                            Details
+                          </Button>
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            size="sm"
+                            to={`/books/${val.bookid}/edit`}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => onTryDelete(val)}
+                          >
+                            Delete
+                          </Button>
+                        </ButtonGroup>
+                      </Row>
+                    </Container>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
 
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel="next >"
-          onPageChange={handlePageClick}
-          pageRangeDisplayed={3}
-          pageCount={pageCount}
-          previousLabel="< prev"
-          containerClassName="pagination align-items-center gap-3"
-          pageClassName="text-black"
-          pageLinkClassName="py-2 px-3 rounded text-decoration-none text-black"
-          previousLinkClassName="page-num text-decoration-none text-black"
-          nextLinkClassName="page-num text-decoration-none text-black"
-          activeLinkClassName="text-white bg-primary"
-        />
-      </Card.Body>
-    </Card>
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel="< prev"
+            containerClassName="pagination align-items-center gap-3"
+            pageClassName="text-black"
+            pageLinkClassName="py-2 px-3 rounded text-decoration-none text-black"
+            previousLinkClassName="page-num text-decoration-none text-black"
+            nextLinkClassName="page-num text-decoration-none text-black"
+            activeLinkClassName="text-white bg-primary"
+          />
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 

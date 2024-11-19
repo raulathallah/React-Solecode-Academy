@@ -8,7 +8,7 @@ function App() {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={routers} />;
+      <RouterProvider router={routers} />
     </QueryClientProvider>
   );
 }

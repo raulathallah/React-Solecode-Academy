@@ -10,7 +10,7 @@ const getAllBook = async () => {
 };
 
 const getAllBookSearchPaged = async (body, searchParams) => {
-  console.log({ body, searchParams });
+  console.log(searchParams);
   try {
     return await Api.post(`/api/books/search`, body, {
       params: searchParams,
