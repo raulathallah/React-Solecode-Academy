@@ -6,19 +6,68 @@ import { addBook, getAllBook, getBook, updateBook } from "../../api/Books";
 import Loading from "../../components/Elements/Loading";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../utils/ErrorMessage";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 const initialValue = {
   title: "",
+  category: "",
+  publisher: "",
   author: "",
-  publicationyear: new Date().getFullYear(),
   isbn: "",
+  description: "",
+  stock: 1,
+  price: 1000,
+  language: "",
 };
 
 const initialError = {
   title: "",
+  category: "",
+  publisher: "",
   author: "",
-  publicationyear: "",
   isbn: "",
+  description: "",
+  stock: "",
+  price: "",
+  language: "",
+};
+
+const bookCategories = [
+  "Science Fiction",
+  "Science",
+  "Fiction",
+  "Cooking",
+  "Mystery",
+  "Business",
+  "Psychology",
+  "Art",
+  "Adventure",
+  "Biography",
+  "Technology",
+  "Sports",
+  "Self-Help",
+  "Fantasy",
+  "History",
+];
+
+const bookPublishers = [
+  "Galaxy Books",
+  "Oceanic Publishing",
+  "Fiction House",
+  "Gramedia",
+];
+
+const bookLanguages = ["English", "French", "Spanish"];
+
+const fetchBookDetail = async ({ id }) => {
+  const { data } = await getBook(id);
+  return data;
+};
+
+const fetchAllBooks = async () => {
+  const { data } = await getAllBook();
+
+  return data;
 };
 
 const BookForm = ({ type }) => {
@@ -33,86 +82,114 @@ const BookForm = ({ type }) => {
 
   const [errors, setErrors] = useState(initialError);
   const [newBook, setNewBook] = useState(initialValue);
-  const [loading, setLoading] = useState(true);
-  const [list, setList] = useState([]);
 
-  //GET BOOK
+  const { data: books } = useQuery({
+    queryKey: ["allBooks"],
+    queryFn: () => fetchAllBooks(),
+    placeholderData: keepPreviousData,
+  });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["bookDetail", id],
+    queryFn: () => (id ? fetchBookDetail({ id }) : null),
+    placeholderData: keepPreviousData,
+  });
+
   useEffect(() => {
-    if (id) {
-      getBook(
-        id,
-        (res) => {
-          setNewBook(res.data);
-        },
-        (err) => {
-          console.log(err.message);
-        }
-      );
+    if (data) {
+      setNewBook(data);
     }
-  }, [id]);
-
-  //GET BOOKS
-  useEffect(() => {
-    getAllBook(
-      (res) => {
-        setList(res.data);
-      },
-      (err) => {
-        console.log(err.message);
-      }
-    );
-  }, []);
+  }, [data]);
 
   //CLEAR FORM
   const clearForm = () => {
     setNewBook(initialValue);
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return ErrorMessage("Get detail failed!");
+  }
+
   //ADD BOOK
   const onAdd = (e) => {
     e.preventDefault();
-    let valid = ValidateBook(list, newBook);
+    let valid = ValidateBook(books, newBook);
     if (valid) {
-      addBook(
-        newBook,
-        (res) => {
-          if (res.status === 200) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Book added!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            setTimeout(() => {
-              navigate("/books");
-            }, 1500);
+      addBook(newBook).then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Book added!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            navigate("/books");
+          }, 1500);
+        } else {
+          if (res.message) {
+            ErrorMessage(res.message);
           }
-        },
-        (err) => {
-          ErrorMessage(err.message);
         }
-      );
-      clearForm();
+      });
+      //clearForm();
+    }
+  };
+
+  //EDIT BOOK
+  const onEdit = (e) => {
+    e.preventDefault();
+    let valid = ValidateBook(books, newBook);
+    if (valid) {
+      updateBook(id, newBook).then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Book updated!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            clearForm();
+            navigate("/books");
+          }, 1500);
+        } else {
+          if (res.message) {
+            ErrorMessage(res.message);
+          }
+        }
+      });
     }
   };
 
   //VALIDATION BOOK
   const ValidateBook = (oldData, book) => {
     let errorMessages = {};
-    let yearNow = new Date().getFullYear();
     //-- isbn
     if (!book.isbn) {
       errorMessages.isbn = "ISBN must be filled!";
-    } else if (
+    }
+
+    /*
+    else if (
       book.isbn.length < 10 ||
       book.isbn.length > 13 ||
       typeof parseInt(book.isbn) !== typeof 0
     ) {
       errorMessages.isbn = `Must be a valid ISBN number! (10-13 Number)`;
-    } else if (oldData.find((x) => x.isbn === book.isbn)) {
+    } else if (
+      oldData
+        .filter((f) => f.isbn !== data.isbn)
+        .find((x) => x.isbn === book.isbn)
+    ) {
       errorMessages.isbn = `Book with ${book.isbn} already exist!`;
     }
+      */
 
     //-- title
     if (!book.title) {
@@ -121,16 +198,29 @@ const BookForm = ({ type }) => {
       errorMessages.title = "Title must be 3 character minimum!";
     }
 
-    //-- year
-    if (!book.publicationyear) {
-      errorMessages.publicationyear = "Publication year must be filled!";
-    } else if (book.publicationyear < 1900 || book.publicationyear > yearNow) {
-      errorMessages.publicationyear = `Must be a valid year! (1900-${yearNow})`;
-    }
-
     //-- author
     if (!book.author) {
       errorMessages.author = "Author must be filled!";
+    }
+
+    //-- category
+    if (!book.category) {
+      errorMessages.category = "Category must be filled!";
+    }
+
+    //-- language
+    if (!book.language) {
+      errorMessages.language = "Language must be filled!";
+    }
+
+    //-- publisher
+    if (!book.publisher) {
+      errorMessages.publisher = "Publisher must be filled!";
+    }
+
+    //-- description
+    if (!book.description) {
+      errorMessages.description = "Description must be filled!";
     }
 
     setErrors(errorMessages);
@@ -143,33 +233,6 @@ const BookForm = ({ type }) => {
     }
 
     return formValid;
-  };
-
-  //EDIT BOOK
-  const onEdit = (e) => {
-    e.preventDefault();
-    updateBook(
-      id,
-      newBook,
-      (res) => {
-        if (res.status === 200) {
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Book updated!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          setTimeout(() => {
-            navigate("/books");
-          }, 1500);
-        }
-      },
-      (err) => {
-        ErrorMessage(err.message);
-      }
-    );
-    clearForm();
   };
 
   //ON CHANGE VALUE
@@ -192,84 +255,145 @@ const BookForm = ({ type }) => {
     navigate(-1);
   };
 
-  //SET LOADING STATE
-  useEffect(() => {
-    if (newBook || list) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  }, [newBook, list]);
-
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
         <Card.Header>{type === "add" ? "Add Book" : "Edit Book"}</Card.Header>
-        {loading ? (
-          <Loading />
-        ) : (
-          <Card.Body>
-            <Row className="mb-3">
-              <Col>
-                <Form.Group controlId="formTitle">
-                  <Form.Label className="fw-semibold">Title</Form.Label>
-                  <Form.Control
-                    ref={inputFocus}
-                    type="text"
-                    value={newBook.title}
-                    size="sm"
-                    onChange={(e) => onChangeValue("title", e)}
-                    isInvalid={errors.title}
-                  />
-                  {errors.title && <small>{errors.title}</small>}
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group controlId="formAuthor">
-                  <Form.Label className="fw-semibold">Author</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={newBook.author}
-                    size="sm"
-                    onChange={(e) => onChangeValue("author", e)}
-                    isInvalid={errors.author}
-                  />
-                  {errors.author && <small>{errors.author}</small>}
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col>
-                <Form.Group controlId="formYear">
-                  <Form.Label className="fw-semibold">Year</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={newBook.publicationyear}
-                    size="sm"
-                    onChange={(e) => onChangeValue("publicationyear", e)}
-                    isInvalid={errors.publicationyear}
-                  />
-                  {errors.publicationyear && (
-                    <small>{errors.publicationyear}</small>
-                  )}
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group controlId="formIsbn">
-                  <Form.Label className="fw-semibold">ISBN</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={newBook.isbn}
-                    size="sm"
-                    onChange={(e) => onChangeValue("isbn", e)}
-                    isInvalid={errors.isbn}
-                  />
-                  {errors.isbn && <small>{errors.isbn}</small>}
-                </Form.Group>
-              </Col>
-            </Row>
-          </Card.Body>
-        )}
+        <Card.Body className="d-grid gap-2">
+          <Form.Group as={Row} controlId="formTitle">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Title</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                ref={inputFocus}
+                type="text"
+                value={newBook.title}
+                size="sm"
+                onChange={(e) => onChangeValue("title", e)}
+                isInvalid={errors.title}
+              />
+              {errors.title && <small>{errors.title}</small>}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="formCategory">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Category</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Select
+                size="sm"
+                value={newBook.category}
+                onChange={(e) => onChangeValue("category", e)}
+                isInvalid={errors.category}
+              >
+                <option value="" disabled hidden></option>
+                {bookCategories.map((val) => (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.category && <small>{errors.category}</small>}
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} controlId="formLanguage">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Language</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Select
+                size="sm"
+                value={newBook.language}
+                onChange={(e) => onChangeValue("language", e)}
+                isInvalid={errors.language}
+              >
+                <option value="" disabled hidden></option>
+                {bookLanguages.map((val) => (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.language && <small>{errors.language}</small>}
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} controlId="formAuthor">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Author</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                type="text"
+                value={newBook.author}
+                size="sm"
+                onChange={(e) => onChangeValue("author", e)}
+                isInvalid={errors.author}
+              />
+              {errors.author && <small>{errors.author}</small>}
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} controlId="formPublisher">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Publisher</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Select
+                size="sm"
+                value={newBook.publisher}
+                onChange={(e) => onChangeValue("publisher", e)}
+                isInvalid={errors.publisher}
+              >
+                <option value="" disabled hidden></option>
+                {bookPublishers.map((val) => (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.publisher && <small>{errors.publisher}</small>}
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} controlId="formIsbn">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">ISBN</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                type="text"
+                value={newBook.isbn}
+                size="sm"
+                onChange={(e) => onChangeValue("isbn", e)}
+                isInvalid={errors.isbn}
+              />
+              {errors.isbn && <small>{errors.isbn}</small>}
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} controlId="formDescription">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Description</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                as={"textarea"}
+                type="text"
+                rows={5}
+                maxLength={200}
+                value={newBook.description}
+                size="sm"
+                onChange={(e) => onChangeValue("description", e)}
+                isInvalid={errors.description}
+              />
+              <p>{newBook.description.length}/200</p>
+              {errors.description && <small>{errors.description}</small>}
+            </Col>
+          </Form.Group>
+        </Card.Body>
 
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">

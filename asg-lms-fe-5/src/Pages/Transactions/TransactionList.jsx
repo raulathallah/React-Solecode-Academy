@@ -7,12 +7,28 @@ import { getAllBook } from "../../api/Books";
 import { getAllUser } from "../../api/Users";
 import ReactPaginate from "react-paginate";
 import ErrorMessage from "../../utils/ErrorMessage";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+
+const fetchBorrows = async () => {
+  const { data } = await getAllBorrow();
+  return data;
+};
 
 const TransactionList = () => {
-  const [loading, setLoading] = useState(true);
   const [list, setList] = useState([]);
   const [listBook, setListBook] = useState([]);
   const [listUser, setListUser] = useState([]);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["borrows"],
+    queryFn: () => fetchBorrows(),
+    placeholderData: keepPreviousData,
+  });
+  useEffect(() => {
+    if (data) {
+      setList(data);
+    }
+  }, [data]);
 
   //GET BORROW
   useEffect(() => {
@@ -48,14 +64,6 @@ const TransactionList = () => {
     );
   }, []);
 
-  useEffect(() => {
-    if (list) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    }
-  }, [list]);
-
   const displayBookName = (bookId) => {
     let book = listBook.find((x) => x.bookid === bookId);
 
@@ -90,6 +98,15 @@ const TransactionList = () => {
     const newOffset = (event.selected * itemsPerPage) % list.length;
     setItemOffset(newOffset);
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError && error) {
+    return ErrorMessage(error.message);
+  }
+
   return (
     <Card>
       <Card.Header>Book Borrow List</Card.Header>
@@ -124,58 +141,52 @@ const TransactionList = () => {
           </div>
         </div>
 
-        {loading ? (
-          <Loading />
-        ) : (
-          <>
-            <Table striped bordered hover responsive="sm">
-              <thead>
-                <tr>
-                  <th>Transaction ID</th>
-                  <th>Member</th>
-                  <th>Book</th>
-                  <th>Borrow Date</th>
-                  <th>Expired Date</th>
-                  <th>Return Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((val, key) => (
-                  <tr key={key}>
-                    <td>{val.transactionid}</td>
-                    <td>{displayMemberName(val.userid)}</td>
-                    <td>{displayBookName(val.bookid)}</td>
-                    <td>{val.borrowdate}</td>
-                    <td>{val.borrowexpired}</td>
-                    <td>{val.returndate}</td>
-                    <td className="text-center">
-                      {val.isreturned ? (
-                        <Badge bg="success">RETURNED</Badge>
-                      ) : (
-                        <Badge bg="secondary">NOT YET RETURNED</Badge>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel="next >"
-              onPageChange={handlePageClick}
-              pageRangeDisplayed={3}
-              pageCount={pageCount}
-              previousLabel="< prev"
-              containerClassName="pagination align-items-center gap-3"
-              pageClassName="text-black"
-              pageLinkClassName="py-2 px-3 rounded text-decoration-none text-black"
-              previousLinkClassName="page-num text-decoration-none text-black"
-              nextLinkClassName="page-num text-decoration-none text-black"
-              activeLinkClassName="text-white bg-primary"
-            />
-          </>
-        )}
+        <Table striped bordered hover responsive="sm">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Member</th>
+              <th>Book</th>
+              <th>Borrow Date</th>
+              <th>Expired Date</th>
+              <th>Return Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems.map((val, key) => (
+              <tr key={key}>
+                <td>{val.transactionid}</td>
+                <td>{displayMemberName(val.userid)}</td>
+                <td>{displayBookName(val.bookid)}</td>
+                <td>{val.borrowdate}</td>
+                <td>{val.borrowexpired}</td>
+                <td>{val.returndate}</td>
+                <td className="text-center">
+                  {val.isreturned ? (
+                    <Badge bg="success">RETURNED</Badge>
+                  ) : (
+                    <Badge bg="secondary">NOT YET RETURNED</Badge>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel="next >"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={3}
+          pageCount={pageCount}
+          previousLabel="< prev"
+          containerClassName="pagination align-items-center gap-3"
+          pageClassName="text-black"
+          pageLinkClassName="py-2 px-3 rounded text-decoration-none text-black"
+          previousLinkClassName="page-num text-decoration-none text-black"
+          nextLinkClassName="page-num text-decoration-none text-black"
+          activeLinkClassName="text-white bg-primary"
+        />
       </Card.Body>
     </Card>
   );

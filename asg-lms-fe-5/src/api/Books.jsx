@@ -1,4 +1,3 @@
-import axios from "axios";
 import Api from "./Api";
 
 const getAllBook = async () => {
@@ -10,7 +9,6 @@ const getAllBook = async () => {
 };
 
 const getAllBookSearchPaged = async (body, searchParams) => {
-  console.log(searchParams);
   try {
     return await Api.post(`/api/books/search`, body, {
       params: searchParams,
@@ -20,64 +18,38 @@ const getAllBookSearchPaged = async (body, searchParams) => {
   }
 };
 
-const getBook = async (id, callback, errorcallback, config) => {
-  await axios
-    .get(`http://localhost/api/books/${id}`, config)
-    .then((res) => {
-      if (callback != null) {
-        callback(res);
-      }
-    })
-    .catch((err) => {
-      if (errorcallback != null) {
-        errorcallback(err);
-      }
-    });
+const getBook = async (id) => {
+  try {
+    return await Api.get(`/api/books/${id}`);
+  } catch (err) {
+    return err;
+  }
 };
 
-const updateBook = async (id, body, callback, errorcallback, config) => {
-  await axios
-    .put(`http://localhost/api/books/${id}`, body, config)
-    .then((res) => {
-      if (callback != null) {
-        callback(res);
-      }
-    })
-    .catch((err) => {
-      if (errorcallback != null) {
-        errorcallback(err);
-      }
-    });
+const updateBook = async (id, body) => {
+  try {
+    return await Api.put(`/api/books/${id}`, body);
+  } catch (err) {
+    return err;
+  }
 };
 
-const addBook = async (body, callback, errorcallback, config) => {
-  await axios
-    .post(`http://localhost/api/books`, body, config)
-    .then((res) => {
-      if (callback != null) {
-        callback(res);
-      }
-    })
-    .catch((err) => {
-      if (errorcallback != null) {
-        errorcallback(err);
-      }
-    });
+const addBook = async (body) => {
+  try {
+    return await Api.post(`/api/books`, body);
+  } catch (err) {
+    return err;
+  }
 };
 
-const deleteBook = async (id, callback, errorcallback, config) => {
-  await axios
-    .delete(`http://localhost/api/books/${id}`, config)
-    .then((res) => {
-      if (callback != null) {
-        callback(res);
-      }
-    })
-    .catch((err) => {
-      if (errorcallback != null) {
-        errorcallback(err);
-      }
+const deleteBook = async (id, body) => {
+  try {
+    return await Api.delete(`/api/books/${id}`, {
+      data: body,
     });
+  } catch (err) {
+    return err;
+  }
 };
 
 export {

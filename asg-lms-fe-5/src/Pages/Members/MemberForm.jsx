@@ -2,21 +2,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { addUser, getAllUser, getUser, updateUser } from "../../api/Users";
+import { addUser, getUser, updateUser } from "../../api/Users";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../utils/ErrorMessage";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import Loading from "../../components/Elements/Loading";
 
 const initialValue = {
-  username: "",
-  phonenumber: "",
+  fName: "",
+  lName: "",
+  userPrivilage: "",
+  userPosition: "",
 };
 
 const initialError = {
-  username: "",
-  phonenumber: "",
+  fName: "",
+  lName: "",
+  userPrivilage: "",
+  userPosition: "",
 };
+
+const fetchUserDetail = async ({ id }) => {
+  const { data } = await getUser(id);
+  return data;
+};
+
+const userPositions = ["Library Manager", "Librarian", "Library User"];
 
 const MemberForm = ({ type }) => {
   const navigate = useNavigate();
@@ -28,94 +40,67 @@ const MemberForm = ({ type }) => {
   }, [type]);
 
   const { id } = useParams();
-
-  const [list, setList] = useState([]);
   const [errors, setErrors] = useState(initialError);
   const [newMember, setNewMember] = useState(initialValue);
 
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["userDetail", id],
+    queryFn: () => (id ? fetchUserDetail({ id }) : null),
+    placeholderData: keepPreviousData,
+  });
+
   //GET USER
   useEffect(() => {
-    if (id) {
-      getUser(
-        id,
-        (res) => {
-          setNewMember(res.data);
-        },
-        (err) => {
-          console.log(err.message);
-        }
-      );
+    if (data) {
+      setNewMember(data);
     }
-  }, [id]);
+  }, [data]);
 
   //CLEAR FORM
   const clearForm = () => {
     setNewMember(initialValue);
   };
 
-  //GET USERS
-  useEffect(() => {
-    getAllUser(
-      (res) => {
-        setList(res.data);
-      },
-      (err) => {
-        console.log(err.message);
-      }
-    );
-  }, []);
-
   //ADD MEMBER
   const onAdd = (e) => {
     e.preventDefault();
-    let valid = ValidateMember(list, newMember);
+    let valid = ValidateMember(newMember);
     if (valid) {
-      addUser(
-        newMember,
-        (res) => {
-          if (res.status === 200) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Member added!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            setTimeout(() => {
-              navigate("/members");
-            }, 1500);
+      addUser(newMember).then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Member added!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            navigate("/members");
+          }, 1500);
+        } else {
+          if (res.message) {
+            ErrorMessage(res.message);
           }
-        },
-        (err) => {
-          ErrorMessage(err.message);
         }
-      );
+      });
     }
   };
 
   //VALIDATION MEMBER
-  const ValidateMember = (oldData, member) => {
+  const ValidateMember = (member) => {
     let errorMessages = {};
 
-    const isExist = list.filter((x) => x.userid !== parseInt(id));
-    //-- username
-    if (!member.username) {
-      errorMessages.username = `Usrname must be filled!`;
-    } else if (
-      isExist &&
-      isExist.find((val) => val.username === member.username)
-    ) {
-      errorMessages.username = `Username already taken!`;
+    if (!member.fName) {
+      errorMessages.fName = "First name must be filled!";
     }
 
-    //-- phonenumber
-    if (!member.phonenumber || member.phonenumber.length <= 4) {
-      errorMessages.phonenumber = `Phone must be filled!`;
-    } else if (
-      isExist &&
-      isExist.find((val) => val.phonenumber === member.phonenumber)
-    ) {
-      errorMessages.phonenumber = `Phone already exist!`;
+    if (!member.userPrivilage) {
+      errorMessages.userPrivilage = "User Privilage must be filled!";
+    }
+
+    if (!member.userPosition) {
+      errorMessages.userPosition = "User Position Privilage must be filled!";
     }
 
     setErrors(errorMessages);
@@ -134,29 +119,26 @@ const MemberForm = ({ type }) => {
   const onEdit = (e) => {
     e.preventDefault();
 
-    let valid = ValidateMember(list, newMember);
+    let valid = ValidateMember(newMember);
     if (valid) {
-      updateUser(
-        id,
-        newMember,
-        (res) => {
-          if (res.status === 200) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Member updated!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            setTimeout(() => {
-              navigate("/members");
-            }, 1500);
+      updateUser(id, newMember).then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Member updated!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            navigate("/members");
+          }, 1500);
+        } else {
+          if (res.message) {
+            ErrorMessage(res.message);
           }
-        },
-        (err) => {
-          ErrorMessage(err.message);
         }
-      );
+      });
     }
   };
 
@@ -179,43 +161,93 @@ const MemberForm = ({ type }) => {
     };
   }, []);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError && error) {
+    return ErrorMessage(error.message);
+  }
+
   return (
     <Card>
       <Form onSubmit={type === "add" ? onAdd : onEdit}>
         <Card.Header>
           {type === "add" ? "Add Member" : "Edit Member"}
         </Card.Header>
-        <Card.Body>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group controlId="formFullNama">
-                <Form.Label className="fw-semibold">Username</Form.Label>
-                <Form.Control
-                  ref={inputFocus}
-                  type="text"
-                  value={newMember.username}
-                  size="sm"
-                  onChange={(e) => onChangeValue("username", e)}
-                  isInvalid={errors.username}
-                />
-                {errors.username && <small>{errors.username}</small>}
-              </Form.Group>
+        <Card.Body className="d-grid gap-2">
+          <Form.Group as={Row} controlId="formFname">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">First Name</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                ref={inputFocus}
+                type="text"
+                value={newMember.fName}
+                size="sm"
+                onChange={(e) => onChangeValue("fName", e)}
+                isInvalid={errors.fName}
+              />
+              {errors.fName && <small>{errors.fName}</small>}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="formLname">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Last Name</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                ref={inputFocus}
+                type="text"
+                value={newMember.lName}
+                size="sm"
+                onChange={(e) => onChangeValue("lName", e)}
+                isInvalid={errors.lName}
+              />
+              {errors.lName && <small>{errors.lName}</small>}
             </Col>
             <Col>
-              <Form.Group controlId="formPhone">
-                <Form.Label className="fw-semibold">Phone</Form.Label>
-                <PhoneInput
-                  inputStyle={{ width: "100%" }}
-                  country={"id"}
-                  value={newMember.phonenumber}
-                  onChange={(e) =>
-                    setNewMember({ ...newMember, phonenumber: e })
-                  }
-                />
-                {errors.phonenumber && <small>{errors.phonenumber}</small>}
-              </Form.Group>
+              <span style={{ fontSize: "13px" }}>(optional)</span>
             </Col>
-          </Row>
+          </Form.Group>
+          <Form.Group as={Row} controlId="formUserPrivilage">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">User Privilage</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Control
+                ref={inputFocus}
+                type="text"
+                value={newMember.userPrivilage}
+                size="sm"
+                onChange={(e) => onChangeValue("userPrivilage", e)}
+                isInvalid={errors.userPrivilage}
+              />
+              {errors.userPrivilage && <small>{errors.userPrivilage}</small>}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="formUserPosition">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">User Position</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Select
+                size="sm"
+                value={newMember.userPosition}
+                onChange={(e) => onChangeValue("userPosition", e)}
+                isInvalid={errors.userPosition}
+              >
+                <option value="" disabled hidden></option>
+                {userPositions.map((val) => (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.userPosition && <small>{errors.userPosition}</small>}
+            </Col>
+          </Form.Group>
         </Card.Body>
         <Card.Footer className="text-muted">
           <div className="d-flex justify-content-end">

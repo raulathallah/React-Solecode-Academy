@@ -16,32 +16,25 @@ const fetchInfiniteBooks = async ({ pageParam = 2 }) => {
   return data;
 };
 const InfiniteScrollList = () => {
-  const { data, fetchNextPage, isLoading, isFetchingNextPage, hasNextPage } =
-    useInfiniteQuery({
-      queryKey: ["infiniteData"],
-      queryFn: fetchInfiniteBooks,
-      initialPageParam: 1,
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.data.length < PAGE_SIZE) {
-          return undefined;
-        }
-        return allPages.length + 1;
-      },
-    });
+  const { data, fetchNextPage } = useInfiniteQuery({
+    queryKey: ["infiniteData"],
+    queryFn: fetchInfiniteBooks,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.data.length < PAGE_SIZE) {
+        return undefined;
+      }
+      return allPages.length + 1;
+    },
+  });
 
   const items = data?.pages.flatMap((page) => page.data) ?? [];
 
-  console.log({ data: data?.pages.flatMap((page) => page.data) });
-  console.log(isLoading);
   const isEmpty = items.length === 0;
   const isReachingEnd =
     isEmpty ||
     (data && data.pages[data.pages.length - 1]?.data.length < PAGE_SIZE);
-  console.log({
-    isEnd:
-      isEmpty ||
-      (data && data.pages[data.pages.length - 1]?.data.length < PAGE_SIZE),
-  });
+
   return (
     <InfiniteScroll
       dataLength={items.length}
