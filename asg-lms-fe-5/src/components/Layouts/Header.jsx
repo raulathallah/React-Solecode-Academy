@@ -23,7 +23,9 @@ const Header = () => {
             <Dropdown.Toggle as={NavLink}>Books</Dropdown.Toggle>
             <Dropdown.Menu>
               <Nav.Link href="/books">Books</Nav.Link>
-              <Nav.Link href="/transactions">Borrow</Nav.Link>
+              <Nav.Link href="/transactions" disabled>
+                Borrow
+              </Nav.Link>
             </Dropdown.Menu>
           </Dropdown>
 

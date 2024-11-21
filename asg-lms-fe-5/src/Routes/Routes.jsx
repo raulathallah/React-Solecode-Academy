@@ -3,7 +3,7 @@ import Layouts from "../components/Layouts/Layouts";
 import BookRoutes from "./BookRoutes";
 import MemberRoutes from "./MemberRoutes";
 import Home from "../Pages/Home";
-import TransactionRoutes from "./TransactionRoutes";
+//import TransactionRoutes from "./TransactionRoutes";
 import InfiniteScrollList from "../Pages/Books/InfiniteScrollList";
 
 export const routers = createBrowserRouter([
@@ -18,7 +18,7 @@ export const routers = createBrowserRouter([
 
       ...BookRoutes,
       ...MemberRoutes,
-      ...TransactionRoutes,
+      //...TransactionRoutes, (API TIDAK TERSEDIA)
     ],
   },
   {
