@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
+  Badge,
   Button,
   ButtonGroup,
   Card,
@@ -20,40 +21,48 @@ import {
   faList,
 } from "@fortawesome/free-solid-svg-icons";
 import { getAllDepartment, getDepartment } from "../../api/Department";
-import { getAllEmployee, getEmployeePaginate } from "../../api/Employee";
-import PaginationCustom from "../../components/Elements/PaginationCustom";
 import {
   getDepartmentName,
   getEmployeeName,
 } from "../../utils/helpers/HelperFunctions";
 import Loading from "../../components/Elements/Loading";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { fetchAllEmployees } from "../../api/Fetchs/FetchEmployees";
 
 const initialValue = {
   deptno: null,
   deptname: "",
   mgrempno: null,
-  locationId: [],
+  location: [],
 };
+
+const locations = [
+  {
+    id: 1,
+    name: "Jakarta",
+  },
+  {
+    id: 2,
+    name: "Bandung",
+  },
+  {
+    id: 3,
+    name: "Surabaya",
+  },
+];
 
 const DepartmentDetail = () => {
   const { id: deptNo } = useParams();
   const navigate = useNavigate();
 
   const [departmentData, setDepartmentData] = useState(initialValue);
-  const [listEmployeePaginate, setListEmployeePaginate] = useState([]);
+  const [listDeptEmployee, setListDeptEmployee] = useState([]);
   const [listEmployee, setListEmployee] = useState([]);
   const [listDepartment, setListDepartment] = useState([]);
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAllEmployee().then((res) => {
-      if (res.status === 200) {
-        setListEmployee(res.data);
-      }
-    });
     getAllDepartment().then((res) => {
       if (res.status === 200) {
         setListDepartment(res.data);
@@ -61,6 +70,24 @@ const DepartmentDetail = () => {
     });
   }, []);
 
+  const {
+    data: listE,
+    isLoading: isLoadingE,
+    //isError: isErrorE,
+    //error: errorE,
+  } = useQuery({
+    queryKey: ["allEmployees"],
+    queryFn: () => fetchAllEmployees(),
+    placeholderData: keepPreviousData,
+  });
+
+  useEffect(() => {
+    if (listE) {
+      setListEmployee(listE);
+      setListDeptEmployee(listE.filter((e) => e.deptno === parseInt(deptNo)));
+    }
+  }, [listE]);
+  console.log(departmentData);
   useEffect(() => {
     if (deptNo) {
       getDepartment(deptNo)
@@ -77,38 +104,12 @@ const DepartmentDetail = () => {
     }
   }, [deptNo]);
 
-  useEffect(() => {
-    if (deptNo) {
-      getEmployeePaginate(page, perPage).then((res) => {
-        if (res.status === 200) {
-          let filtered = res.data.filter(
-            (val) => val.deptno === parseInt(deptNo)
-          );
-          if (filtered.length !== 0) {
-            setListEmployeePaginate(filtered);
-          } else {
-            setPage(page - 1);
-          }
-        }
-      });
-    }
-  }, [deptNo, page, perPage]);
-
   //ON CANCEL
   const onCancel = () => {
     navigate(-1);
   };
 
-  const onChangePage = (action) => {
-    let result = page + action;
-    if (result < 1) {
-      setPage(1);
-    } else {
-      setPage(page + action);
-    }
-  };
-
-  if (loading) {
+  if (loading && isLoadingE) {
     return <Loading />;
   }
 
@@ -160,13 +161,36 @@ const DepartmentDetail = () => {
                   </div>
                 </ListGroup.Item>
               </ListGroup>
+
+              <ListGroup as="ol" className="list-group-flush border-0">
+                <ListGroup.Item
+                  as="li"
+                  className="d-flex justify-content-between align-items-start"
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">Locations</div>
+                    <div className="tw-grid tw-grid-cols-4 tw-gap-0">
+                      {departmentData.location &&
+                        departmentData.location.map((x) => (
+                          <h5 key={x}>
+                            <Badge bg="info">
+                              {x
+                                ? locations.find((loc) => loc.id === x)?.name
+                                : ""}
+                            </Badge>
+                          </h5>
+                        ))}
+                    </div>
+                  </div>
+                </ListGroup.Item>
+              </ListGroup>
             </div>
           </Card.Body>
         </Card>
         <Card className="">
           <Card.Header>Employee in Department</Card.Header>
           <Card.Body>
-            {listEmployeePaginate.length !== 0 ? (
+            {listDeptEmployee.length !== 0 ? (
               <>
                 <Table striped bordered hover responsive="sm">
                   <thead>
@@ -178,7 +202,7 @@ const DepartmentDetail = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {listEmployeePaginate.map((val, key) => (
+                    {listDeptEmployee.map((val, key) => (
                       <tr key={key}>
                         <td>{val.empno}</td>
                         <td>{`${val.fname} ${val.lname}`}</td>
@@ -218,12 +242,6 @@ const DepartmentDetail = () => {
                     ))}
                   </tbody>
                 </Table>
-                <PaginationCustom
-                  page={page}
-                  perPage={perPage}
-                  onChangePage={onChangePage}
-                  onChangePerPage={(e) => setPerPage(e.target.value)}
-                />
               </>
             ) : (
               <p className="text-center tw-text-gray-400">Employee Empty</p>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Badge,
   Button,
   ButtonGroup,
   Card,
@@ -18,17 +17,19 @@ import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
+  faFlag,
   faHistory,
   faList,
   faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { deleteEmployee } from "../../api/Employee";
+import { deactivateEmployee, deleteEmployee } from "../../api/Employee";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import ReactPaginate from "react-paginate";
 import { fetchEmployeeSearch } from "../../api/Fetchs/FetchEmployees";
 import moment from "moment";
+import { getEmpStatus, getEmpType } from "../../utils/helpers/HelperFunctions";
 
 const searchByList = [
   {
@@ -66,6 +67,7 @@ const initialSearchValue = {
   keyword: "",
   sortBy: "name",
   isDescending: false,
+  isActive: null,
 };
 
 const Employees = () => {
@@ -74,7 +76,6 @@ const Employees = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [pageCount, setPageCount] = useState(0);
-
   const [searchQuery, setSearchQuery] = useState(initialSearchValue);
 
   const { data, isLoading, isError, error } = useQuery({
@@ -107,6 +108,64 @@ const Employees = () => {
         onDelete(empNo);
       }
     });
+  };
+
+  const onTryChangeStatus = (emp) => {
+    Swal.fire({
+      title: `Deactivate Employee`,
+      text: `${emp.empno} - ${emp.name}`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "Submit",
+      inputLabel: "Reason",
+      input: emp.isActive ? "text" : null,
+      denyButtonText: `Cancel`,
+      customClass: {
+        confirmButton: "btn btn-primary",
+        denyButton: "btn btn-danger",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (!result.value && emp.isActive) {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error!",
+            text: "Deactivate reason must be filled!",
+            showConfirmButton: true,
+          });
+        }
+
+        const body = {
+          deactivateReason: result.value,
+        };
+        console.log(body);
+        onUpdateStatus(emp, body);
+      }
+    });
+  };
+
+  // UPDATE STATUS
+  const onUpdateStatus = (emp, body) => {
+    if (emp && body) {
+      deactivateEmployee(emp.empno, body)
+        .then((res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Employee status changed!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
+        })
+        .finally(() => {
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        });
+    }
   };
 
   //DELETE EMPLOYEE
@@ -143,12 +202,6 @@ const Employees = () => {
     setPage(0);
   };
 
-  const getEmpType = (empType) => {
-    if (empType === "Permanent") return <Badge bg="primary">{empType}</Badge>;
-    if (empType === "Contract") return <Badge bg="success">{empType}</Badge>;
-
-    return "-";
-  };
   console.log({ searchQuery });
 
   if (isLoading) {
@@ -253,6 +306,30 @@ const Employees = () => {
                 Descending
               </option>
             </Form.Select>
+            <Form.Select
+              size="sm"
+              value={searchQuery.isActive}
+              onChange={(e) => {
+                let bool = null;
+                if (e.target.value === "true") {
+                  bool = true;
+                }
+                if (e.target.value === "false") {
+                  bool = false;
+                }
+                setSearchQuery({ ...searchQuery, isActive: bool });
+              }}
+            >
+              <option key={1} value={null}>
+                All Employee
+              </option>
+              <option key={2} value={true}>
+                Active Employee
+              </option>
+              <option key={3} value={false}>
+                Inactive Employee
+              </option>
+            </Form.Select>
           </div>
         </div>
 
@@ -266,6 +343,7 @@ const Employees = () => {
               <th>Level</th>
               <th>Type</th>
               <th>Last Updated</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -281,6 +359,7 @@ const Employees = () => {
                 <td>
                   {val.updateAt ? moment(val.updateAt).format("LLL") : "(null)"}
                 </td>
+                <td>{getEmpStatus(val.isActive)}</td>
                 <td style={{ width: "20px" }}>
                   <Container>
                     <Row>
@@ -300,7 +379,6 @@ const Employees = () => {
                           <Button
                             as={Link}
                             variant="secondary"
-                            size="sm"
                             to={`/employees/${val.empno}/history`}
                           >
                             <FontAwesomeIcon icon={faHistory} />
@@ -313,6 +391,16 @@ const Employees = () => {
                             to={`/employees/${val.empno}/edit`}
                           >
                             <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          overlay={<Tooltip>Change Status</Tooltip>}
+                        >
+                          <Button
+                            variant="warning"
+                            onClick={() => onTryChangeStatus(val)}
+                          >
+                            <FontAwesomeIcon icon={faFlag} />
                           </Button>
                         </OverlayTrigger>
                         <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>

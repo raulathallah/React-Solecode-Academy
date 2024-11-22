@@ -405,6 +405,25 @@ const EmployeeForm = ({ type }) => {
           </Row>
           <Row className="mb-3">
             <Col>
+              <Form.Group controlId="formAddress">
+                <Form.Label className="fw-semibold">Address</Form.Label>
+                <Form.Control
+                  as={"textarea"}
+                  rows={4}
+                  value={employeeData.address}
+                  size="sm"
+                  onChange={(e) => onChangeValue("address", e)}
+                  isInvalid={errors.address}
+                />
+                <p style={{ fontSize: "12px" }}>
+                  {employeeData.address.length}/200
+                </p>
+                {errors.address && <small>{errors.address}</small>}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col>
               <Form.Group controlId="formDepartment">
                 <Form.Label className="fw-semibold">Department</Form.Label>
                 <Form.Select
@@ -551,25 +570,6 @@ const EmployeeForm = ({ type }) => {
                   size="sm"
                 />
                 {errors.empLevel && <small>{errors.empLevel}</small>}
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group controlId="formAddress">
-                <Form.Label className="fw-semibold">Address</Form.Label>
-                <Form.Control
-                  as={"textarea"}
-                  rows={4}
-                  value={employeeData.address}
-                  size="sm"
-                  onChange={(e) => onChangeValue("address", e)}
-                  isInvalid={errors.address}
-                />
-                <p style={{ fontSize: "12px" }}>
-                  {employeeData.address.length}/200
-                </p>
-                {errors.address && <small>{errors.address}</small>}
               </Form.Group>
             </Col>
           </Row>

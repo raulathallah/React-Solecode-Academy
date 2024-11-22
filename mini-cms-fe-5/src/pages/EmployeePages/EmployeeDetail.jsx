@@ -8,6 +8,7 @@ import TextDetail from "../../components/Elements/TextDetail";
 import Loading from "../../components/Elements/Loading";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchEmployeeDetail } from "../../api/Fetchs/FetchEmployees";
+import { getEmpType } from "../../utils/helpers/HelperFunctions";
 
 const initialValue = {
   fname: "",
@@ -103,8 +104,8 @@ const EmployeeDetail = () => {
                 <TextDetail label={"Date of Birth"}>
                   {employeeData.dob}
                 </TextDetail>
-                <TextDetail label={"Emp Type"}>
-                  {employeeData.empType}
+                <TextDetail label={"Employee Type"}>
+                  {getEmpType(employeeData.empType)}
                 </TextDetail>
                 <TextDetail label={"SSN"}>{employeeData.ssn}</TextDetail>
                 <TextDetail label={"Salary"}>{employeeData.salary}</TextDetail>
