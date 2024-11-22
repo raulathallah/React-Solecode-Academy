@@ -141,6 +141,7 @@ const EmployeeForm = ({ type }) => {
         .then((res) => {
           if (res.status === 200) {
             setEmployeeData(res.data);
+            setDependants(res.data.empDependents);
           }
         })
         .finally(() => setTimeout(() => {}, 1500));
@@ -230,15 +231,12 @@ const EmployeeForm = ({ type }) => {
         .catch((err) => ErrorMessage(err.message));
     }
   };
-  console.log({ errors, initialError });
   const onAddDependants = () => {
     console.log({ dependantData });
     setDependants([...dependants, dependantData]);
     setDependantData(initialValueDependant);
     handleClose();
   };
-
-  console.log({ employeeData });
 
   const onDeleteDependants = (val) => {
     const filtered = dependants.filter((x) => x !== val);
@@ -320,7 +318,8 @@ const EmployeeForm = ({ type }) => {
 
     return formValid;
   };
-
+  console.log({ employeeData });
+  console.log(1);
   if (isLoadingE && isLoadingD) {
     return <Loading />;
   }
@@ -585,7 +584,9 @@ const EmployeeForm = ({ type }) => {
                         onChange={(e) =>
                           setEmployeeData({
                             ...employeeData,
-                            salary: parseInt(e.target.value),
+                            salary: e.target.value
+                              ? parseInt(e.target.value)
+                              : 0,
                           })
                         }
                         isInvalid={errors.salary}

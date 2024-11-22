@@ -7,8 +7,15 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import TextDetail from "../../components/Elements/TextDetail";
 import Loading from "../../components/Elements/Loading";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchEmployeeDetail } from "../../api/Fetchs/FetchEmployees";
-import { getEmpType } from "../../utils/helpers/HelperFunctions";
+import {
+  fetchAllEmployees,
+  fetchEmployeeDetail,
+} from "../../api/Fetchs/FetchEmployees";
+import {
+  getDepartmentName,
+  getEmpType,
+} from "../../utils/helpers/HelperFunctions";
+import { fetchAllDepartments } from "../../api/Fetchs/FetchDepartments";
 
 const initialValue = {
   fname: "",
@@ -42,6 +49,28 @@ const EmployeeDetail = () => {
     placeholderData: keepPreviousData,
   });
 
+  const {
+    data: listE,
+    isLoading: isLoadingE,
+    isError: isErrorE,
+    error: errorE,
+  } = useQuery({
+    queryKey: ["allEmployee"],
+    queryFn: () => fetchAllEmployees(),
+    placeholderData: keepPreviousData,
+  });
+
+  const {
+    data: listD,
+    isLoading: isLoadingD,
+    isError: isErrorD,
+    error: errorD,
+  } = useQuery({
+    queryKey: ["allDepartment"],
+    queryFn: () => fetchAllDepartments(),
+    placeholderData: keepPreviousData,
+  });
+
   useEffect(() => {
     if (data) {
       setEmployeeData(data);
@@ -53,12 +82,29 @@ const EmployeeDetail = () => {
     navigate(-1);
   };
 
-  if (isLoading) {
+  const getSupervisorName = (directSupervisor) => {
+    if (listE && directSupervisor) {
+      let spv = listE.find((val) => val.empno === directSupervisor);
+
+      return `${spv.fname} ${spv.lname}`;
+    }
+    return "(null)";
+  };
+
+  if (isLoading && isLoadingE && isLoadingD) {
     return <Loading />;
   }
 
   if (isError && error) {
     return <p>Error... {error.message}</p>;
+  }
+
+  if (isErrorE && errorE) {
+    return <p>Error... {errorE.message}</p>;
+  }
+
+  if (isErrorD && errorD) {
+    return <p>Error... {errorD.message}</p>;
   }
 
   return (
@@ -119,13 +165,13 @@ const EmployeeDetail = () => {
               <hr />
               <div className="tw-grid gap-2">
                 <TextDetail label={"Deptartment"}>
-                  {employeeData.deptno}
+                  {getDepartmentName(listD, employeeData.deptno)}
                 </TextDetail>
                 <TextDetail label={"Position"}>
                   {employeeData.position}
                 </TextDetail>
                 <TextDetail label={"Direct Supervisor"}>
-                  {employeeData.directSupervisor}
+                  {getSupervisorName(employeeData.directSupervisor)}
                 </TextDetail>
               </div>
             </Card.Body>

@@ -30,19 +30,19 @@ export const getDepartmentName = (data, deptNo) => {
     }
   }
 
-  return "-";
+  return "(null)";
 };
 
 export const getEmpType = (empType) => {
   if (empType === "Permanent") return <Badge bg="primary">{empType}</Badge>;
   if (empType === "Contract") return <Badge bg="success">{empType}</Badge>;
 
-  return "-";
+  return "(null)";
 };
 
 export const getEmpStatus = (status) => {
   if (status === true) return <Badge bg="success">Active</Badge>;
   if (status === false) return <Badge bg="danger">Inactive</Badge>;
 
-  return "-";
+  return "(null)";
 };

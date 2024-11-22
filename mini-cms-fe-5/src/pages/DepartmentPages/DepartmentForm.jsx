@@ -229,7 +229,7 @@ const DepartmentForm = ({ type }) => {
 
     //-- deptName
     if (!newDept.deptname) {
-      errorMessages.deptName = `Department name must be filled!`;
+      errorMessages.deptname = `Department name must be filled!`;
     }
 
     setErrors(errorMessages);

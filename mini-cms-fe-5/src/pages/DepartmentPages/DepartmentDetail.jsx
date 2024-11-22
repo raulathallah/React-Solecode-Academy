@@ -87,7 +87,7 @@ const DepartmentDetail = () => {
       setListDeptEmployee(listE.filter((e) => e.deptno === parseInt(deptNo)));
     }
   }, [listE]);
-  console.log(departmentData);
+
   useEffect(() => {
     if (deptNo) {
       getDepartment(deptNo)
@@ -169,7 +169,7 @@ const DepartmentDetail = () => {
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">Locations</div>
-                    <div className="tw-grid tw-grid-cols-4 tw-gap-0">
+                    <div className="tw-grid tw-grid-cols-4 tw-gap-2">
                       {departmentData.location &&
                         departmentData.location.map((x) => (
                           <h5 key={x}>

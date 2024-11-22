@@ -69,7 +69,7 @@ const initialSearchValue = {
   keyword: "",
   sortBy: "name",
   isDescending: false,
-  isActive: null,
+  isActive: "",
 };
 
 const Employees = () => {
@@ -204,8 +204,6 @@ const Employees = () => {
     setPage(0);
   };
 
-  console.log({ searchQuery });
-
   if (isLoading) {
     return <Loading />;
   }
@@ -337,7 +335,7 @@ const Employees = () => {
               size="sm"
               value={searchQuery.isActive}
               onChange={(e) => {
-                let bool = null;
+                let bool = "";
                 if (e.target.value === "true") {
                   bool = true;
                 }
@@ -347,7 +345,7 @@ const Employees = () => {
                 setSearchQuery({ ...searchQuery, isActive: bool });
               }}
             >
-              <option key={1} value={null}>
+              <option key={1} value={""}>
                 All Employee
               </option>
               <option key={2} value={true}>
