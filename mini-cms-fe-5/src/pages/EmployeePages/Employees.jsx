@@ -62,6 +62,8 @@ const sortByList = [
   },
 ];
 
+const empTypeList = ["Contract", "Permanent"];
+
 const initialSearchValue = {
   searchBy: "name",
   keyword: "",
@@ -251,7 +253,11 @@ const Employees = () => {
             <Form.Select
               value={searchQuery.searchBy}
               onChange={(e) =>
-                setSearchQuery({ ...searchQuery, searchBy: e.target.value })
+                setSearchQuery({
+                  ...searchQuery,
+                  searchBy: e.target.value,
+                  keyword: "",
+                })
               }
             >
               {searchByList.map((val) => (
@@ -260,14 +266,35 @@ const Employees = () => {
                 </option>
               ))}
             </Form.Select>
-            <Form.Control
-              className="w-50"
-              type="text"
-              value={searchQuery.keyword}
-              onChange={(e) =>
-                setSearchQuery({ ...searchQuery, keyword: e.target.value })
-              }
-            />
+
+            {searchQuery.searchBy !== "type" ? (
+              <Form.Control
+                className="w-50"
+                type="text"
+                value={searchQuery.keyword}
+                onChange={(e) =>
+                  setSearchQuery({ ...searchQuery, keyword: e.target.value })
+                }
+              />
+            ) : (
+              <Form.Select
+                className="w-50"
+                value={searchQuery.keyword}
+                onChange={(e) =>
+                  setSearchQuery({
+                    ...searchQuery,
+                    keyword: e.target.value,
+                  })
+                }
+              >
+                <option value={""} hidden disabled />
+                {empTypeList.map((val) => (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
           </InputGroup>
 
           <div className="tw-flex tw-justify-end tw-gap-2 w-50">

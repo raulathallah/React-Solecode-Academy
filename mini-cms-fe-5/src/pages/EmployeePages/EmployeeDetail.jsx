@@ -60,6 +60,7 @@ const EmployeeDetail = () => {
   if (isError && error) {
     return <p>Error... {error.message}</p>;
   }
+
   return (
     <>
       <div className="d-flex mb-2">
@@ -137,21 +138,19 @@ const EmployeeDetail = () => {
               <Table striped bordered hover responsive="sm">
                 <thead>
                   <tr>
-                    <th>First</th>
-                    <th>Last</th>
+                    <th>Relation</th>
+                    <th>Name</th>
                     <th>Sex</th>
                     <th>Birth Date</th>
-                    <th>Relation</th>
                   </tr>
                 </thead>
                 <tbody>
                   {employeeData.empDependents.map((val, key) => (
                     <tr key={key}>
-                      <td>{val.fname}</td>
-                      <td>{val.lname}</td>
+                      <td>{val.relation}</td>
+                      <td>{`${val.fname} ${val.lname}`}</td>
                       <td>{val.sex}</td>
                       <td>{val.birthDate}</td>
-                      <td>{val.relation}</td>
                     </tr>
                   ))}
                 </tbody>

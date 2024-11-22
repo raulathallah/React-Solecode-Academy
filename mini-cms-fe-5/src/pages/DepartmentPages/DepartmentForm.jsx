@@ -74,6 +74,7 @@ const DepartmentForm = ({ type }) => {
     setLocationTemp(0);
     handleClose();
   };
+
   const inputFocus = useRef(null);
   useEffect(() => {
     if (inputFocus.current) {
@@ -304,7 +305,7 @@ const DepartmentForm = ({ type }) => {
                 </Form.Group>
               </Col>
             </Row>
-            <Row>
+            <Row className="mb-3">
               <Col>
                 <Form.Group controlId="formMgrEmpNo">
                   <Form.Label className="fw-semibold tw-flex tw-justify-between">
@@ -378,7 +379,7 @@ const DepartmentForm = ({ type }) => {
           </Card.Footer>
         </Form>
       </Card>
-      {console.log(departmentData)}
+
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add Location</Modal.Title>
@@ -400,7 +401,6 @@ const DepartmentForm = ({ type }) => {
                   </option>
                 ))}
             </Form.Select>
-            {errors.mgrempno && <small>{errors.mgrempno}</small>}
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
