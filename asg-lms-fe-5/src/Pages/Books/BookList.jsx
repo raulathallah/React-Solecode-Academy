@@ -377,7 +377,7 @@ const BookList = () => {
             </Button>
           </div>
 
-          <div className="d-flex justify-content-between">
+          <div className="d-flex justify-content-center">
             <div className="d-flex">
               <Form.Label className="mx-2">Sort By</Form.Label>
               <Form.Select
