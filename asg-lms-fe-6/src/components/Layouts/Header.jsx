@@ -1,12 +1,4 @@
-import {
-  Button,
-  Container,
-  Dropdown,
-  Nav,
-  Navbar,
-  NavItem,
-  NavLink,
-} from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import { options } from "../../utils/DateOptions";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, reset } from "../../api/slices/authSlice";
@@ -29,6 +21,14 @@ const menuItems = [
     path: "/members",
     visibleForRoles: ["Library Manager"],
   },
+  {
+    label: "Search",
+    path: "/books/search",
+    visibleForRoles: ["Librarian", "Library User"],
+  },
+];
+
+const authMenuItems = [
   {
     label: "Login",
     path: "/login",
@@ -63,6 +63,7 @@ const Header = () => {
     if (item.label == "Logout" && currentUser) {
       return true;
     }
+
     // Cek role untuk menu spesifik
     if (item.visibleForRoles && currentUser?.roles) {
       return item.visibleForRoles.some((role) =>
@@ -96,7 +97,7 @@ const Header = () => {
 
   const onLogout = (e) => {
     e.preventDefault();
-    let refreshToken = currentUser.refreshToken;
+    //let refreshToken = currentUser.refreshToken;
 
     dispatch(logout());
   };
@@ -118,6 +119,18 @@ const Header = () => {
         </Nav>
         <Navbar.Collapse className="justify-content-end gap-4">
           <Navbar.Text>{WAKTU_SEKARANG}</Navbar.Text>
+
+          <Nav>
+            {authMenuItems.filter(isMenuVisible).map((item, index) => (
+              <Nav.Link
+                key={index}
+                href={item.path}
+                onClick={item.label === "Logout" ? onLogout : null}
+              >
+                {item.label}
+              </Nav.Link>
+            ))}
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>

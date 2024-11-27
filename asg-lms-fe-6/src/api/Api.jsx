@@ -14,7 +14,6 @@ Api.interceptors.response.use(
   async (error) => {
     if (error.response.status === 401) {
       try {
-        console.log(1);
         await refreshToken();
       } catch (refreshError) {
         return Promise.reject(refreshError);

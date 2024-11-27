@@ -1,8 +1,6 @@
+/* eslint-disable react/prop-types */
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Footer from "./Layouts/Footer";
-import Header from "./Layouts/Header";
-import Layouts from "./Layouts/Layouts";
 
 const PrivateRoute = ({ allowedRoles }) => {
   const { user } = useSelector((state) => state.auth);
@@ -15,7 +13,7 @@ const PrivateRoute = ({ allowedRoles }) => {
 
   if (allowedRoles && !hasRequiredRole()) {
     // Redirect ke halaman unauthorized jika role tidak sesuai
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to="/login" />;
   }
 
   return user ? <Outlet /> : <Navigate to="/login" replace />;
