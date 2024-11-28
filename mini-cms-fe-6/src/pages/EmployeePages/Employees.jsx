@@ -141,7 +141,6 @@ const Employees = () => {
         const body = {
           deactivateReason: result.value,
         };
-        console.log(body);
         onUpdateStatus(emp, body);
       }
     });

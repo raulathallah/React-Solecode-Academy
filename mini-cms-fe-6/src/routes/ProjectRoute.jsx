@@ -6,7 +6,16 @@ import ProjectWorkHistory from "../pages/ProjectPages/ProjectWorkHistory";
 
 const ProjectRoute = [
   {
-    element: <PrivateRoute allowedRoles={["Administator"]} />,
+    element: (
+      <PrivateRoute
+        allowedRoles={[
+          "Administrator",
+          "Employee Supervisor",
+          "Employee",
+          "HR Manager",
+        ]}
+      />
+    ),
     children: [
       {
         path: "/projects",

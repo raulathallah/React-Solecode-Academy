@@ -6,7 +6,7 @@ import EmployeeWorkHistory from "../pages/EmployeePages/EmployeeWorkHistory";
 
 const EmployeesRoute = [
   {
-    element: <PrivateRoute allowedRoles={["Administator"]} />,
+    element: <PrivateRoute allowedRoles={["Administrator", "HR Manager"]} />,
     children: [
       {
         path: "/employees",

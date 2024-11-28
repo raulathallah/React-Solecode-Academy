@@ -32,7 +32,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess || user) {
-      navigate("/profile");
+      navigate("/");
     }
 
     dispatch(reset());
@@ -40,7 +40,6 @@ const Login = () => {
 
   const onLogin = (e) => {
     e.preventDefault();
-    console.log(loginData);
     dispatch(login(loginData));
   };
 
@@ -66,7 +65,7 @@ const Login = () => {
   return (
     <div className="container my-5 d-grid gap-3 w-25">
       <div className="border p-4 rounded d-grid gap-4">
-        <h3>LMS Login</h3>
+        <h3>CMS Login</h3>
         <Form onSubmit={onLogin}>
           <div className="d-grid gap-3">
             <Form.Group controlId="formUsername">

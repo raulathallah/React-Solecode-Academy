@@ -5,7 +5,9 @@ import Departments from "../pages/DepartmentPages/Departments";
 
 const DepartmentRoute = [
   {
-    element: <PrivateRoute allowedRoles={["Administator"]} />,
+    element: (
+      <PrivateRoute allowedRoles={["Administrator", "Department Manager"]} />
+    ),
     children: [
       {
         path: "/departments",

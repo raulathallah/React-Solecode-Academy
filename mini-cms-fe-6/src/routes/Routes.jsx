@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import Dashboard from "../pages/Dashboard";
 import Layout from "../components/Layouts/Layout";
 import EmployeesRoute from "./EmployeesRoute";
 import DepartmentRoute from "./DepartmentRoute";
@@ -7,6 +6,10 @@ import ProjectRoute from "./ProjectRoute";
 import AssignmentRoute from "./AssignmentRoute";
 import Unauthorized from "../pages/Unauthorized";
 import Login from "../pages/AuthPages/Login";
+import Dashboard from "../pages/Dashboard";
+import PrivateRoute from "../components/PrivateRoutes";
+import Profile from "../pages/ProfilePages/Profile";
+import Register from "../pages/AuthPages/Register";
 
 const routers = createBrowserRouter([
   {
@@ -21,10 +24,28 @@ const routers = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
-      //REGISTER
       {
-        path: "/",
-        element: <Dashboard />,
+        element: <PrivateRoute allowedRoles={["Administrator"]} />,
+        children: [
+          {
+            path: "/register",
+            element: <Register />,
+          },
+        ],
+      },
+
+      {
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: "/",
+            element: <Dashboard />,
+          },
+          {
+            path: "/profile",
+            element: <Profile />,
+          },
+        ],
       },
       ...EmployeesRoute,
       ...DepartmentRoute,

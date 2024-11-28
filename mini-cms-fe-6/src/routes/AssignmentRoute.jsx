@@ -5,7 +5,11 @@ import Assignments from "../pages/AssignmentPages/Assignments";
 
 const AssignmentRoute = [
   {
-    element: <PrivateRoute allowedRoles={["Administator"]} />,
+    element: (
+      <PrivateRoute
+        allowedRoles={["Administrator", "Employee Supervisor", "Employee"]}
+      />
+    ),
     children: [
       {
         path: "/assignments",

@@ -19,6 +19,7 @@ export const register = createAsyncThunk("auth/register", async (userData) => {
     return await AuthService.register(userData);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
+    console.log(message);
     return ErrorMessage(message);
   }
 });
@@ -29,6 +30,7 @@ export const login = createAsyncThunk("auth/login", async (userData) => {
     return await AuthService.login(userData);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
+    console.log(message);
     return ErrorMessage(message);
   }
 });
@@ -38,6 +40,7 @@ export const logout = createAsyncThunk("auth/logout", async () => {
     return await AuthService.logout();
   } catch (error) {
     const message = error.response?.data?.message || error.message;
+    console.log(message);
     return ErrorMessage(message);
   }
 });
@@ -45,11 +48,11 @@ export const logout = createAsyncThunk("auth/logout", async () => {
 export const refreshToken = createAsyncThunk("auth/refreshToken", async () => {
   try {
     const response = await AuthService.refreshToken();
-    console.log("TOKEN REFRESHED!");
-    return response;
+    return response.data;
   } catch (error) {
     const message = error.response?.data?.message || error.message;
-    return ErrorMessage(message);
+    console.log(message);
+    return ErrorMessage(`Session Expired! ${message}`);
   }
 });
 
@@ -98,10 +101,13 @@ const authSlice = createSlice({
         state.isSuccess = true;
       })
       //refreshtoken case
+      .addCase(refreshToken.fulfilled, (state) => {
+        state.isAuthenticated = true;
+      })
       .addCase(refreshToken.rejected, (state) => {
+        localStorage.removeItem("user");
         state.user = null;
         state.isAuthenticated = false;
-        localStorage.removeItem("user");
       });
   },
 });

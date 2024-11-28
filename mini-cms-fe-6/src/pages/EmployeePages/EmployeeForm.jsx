@@ -319,7 +319,6 @@ const EmployeeForm = ({ type }) => {
     return formValid;
   };
   console.log({ employeeData });
-  console.log(1);
   if (isLoadingE && isLoadingD) {
     return <Loading />;
   }
