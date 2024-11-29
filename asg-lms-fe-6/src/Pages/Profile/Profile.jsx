@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import blankpp from "../../assets/blankpp.png";
-import { Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
+import { logout } from "../../api/slices/authSlice";
 
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const [userData, setUserData] = useState({});
 
@@ -14,7 +16,11 @@ const Profile = () => {
     }
   }, [user]);
 
-  console.log(userData);
+  const onLogout = (e) => {
+    e.preventDefault();
+    dispatch(logout());
+  };
+
   return (
     <div className="d-flex gap-5">
       <img src={blankpp} style={{ height: "200px" }} />
@@ -60,6 +66,10 @@ const Profile = () => {
             </Row>
           </Card.Body>
         </Card>
+
+        <Button variant="secondary" className="mt-2" onClick={onLogout}>
+          Logout
+        </Button>
       </div>
     </div>
   );

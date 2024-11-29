@@ -48,8 +48,9 @@ export const refreshToken = createAsyncThunk("auth/refreshToken", async () => {
     console.log("TOKEN REFRESHED!");
     return response;
   } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    return ErrorMessage(message);
+    console.log(error);
+    //const message = error.response?.data?.message || error.message;
+    //return ErrorMessage(message);
   }
 });
 
@@ -98,6 +99,9 @@ const authSlice = createSlice({
         state.isSuccess = true;
       })
       //refreshtoken case
+      .addCase(refreshToken.fulfilled, (state) => {
+        state.isAuthenticated = true;
+      })
       .addCase(refreshToken.rejected, (state) => {
         state.user = null;
         state.isAuthenticated = false;

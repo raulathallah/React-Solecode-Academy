@@ -1,9 +1,7 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { options } from "../../utils/DateOptions";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, reset } from "../../api/slices/authSlice";
-import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useSelector } from "react-redux";
+//import { logout, reset } from "../../api/slices/authSlice";
 
 const menuItems = [
   {
@@ -39,9 +37,6 @@ const authMenuItems = [
     path: "/register",
     isAuthenticated: false,
   },
-  {
-    label: "Logout",
-  },
 ];
 
 const Header = () => {
@@ -74,33 +69,8 @@ const Header = () => {
     return false;
   };
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const {
-    user: currentUser,
-    isSuccess,
-    isError,
-    message,
-  } = useSelector((state) => state.auth);
+  const { user: currentUser } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (isError) {
-      alert(message);
-    }
-
-    if (isSuccess) {
-      navigate("/");
-    }
-
-    dispatch(reset());
-  }, [currentUser, isError, isSuccess, message, navigate, dispatch]);
-
-  const onLogout = (e) => {
-    e.preventDefault();
-    //let refreshToken = currentUser.refreshToken;
-
-    dispatch(logout());
-  };
   let { title: NAMA_WEBSITE, dateNow: WAKTU_SEKARANG } = header;
   return (
     <Navbar bg="dark" data-bs-theme="dark" className="p-4">
@@ -108,11 +78,7 @@ const Header = () => {
       <Container>
         <Nav className="me-auto d-flex gap-4">
           {menuItems.filter(isMenuVisible).map((item, index) => (
-            <Nav.Link
-              key={index}
-              href={item.path}
-              onClick={item.label === "Logout" ? onLogout : null}
-            >
+            <Nav.Link key={index} href={item.path}>
               {item.label}
             </Nav.Link>
           ))}
@@ -122,11 +88,7 @@ const Header = () => {
 
           <Nav>
             {authMenuItems.filter(isMenuVisible).map((item, index) => (
-              <Nav.Link
-                key={index}
-                href={item.path}
-                onClick={item.label === "Logout" ? onLogout : null}
-              >
+              <Nav.Link key={index} href={item.path}>
                 {item.label}
               </Nav.Link>
             ))}
