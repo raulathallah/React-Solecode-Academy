@@ -232,7 +232,6 @@ const EmployeeForm = ({ type }) => {
     }
   };
   const onAddDependants = () => {
-    console.log({ dependantData });
     setDependants([...dependants, dependantData]);
     setDependantData(initialValueDependant);
     handleClose();
@@ -507,6 +506,7 @@ const EmployeeForm = ({ type }) => {
                         }
                         isInvalid={errors.deptno}
                         value={employeeData.deptno}
+                        disabled={type !== "add"}
                         size="sm"
                       >
                         <option disabled value={0} hidden />
@@ -547,7 +547,7 @@ const EmployeeForm = ({ type }) => {
                               .filter((f) => f.deptno === employeeData.deptno)
                               .map((val) => (
                                 <option key={val.empno} value={val.empno}>
-                                  {val.fname}
+                                  {`${val.empno} - ${val.fname} ${val.lname}`}
                                 </option>
                               ))}
                           </Form.Select>

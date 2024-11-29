@@ -6,12 +6,21 @@ const menuItems = [
   {
     label: "Employees",
     path: "/employees",
-    visibleForRoles: ["Administrator", "HR Manager"],
+    visibleForRoles: [
+      "Administrator",
+      "HR Manager",
+      "Employee Supervisor",
+      "Employee",
+    ],
   },
   {
     label: "Departments",
     path: "/departments",
-    visibleForRoles: ["Administrator", "Department Manager"],
+    visibleForRoles: [
+      "Administrator",
+      "Department Manager",
+      "Employee Supervisor",
+    ],
   },
   {
     label: "Projects",
@@ -19,7 +28,6 @@ const menuItems = [
     visibleForRoles: [
       "Administrator",
       "Department Manager",
-      "HR Manager",
       "Employee",
       "Employee Supervisor",
     ],
@@ -27,7 +35,12 @@ const menuItems = [
   {
     label: "Assignments",
     path: "/assignments",
-    visibleForRoles: ["Administrator", "Employee", "Employee Supervisor"],
+    visibleForRoles: [
+      "Administrator",
+      "Employee",
+      "Employee Supervisor",
+      "HR Manager",
+    ],
   },
   {
     label: "Make an account",

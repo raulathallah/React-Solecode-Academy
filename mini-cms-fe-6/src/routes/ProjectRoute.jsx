@@ -6,13 +6,26 @@ import ProjectWorkHistory from "../pages/ProjectPages/ProjectWorkHistory";
 
 const ProjectRoute = [
   {
+    element: <PrivateRoute allowedRoles={["Administrator", "HR Manager"]} />,
+    children: [
+      {
+        path: "/projects/new",
+        element: <ProjectForm type={"add"} />,
+      },
+      {
+        path: "/projects/:id/edit",
+        element: <ProjectForm type={"edit"} />,
+      },
+    ],
+  },
+  {
     element: (
       <PrivateRoute
         allowedRoles={[
           "Administrator",
           "Employee Supervisor",
           "Employee",
-          "HR Manager",
+          "Department Manager",
         ]}
       />
     ),
@@ -21,10 +34,15 @@ const ProjectRoute = [
         path: "/projects",
         element: <Projects />,
       },
-      {
-        path: "/projects/new",
-        element: <ProjectForm type={"add"} />,
-      },
+    ],
+  },
+  {
+    element: (
+      <PrivateRoute
+        allowedRoles={["Administrator", "Employee Supervisor", "Employee"]}
+      />
+    ),
+    children: [
       {
         path: "/projects/:id",
         element: <ProjectDetail />,
@@ -32,10 +50,6 @@ const ProjectRoute = [
       {
         path: "/projects/:id/history",
         element: <ProjectWorkHistory />,
-      },
-      {
-        path: "/projects/:id/edit",
-        element: <ProjectForm type={"edit"} />,
       },
     ],
   },

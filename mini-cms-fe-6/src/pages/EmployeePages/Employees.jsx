@@ -21,6 +21,7 @@ import {
   faHistory,
   faList,
   faPlus,
+  faTag,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -30,6 +31,7 @@ import ReactPaginate from "react-paginate";
 import { fetchEmployeeSearch } from "../../api/Fetchs/FetchEmployees";
 import moment from "moment";
 import { getEmpStatus, getEmpType } from "../../utils/helpers/HelperFunctions";
+import { useSelector } from "react-redux";
 
 const searchByList = [
   {
@@ -85,6 +87,8 @@ const Employees = () => {
     queryFn: () => fetchEmployeeSearch({ page, pageSize, searchQuery }),
     placeholderData: keepPreviousData,
   });
+
+  const { user: currentUser } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (data) {
@@ -211,19 +215,39 @@ const Employees = () => {
     return <p>Error... {error.message}</p>;
   }
 
+  const isEmployeeSupervisor = currentUser?.roles?.some((role) =>
+    ["Employee Supervisor"].includes(role)
+  );
+
   return (
     <Card>
       <Card.Header>Employee List</Card.Header>
       <Card.Body className="d-grid gap-2">
         <div className="tw-flex tw-justify-between">
-          <ButtonCustom
-            icon={<FontAwesomeIcon icon={faPlus} />}
-            as={Link}
-            to={"/employees/new"}
-            size="sm"
-          >
-            Add Employee
-          </ButtonCustom>
+          <div className="d-flex gap-2">
+            <ButtonCustom
+              icon={<FontAwesomeIcon icon={faPlus} />}
+              as={Link}
+              to={"/employees/new"}
+              size="sm"
+            >
+              Add Employee
+            </ButtonCustom>
+
+            {currentUser?.roles?.some((role) =>
+              ["Administrator", "HR Manager"].includes(role)
+            ) && (
+              <ButtonCustom
+                icon={<FontAwesomeIcon icon={faTag} />}
+                as={Link}
+                to={"/employees/assign"}
+                size="sm"
+              >
+                Assign Employee
+              </ButtonCustom>
+            )}
+          </div>
+
           <div className="d-flex gap-1">
             <Form.Select
               type="text"
@@ -408,33 +432,38 @@ const Employees = () => {
                             <FontAwesomeIcon icon={faHistory} />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
-                          <Button
-                            as={Link}
-                            variant="primary"
-                            to={`/employees/${val.empno}/edit`}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                          overlay={<Tooltip>Change Status</Tooltip>}
-                        >
-                          <Button
-                            variant="warning"
-                            onClick={() => onTryChangeStatus(val)}
-                          >
-                            <FontAwesomeIcon icon={faFlag} />
-                          </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                          <Button
-                            variant="danger"
-                            onClick={() => onTryDelete(val.empno)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </OverlayTrigger>
+
+                        {!isEmployeeSupervisor && (
+                          <>
+                            <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                              <Button
+                                as={Link}
+                                variant="primary"
+                                to={`/employees/${val.empno}/edit`}
+                              >
+                                <FontAwesomeIcon icon={faEdit} />
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger
+                              overlay={<Tooltip>Change Status</Tooltip>}
+                            >
+                              <Button
+                                variant="warning"
+                                onClick={() => onTryChangeStatus(val)}
+                              >
+                                <FontAwesomeIcon icon={faFlag} />
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                              <Button
+                                variant="danger"
+                                onClick={() => onTryDelete(val.empno)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </OverlayTrigger>
+                          </>
+                        )}
                       </ButtonGroup>
                     </Row>
                   </Container>

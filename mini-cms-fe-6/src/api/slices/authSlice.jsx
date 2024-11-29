@@ -47,12 +47,12 @@ export const logout = createAsyncThunk("auth/logout", async () => {
 
 export const refreshToken = createAsyncThunk("auth/refreshToken", async () => {
   try {
-    const response = await AuthService.refreshToken();
-    return response.data;
+    await AuthService.refreshToken();
   } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    console.log(message);
-    return ErrorMessage(`Session Expired! ${message}`);
+    console.log(error.message);
+    //const message = error.response?.data?.message || error.message;
+    //console.log(message);
+    //return ErrorMessage(`Session Expired! ${message}`);
   }
 });
 
@@ -105,9 +105,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       })
       .addCase(refreshToken.rejected, (state) => {
-        localStorage.removeItem("user");
         state.user = null;
         state.isAuthenticated = false;
+        localStorage.removeItem("user");
       });
   },
 });

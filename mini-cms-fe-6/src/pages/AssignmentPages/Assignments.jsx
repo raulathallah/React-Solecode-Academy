@@ -28,6 +28,7 @@ import {
   getEmployeeName,
   getProjectName,
 } from "../../utils/helpers/HelperFunctions";
+import { useSelector } from "react-redux";
 
 const Assignments = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Assignments = () => {
 
   const [listEmployee, setListEmployee] = useState([]);
   const [listProject, setListProject] = useState([]);
-
+  const { user: currentUser } = useSelector((state) => state.auth);
   useEffect(() => {
     getAllEmployee().then((res) => {
       if (res.status === 200) {
@@ -113,7 +114,9 @@ const Assignments = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
-            setPage(page - 1);
+            if (page !== 1) {
+              setPage(page - 1);
+            }
           }
         } else {
           Swal.fire({
@@ -121,6 +124,10 @@ const Assignments = () => {
             icon: "error",
             title: res.message,
             showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate(-1);
+            }
           });
         }
       })
@@ -143,19 +150,25 @@ const Assignments = () => {
       setPage(page + action);
     }
   };
+
+  const isEmployeeSupervisor = currentUser?.roles?.some((role) =>
+    ["Employee Supervisor"].includes(role)
+  );
   return (
     <Card>
       <Card.Header>Assignment List</Card.Header>
       <Card.Body className="d-grid gap-2">
         <div>
-          <ButtonCustom
-            icon={<FontAwesomeIcon icon={faPlus} />}
-            as={Link}
-            to={"/assignments/new"}
-            size="sm"
-          >
-            Add Assignments
-          </ButtonCustom>
+          {isEmployeeSupervisor && (
+            <ButtonCustom
+              icon={<FontAwesomeIcon icon={faPlus} />}
+              as={Link}
+              to={"/assignments/new"}
+              size="sm"
+            >
+              Add Assignments
+            </ButtonCustom>
+          )}
         </div>
         <Table striped bordered hover responsive="sm">
           <thead>
@@ -184,23 +197,27 @@ const Assignments = () => {
                             <FontAwesomeIcon icon={faList} />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
-                          <Button
-                            as={Link}
-                            variant="primary"
-                            to={`/assignments/${val.empno}/${val.projno}/edit`}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                          <Button
-                            variant="danger"
-                            onClick={() => onTryDelete(val)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </OverlayTrigger>
+                        {isEmployeeSupervisor && (
+                          <>
+                            <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                              <Button
+                                as={Link}
+                                variant="primary"
+                                to={`/assignments/${val.empno}/${val.projno}/edit`}
+                              >
+                                <FontAwesomeIcon icon={faEdit} />
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                              <Button
+                                variant="danger"
+                                onClick={() => onTryDelete(val)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </OverlayTrigger>
+                          </>
+                        )}
                       </ButtonGroup>
                     </Row>
                   </Container>

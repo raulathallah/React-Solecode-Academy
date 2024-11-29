@@ -7,7 +7,12 @@ const AssignmentRoute = [
   {
     element: (
       <PrivateRoute
-        allowedRoles={["Administrator", "Employee Supervisor", "Employee"]}
+        allowedRoles={[
+          "Administrator",
+          "Employee Supervisor",
+          "Employee",
+          "HR Manager",
+        ]}
       />
     ),
     children: [
@@ -16,12 +21,19 @@ const AssignmentRoute = [
         element: <Assignments />,
       },
       {
-        path: "/assignments/new",
-        element: <AssignmentForm type={"add"} />,
-      },
-      {
         path: "/assignments/:empNo/:projNo",
         element: <AssignmentDetail />,
+      },
+    ],
+  },
+  {
+    element: (
+      <PrivateRoute allowedRoles={["Administrator", "Employee Supervisor"]} />
+    ),
+    children: [
+      {
+        path: "/assignments/new",
+        element: <AssignmentForm type={"add"} />,
       },
       {
         path: "/assignments/:empNo/:projNo/edit",

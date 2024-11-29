@@ -69,6 +69,14 @@ const deactivateEmployee = async (empNo, body) => {
   }
 };
 
+const assignEmployee = async (empNo, body) => {
+  try {
+    return await Api.put(`/api/v1/Employees/${empNo}/assign`, body);
+  } catch (err) {
+    return err;
+  }
+};
+
 export {
   getEmployeePaginate,
   getAllEmployee,
@@ -78,4 +86,5 @@ export {
   deleteEmployee,
   getEmployeePaginateSearch,
   deactivateEmployee,
+  assignEmployee,
 };

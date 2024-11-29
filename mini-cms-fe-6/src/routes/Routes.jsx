@@ -33,7 +33,6 @@ const routers = createBrowserRouter([
           },
         ],
       },
-
       {
         element: <PrivateRoute />,
         children: [

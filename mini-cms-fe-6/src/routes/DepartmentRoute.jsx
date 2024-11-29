@@ -6,21 +6,36 @@ import Departments from "../pages/DepartmentPages/Departments";
 const DepartmentRoute = [
   {
     element: (
-      <PrivateRoute allowedRoles={["Administrator", "Department Manager"]} />
+      <PrivateRoute
+        allowedRoles={[
+          "Administrator",
+          "Department Manager",
+          "Employee Supervisor",
+        ]}
+      />
     ),
     children: [
       {
         path: "/departments",
         element: <Departments />,
       },
-      {
-        path: "/departments/new",
-        element: <DepartmentForm type={"add"} />,
-      },
+
       {
         path: "/departments/:id",
         element: <DepartmentDetail />,
       },
+    ],
+  },
+  {
+    element: (
+      <PrivateRoute allowedRoles={["Administrator", "Department Manager"]} />
+    ),
+    children: [
+      {
+        path: "/departments/new",
+        element: <DepartmentForm type={"add"} />,
+      },
+
       {
         path: "/departments/:id/edit",
         element: <DepartmentForm type={"edit"} />,

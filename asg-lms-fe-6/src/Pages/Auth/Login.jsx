@@ -40,7 +40,6 @@ const Login = () => {
 
   const onLogin = (e) => {
     e.preventDefault();
-    console.log(loginData);
     dispatch(login(loginData));
   };
 

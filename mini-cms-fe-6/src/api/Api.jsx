@@ -23,11 +23,9 @@ Api.interceptors.response.use(
         return Api(originalRequest);
       } catch (refreshError) {
         window.location.href = "/login";
-        //await store.dispatch(logout()).unwrap();
         return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );

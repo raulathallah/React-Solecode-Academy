@@ -25,6 +25,7 @@ import { getDepartmentName } from "../../utils/helpers/HelperFunctions";
 import { deleteProject, getProjectPaginate } from "../../api/Project";
 import { getAllDepartment } from "../../api/Department";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
+import { useSelector } from "react-redux";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -33,6 +34,11 @@ const Projects = () => {
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
+
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const isEmployee = currentUser?.roles?.some((role) =>
+    ["Employee"].includes(role)
+  );
 
   const [listDepartment, setListDepartment] = useState();
   const onTryDelete = (proj) => {
@@ -98,7 +104,7 @@ const Projects = () => {
           if (res.data.length !== 0) {
             setList(res.data);
           } else {
-            setPage(page - 1);
+            //setPage(page - 1);
           }
         } else {
           Swal.fire({
@@ -142,14 +148,16 @@ const Projects = () => {
       <Card.Header>Project List</Card.Header>
       <Card.Body className="d-grid gap-2">
         <div>
-          <ButtonCustom
-            icon={<FontAwesomeIcon icon={faPlus} />}
-            as={Link}
-            to={"/projects/new"}
-            size="sm"
-          >
-            Add Project
-          </ButtonCustom>
+          {!isEmployee && (
+            <ButtonCustom
+              icon={<FontAwesomeIcon icon={faPlus} />}
+              as={Link}
+              to={"/projects/new"}
+              size="sm"
+            >
+              Add Project
+            </ButtonCustom>
+          )}
         </div>
         <Table striped bordered hover responsive="sm">
           <thead>
@@ -178,7 +186,7 @@ const Projects = () => {
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
-                        </OverlayTrigger>
+                        </OverlayTrigger>{" "}
                         <OverlayTrigger
                           overlay={<Tooltip>Work History</Tooltip>}
                         >
@@ -190,23 +198,27 @@ const Projects = () => {
                             <FontAwesomeIcon icon={faHistory} />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
-                          <Button
-                            as={Link}
-                            variant="primary"
-                            to={`/projects/${val.projno}/edit`}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                          <Button
-                            variant="danger"
-                            onClick={() => onTryDelete(val)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </OverlayTrigger>
+                        {!isEmployee && (
+                          <>
+                            <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
+                              <Button
+                                as={Link}
+                                variant="primary"
+                                to={`/projects/${val.projno}/edit`}
+                              >
+                                <FontAwesomeIcon icon={faEdit} />
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                              <Button
+                                variant="danger"
+                                onClick={() => onTryDelete(val)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </OverlayTrigger>
+                          </>
+                        )}
                       </ButtonGroup>
                     </Row>
                   </Container>

@@ -24,6 +24,7 @@ import { deleteDepartment, getDepartmentPaginate } from "../../api/Department";
 import PaginationCustom from "../../components/Elements/PaginationCustom";
 import { getAllEmployee } from "../../api/Employee";
 import { getEmployeeName } from "../../utils/helpers/HelperFunctions";
+import { useSelector } from "react-redux";
 
 const Departments = () => {
   const navigate = useNavigate();
@@ -34,7 +35,10 @@ const Departments = () => {
   const [perPage, setPerPage] = useState(5);
 
   const [listEmployee, setListEmployee] = useState([]);
-
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const isDepartmentManager = currentUser?.roles?.some((role) =>
+    ["Department Manager"].includes(role)
+  );
   const onTryDelete = (dept) => {
     Swal.fire({
       title: `Are you sure want to delete Department?`,
@@ -143,14 +147,16 @@ const Departments = () => {
       <Card.Header>Department List</Card.Header>
       <Card.Body className="d-grid gap-2">
         <div>
-          <ButtonCustom
-            icon={<FontAwesomeIcon icon={faPlus} />}
-            as={Link}
-            to={"/departments/new"}
-            size="sm"
-          >
-            Add Department
-          </ButtonCustom>
+          {!isDepartmentManager && (
+            <ButtonCustom
+              icon={<FontAwesomeIcon icon={faPlus} />}
+              as={Link}
+              to={"/departments/new"}
+              size="sm"
+            >
+              Add Department
+            </ButtonCustom>
+          )}
         </div>
         <Table striped bordered hover responsive="sm">
           <thead>
@@ -183,7 +189,7 @@ const Departments = () => {
                           >
                             <FontAwesomeIcon icon={faList} />
                           </Button>
-                        </OverlayTrigger>
+                        </OverlayTrigger>{" "}
                         <OverlayTrigger overlay={<Tooltip>Edit</Tooltip>}>
                           <Button
                             as={Link}
@@ -193,14 +199,18 @@ const Departments = () => {
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>
                         </OverlayTrigger>
-                        <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
-                          <Button
-                            variant="danger"
-                            onClick={() => onTryDelete(val)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </OverlayTrigger>
+                        {!isDepartmentManager && (
+                          <>
+                            <OverlayTrigger overlay={<Tooltip>Delete</Tooltip>}>
+                              <Button
+                                variant="danger"
+                                onClick={() => onTryDelete(val)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </OverlayTrigger>
+                          </>
+                        )}
                       </ButtonGroup>
                     </Row>
                   </Container>
