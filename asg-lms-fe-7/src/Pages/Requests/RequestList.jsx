@@ -9,14 +9,10 @@ import {
   Table,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../../components/Elements/Loading";
 import { useEffect, useState } from "react";
 import { getAllRequestList } from "../../api/services/Transactions";
-import { getAllBook } from "../../api/services/Books";
-import { getAllUser } from "../../api/services/Users";
-import ReactPaginate from "react-paginate";
-import ErrorMessage from "../../utils/ErrorMessage";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import Loading from "../../components/Elements/Loading";
 
 const fetchRequestList = async () => {
   const { data } = await getAllRequestList();
@@ -57,6 +53,10 @@ const RequestList = () => {
 
     return <Badge bg={bg}>{status}</Badge>;
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <Card>
       <Card.Header>Request List</Card.Header>
