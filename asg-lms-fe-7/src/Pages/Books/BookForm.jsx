@@ -173,7 +173,7 @@ const BookForm = ({ type }) => {
   };
 
   //VALIDATION BOOK
-  const ValidateBook = (oldData, book) => {
+  const ValidateBook = (book) => {
     let errorMessages = {};
     //-- isbn
     if (!book.isbn) {

@@ -1,5 +1,7 @@
+import { Spinner } from "react-bootstrap";
+
 const Loading = () => {
-  return <p className="container text-center">Loading...</p>;
+  return <Spinner animation="border" role="status" />;
 };
 
 export default Loading;

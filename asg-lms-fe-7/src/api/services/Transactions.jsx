@@ -38,13 +38,44 @@ const getAllBorrow = async () => {
     return err;
   }
 };
-
 const getAllRequestList = async () => {
   try {
-    return await Api.get(`/api/stocks/request-list`);
+    return await Api.get(`/api/stocks/request/list`);
   } catch (err) {
     return err;
   }
 };
 
-export { borrowBook, getAllBorrow, returnBook, getAllRequestList };
+const bookRequest = async (body) => {
+  try {
+    return await Api.post(`/api/stocks/book-request`, body);
+  } catch (err) {
+    return err;
+  }
+};
+
+const getBookRequestDetail = async (id) => {
+  try {
+    return await Api.get(`/api/stocks/request/${id}`);
+  } catch (err) {
+    return err;
+  }
+};
+
+const bookApproval = async (body) => {
+  try {
+    return await Api.post(`/api/stocks/book-approval`, body);
+  } catch (err) {
+    return err;
+  }
+};
+
+export {
+  borrowBook,
+  getAllBorrow,
+  returnBook,
+  getAllRequestList,
+  bookRequest,
+  getBookRequestDetail,
+  bookApproval,
+};

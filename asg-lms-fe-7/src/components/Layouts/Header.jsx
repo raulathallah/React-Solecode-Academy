@@ -1,17 +1,7 @@
-import {
-  Button,
-  Container,
-  Dropdown,
-  Nav,
-  Navbar,
-  NavItem,
-  NavLink,
-} from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import { options } from "../../utils/DateOptions";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, reset } from "../../api/slices/authSlice";
-import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useSelector } from "react-redux";
+//import { logout, reset } from "../../api/slices/authSlice";
 
 const menuItems = [
   {
@@ -30,6 +20,29 @@ const menuItems = [
     visibleForRoles: ["Library Manager"],
   },
   {
+    label: "Search",
+    path: "/books/search",
+    visibleForRoles: ["Librarian", "Library User"],
+  },
+  {
+    label: "Upload",
+    path: "/uploads",
+    visibleForRoles: ["Librarian", "Library Manager", "Library User"],
+  },
+  {
+    label: "Request List",
+    path: "/request",
+    visibleForRoles: ["Librarian", "Library Manager"],
+  },
+  {
+    label: "Request Book",
+    path: "/request/add",
+    visibleForRoles: ["Library User"],
+  },
+];
+
+const authMenuItems = [
+  {
     label: "Login",
     path: "/login",
     isAuthenticated: false,
@@ -38,19 +51,6 @@ const menuItems = [
     label: "Register",
     path: "/register",
     isAuthenticated: false,
-  },
-  {
-    label: "Upload",
-    path: "/uploads",
-    visibleForRoles: ["Librarian", "Library Manager", "Library User"],
-  },
-  {
-    label: "Requests",
-    path: "/request",
-    visibleForRoles: ["Librarian", "Library Manager", "Library User"],
-  },
-  {
-    label: "Logout",
   },
 ];
 
@@ -73,6 +73,7 @@ const Header = () => {
     if (item.label == "Logout" && currentUser) {
       return true;
     }
+
     // Cek role untuk menu spesifik
     if (item.visibleForRoles && currentUser?.roles) {
       return item.visibleForRoles.some((role) =>
@@ -83,33 +84,8 @@ const Header = () => {
     return false;
   };
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const {
-    user: currentUser,
-    isSuccess,
-    isError,
-    message,
-  } = useSelector((state) => state.auth);
+  const { user: currentUser } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (isError) {
-      alert(message);
-    }
-
-    if (isSuccess) {
-      navigate("/");
-    }
-
-    dispatch(reset());
-  }, [currentUser, isError, isSuccess, message, navigate, dispatch]);
-
-  const onLogout = (e) => {
-    e.preventDefault();
-    let refreshToken = currentUser.refreshToken;
-
-    dispatch(logout());
-  };
   let { title: NAMA_WEBSITE, dateNow: WAKTU_SEKARANG } = header;
   return (
     <Navbar bg="dark" data-bs-theme="dark" className="p-4">
@@ -117,17 +93,21 @@ const Header = () => {
       <Container>
         <Nav className="me-auto d-flex gap-4">
           {menuItems.filter(isMenuVisible).map((item, index) => (
-            <Nav.Link
-              key={index}
-              href={item.path}
-              onClick={item.label === "Logout" ? onLogout : null}
-            >
+            <Nav.Link key={index} href={item.path}>
               {item.label}
             </Nav.Link>
           ))}
         </Nav>
         <Navbar.Collapse className="justify-content-end gap-4">
           <Navbar.Text>{WAKTU_SEKARANG}</Navbar.Text>
+
+          <Nav>
+            {authMenuItems.filter(isMenuVisible).map((item, index) => (
+              <Nav.Link key={index} href={item.path}>
+                {item.label}
+              </Nav.Link>
+            ))}
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>

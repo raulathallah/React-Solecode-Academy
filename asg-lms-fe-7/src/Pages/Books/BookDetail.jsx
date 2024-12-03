@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import Loading from "../../components/Elements/Loading";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import ErrorMessage from "../../utils/ErrorMessage";
+import { getBook } from "../../api/services/Books";
 
 const fetchBookDetail = async ({ id }) => {
   const { data } = await getBook(id);

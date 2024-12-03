@@ -17,7 +17,6 @@ import { getAllUser } from "../../api/services/Users";
 import ReactPaginate from "react-paginate";
 import ErrorMessage from "../../utils/ErrorMessage";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getTableNumber } from "../../utils/HelperFunctions";
 
 const fetchRequestList = async () => {
   const { data } = await getAllRequestList();
@@ -38,7 +37,6 @@ const RequestList = () => {
   }, [data]);
 
   const [list, setList] = useState([]);
-
   const getStatus = (status) => {
     let bg = "";
     if (status === "Librarian Review Borrow Request") {
@@ -59,15 +57,14 @@ const RequestList = () => {
 
     return <Badge bg={bg}>{status}</Badge>;
   };
-
   return (
     <Card>
       <Card.Header>Request List</Card.Header>
       <Card.Body className="d-grid gap-3">
         <div className="d-flex justify-content-between align-items-center">
-          <Button variant="primary" as={Link} to={"/request/add"}>
+          {/* <Button variant="primary" as={Link} to={"/request/add"}>
             Book Request
-          </Button>
+          </Button> */}
           <div className="d-flex gap-3">
             <Form.Label>Items/page</Form.Label>
             <Form.Select
@@ -115,20 +112,22 @@ const RequestList = () => {
                   <td>{val.isbn}</td>
                   <td>{getStatus(val.status)}</td>
                   <td style={{ width: "20px" }}>
-                    <Container>
-                      <Row>
-                        <ButtonGroup aria-label="">
-                          <Button
-                            as={Link}
-                            variant="primary"
-                            size="sm"
-                            to={`#`}
-                          >
-                            Review
-                          </Button>
-                        </ButtonGroup>
-                      </Row>
-                    </Container>
+                    {val.status !== "Request Rejected" && (
+                      <Container>
+                        <Row>
+                          <ButtonGroup aria-label="">
+                            <Button
+                              as={Link}
+                              variant="primary"
+                              size="sm"
+                              to={`/request/${val.bookRequestId}`}
+                            >
+                              Review
+                            </Button>
+                          </ButtonGroup>
+                        </Row>
+                      </Container>
+                    )}
                   </td>
                 </tr>
               ))}
