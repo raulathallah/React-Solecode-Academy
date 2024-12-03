@@ -1,5 +1,6 @@
 import axios from "axios";
 import { refreshToken } from "./slices/authSlice";
+import { store } from "../store";
 
 const Api = axios.create({
   baseURL: "http://localhost:5238",
@@ -12,16 +13,18 @@ const Api = axios.create({
 Api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response.status === 401) {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       try {
-        console.log(1);
-        await refreshToken();
+        await store.dispatch(refreshToken()).unwrap();
+        return Api(originalRequest);
       } catch (refreshError) {
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);
   }
 );
-
 export default Api;

@@ -20,6 +20,7 @@ const logout = async () => {
 
 const refreshToken = async () => {
   const response = await Api.post("/api/Auth/RefreshToken");
+
   if (response.data.user) {
     localStorage.setItem("user", JSON.stringify(response.data));
   }

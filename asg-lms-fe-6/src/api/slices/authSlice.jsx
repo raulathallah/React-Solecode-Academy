@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AuthService from "../services/Auth";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const user = JSON.parse(localStorage.getItem("user"));
 
@@ -13,53 +14,45 @@ const initialState = {
 };
 
 // Register user
-export const register = createAsyncThunk(
-  "auth/register",
-  async (userData, thunkAPI) => {
-    try {
-      return await AuthService.register(userData);
-    } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      return thunkAPI.rejectWithValue(message);
-    }
+export const register = createAsyncThunk("auth/register", async (userData) => {
+  try {
+    return await AuthService.register(userData);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    return ErrorMessage(message);
   }
-);
+});
 
 // login
-export const login = createAsyncThunk(
-  "auth/login",
-  async (userData, thunkAPI) => {
-    try {
-      return await AuthService.login(userData);
-    } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      return thunkAPI.rejectWithValue(message);
-    }
+export const login = createAsyncThunk("auth/login", async (userData) => {
+  try {
+    return await AuthService.login(userData);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    return ErrorMessage(message);
   }
-);
+});
 
-export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+export const logout = createAsyncThunk("auth/logout", async () => {
   try {
     return await AuthService.logout();
   } catch (error) {
     const message = error.response?.data?.message || error.message;
-    return thunkAPI.rejectWithValue(message);
+    return ErrorMessage(message);
   }
 });
 
-export const refreshToken = createAsyncThunk(
-  "auth/refreshToken",
-  async (_, thunkAPI) => {
-    try {
-      const response = await AuthService.refreshToken();
-      console.log("TOKEN REFRESHED!");
-      return response;
-    } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      return thunkAPI.rejectWithValue(message);
-    }
+export const refreshToken = createAsyncThunk("auth/refreshToken", async () => {
+  try {
+    const response = await AuthService.refreshToken();
+    console.log("TOKEN REFRESHED!");
+    return response;
+  } catch (error) {
+    console.log(error);
+    //const message = error.response?.data?.message || error.message;
+    //return ErrorMessage(message);
   }
-);
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -97,7 +90,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.isAuthenticated = false;
-        console.log(action);
         state.message = action.payload;
         state.user = null;
       })
@@ -107,6 +99,9 @@ const authSlice = createSlice({
         state.isSuccess = true;
       })
       //refreshtoken case
+      .addCase(refreshToken.fulfilled, (state) => {
+        state.isAuthenticated = true;
+      })
       .addCase(refreshToken.rejected, (state) => {
         state.user = null;
         state.isAuthenticated = false;
