@@ -18,6 +18,11 @@ const initialValue = {
 
 const leaveTypeList = ["Annual Leave", "Sick Leave", "Personal Leave"];
 
+const ALLOWED_FILE_TYPES = [
+  "application/pdf", // PDF
+  "image/jpeg", //JPG JPEG
+];
+
 const LeaveRequestForm = () => {
   const inputFocus = useRef(null);
   const navigate = useNavigate();
@@ -26,7 +31,9 @@ const LeaveRequestForm = () => {
       inputFocus.current.focus();
     }
   }, []);
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB dalam bytes
 
+  const [selectedFile, setSelectedFile] = useState(null);
   const [newRequest, setNewRequest] = useState(initialValue);
   const [loading, setLoading] = useState(false);
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -53,31 +60,108 @@ const LeaveRequestForm = () => {
       var ed = new Date(newRequest.endDate);
       var sd = new Date(newRequest.startDate);
 
-      let result = Math.floor((ed - sd) / (1000 * 60 * 60 * 24));
+      let result = Math.floor((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
       return result;
     }
   };
 
   const onRequestLeave = (e) => {
     e.preventDefault();
-    setLoading(true);
-    leaveRequest(newRequest)
-      .then((res) => {
-        if (res.status === 200) {
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Request leave success!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          setTimeout(() => {
-            navigate("/profile");
-          }, 1500);
-        }
-      })
-      .catch((err) => ErrorMessage(err.message))
-      .finally(() => setLoading(false));
+
+    const formData = new FormData();
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
+    formData.append("empno", newRequest.empno);
+    formData.append("leaveType", newRequest.leaveType);
+    formData.append("leaveReason", newRequest.leaveReason);
+    formData.append("startDate", newRequest.startDate);
+    formData.append("endDate", newRequest.endDate);
+
+    try {
+      leaveRequest(newRequest)
+        .then((res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Request leave success!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/profile");
+            }, 1500);
+          } else {
+            ErrorMessage(res.message);
+          }
+        })
+        .catch((err) => ErrorMessage(err.message))
+        .finally(() => {
+          setSelectedFile(null);
+          setLoading(false);
+        });
+    } catch (error) {
+      let errorMessage = "Upload failed";
+      if (error.response) {
+        errorMessage = `Upload failed: ${error.response.data}`;
+      } else if (error.request) {
+        errorMessage = "No response from server";
+      } else {
+        errorMessage = `Error: ${error.message}`;
+      }
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: errorMessage,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateFile = (file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      return "File size exceeds 2MB limit";
+    }
+
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      return "Only PDF and Word documents are allowed";
+    }
+
+    return null;
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const validationError = validateFile(file);
+      if (validationError) {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: validationError,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setSelectedFile(null);
+        event.target.value = ""; // Reset input file
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   if (loading) {
@@ -177,9 +261,29 @@ const LeaveRequestForm = () => {
               </Form.Group>
             </Col>
             <Col>
-              <Form.Group controlId="formFile">
-                <Form.Label className="fw-semibold">File</Form.Label>
-              </Form.Group>
+              {getTotalDays() > 1 && newRequest.leaveType === "Sick Leave" && (
+                <Form.Group controlId="formFile">
+                  <Form.Label className="fw-semibold">
+                    Medical Certificate ( pdf / jpg / jpeg , max 5MB )
+                  </Form.Label>
+                  <div className="mb-3">
+                    <Form.Control
+                      type="file"
+                      size="sm"
+                      onChange={handleFileSelect}
+                      className="form-control"
+                      accept=".pdf,.jpg,.jpeg"
+                    />
+
+                    {selectedFile && (
+                      <div className="mt-2 text-muted">
+                        Selected file: {selectedFile.name} (
+                        {formatFileSize(selectedFile.size)})
+                      </div>
+                    )}
+                  </div>
+                </Form.Group>
+              )}
             </Col>
           </Row>
         </Card.Body>

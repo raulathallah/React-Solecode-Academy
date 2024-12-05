@@ -27,78 +27,54 @@ const TestUpload = () => {
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-
     if (file) {
       const validationError = validateFile(file);
-
       if (validationError) {
         toast.error(validationError);
-
         setSelectedFile(null);
-
         event.target.value = ""; // Reset input file
-
         return;
       }
-
       setSelectedFile(file);
-
       toast.info(`File selected: ${file.name}`);
-
       setUploadProgress(0);
     }
   };
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
-
     const k = 1024;
-
     const sizes = ["Bytes", "KB", "MB", "GB"];
-
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
       toast.error("Please select a file first");
-
       return;
     }
-
     setIsLoading(true);
-
     setUploadProgress(0);
-
     const formData = new FormData();
-
     formData.append("file", selectedFile);
-
     try {
       const response = await Api.post("/api/books/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-
         onUploadProgress: (progressEvent) => {
           const progress = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
           );
-
           setUploadProgress(progress);
         },
       });
-
       toast.success(response.data);
-
       setSelectedFile(null);
-
       //document.getElementById("fileInput").value = "";
     } catch (error) {
       let errorMessage = "Upload failed";
-
       if (error.response) {
         errorMessage = `Upload failed: ${error.response.data}`;
       } else if (error.request) {
@@ -106,7 +82,6 @@ const TestUpload = () => {
       } else {
         errorMessage = `Error: ${error.message}`;
       }
-
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

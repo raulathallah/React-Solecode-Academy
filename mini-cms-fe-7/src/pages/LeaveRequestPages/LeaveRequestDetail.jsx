@@ -8,6 +8,7 @@ import moment from "moment";
 import { leaveRequestApproval } from "../../api/Employee";
 import ErrorMessage from "../../utils/ErrorMessage";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 const initialValue = {
   leaveRequestId: 0,
   approval: "",
@@ -169,6 +170,20 @@ const LeaveRequestDetail = () => {
         <div className="d-flex gap-2">
           <span className="fw-semibold">Total Days: </span>
           <span>{detail.totalDays}</span>
+        </div>
+        <div className="d-flex gap-2">
+          <span className="fw-semibold">File: </span>
+          <span>
+            <Button
+              as={Link}
+              variant={detail.file ? "primary" : "secondary"}
+              size="sm"
+              disabled={!detail.file}
+              to={`http://localhost:5045/file/${detail.file}`}
+            >
+              Open File
+            </Button>
+          </span>
         </div>
       </Card.Body>
 

@@ -24,11 +24,13 @@ const menuItems = [
     path: "/books/search",
     visibleForRoles: ["Librarian", "Library User"],
   },
+  /*
   {
     label: "Upload",
     path: "/uploads",
     visibleForRoles: ["Librarian", "Library Manager", "Library User"],
   },
+  */
   {
     label: "Request List",
     path: "/request",

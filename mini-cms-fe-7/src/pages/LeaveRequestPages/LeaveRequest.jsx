@@ -159,7 +159,20 @@ const LeaveRequest = () => {
                 <td>{val.totalDays}</td>
                 <td>{val.leaveType}</td>
                 <td>{val.reason}</td>
-                <td>{val.file}</td>
+                <td style={{ width: "7%" }}>
+                  {val.file ? (
+                    <Button
+                      as={Link}
+                      variant="primary"
+                      size="sm"
+                      to={`http://localhost:5045/file/${val.file}`}
+                    >
+                      Open File
+                    </Button>
+                  ) : (
+                    "-"
+                  )}
+                </td>
                 <td>{getStatus(val.status)}</td>
                 <td>
                   {val.requestDate

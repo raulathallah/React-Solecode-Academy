@@ -71,7 +71,6 @@ const RequestDetail = () => {
 
   const onSubmitReview = (e) => {
     e.preventDefault();
-    console.log({ approval });
     setLoading(true);
     bookApproval(approval).then((res) => {
       if (res.status === 200) {

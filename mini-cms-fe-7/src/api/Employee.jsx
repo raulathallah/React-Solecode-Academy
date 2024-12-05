@@ -95,9 +95,13 @@ const getLeaveRequest = async (id) => {
   }
 };
 
-const leaveRequest = async (body) => {
+const leaveRequest = async (formData) => {
   try {
-    return await Api.post(`/api/v1/Employees/leave`, body);
+    await Api.post("/api/v1/Employees/leave", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   } catch (err) {
     return err;
   }
