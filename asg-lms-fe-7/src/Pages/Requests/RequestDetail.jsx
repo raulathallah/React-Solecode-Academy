@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Form, Row, Table } from "react-bootstrap";
 import Swal from "sweetalert2";
 import Loading from "../../components/Elements/Loading";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const fetchBookRequestDetail = async ({ id }) => {
   const { data } = await getBookRequestDetail(id);
@@ -21,7 +22,7 @@ const initialValue = {
 const RequestDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["bookRequestDetail"],
     queryFn: () => fetchBookRequestDetail({ id }),
     placeholderData: keepPreviousData,
@@ -49,11 +50,11 @@ const RequestDetail = () => {
   };
   const getStatus = (status) => {
     let bg = "";
-    if (status === "Librarian Review Borrow Request") {
+    if (status === "Librarian Review Request") {
       bg = "warning";
     }
 
-    if (status === "Library Manager Review Borrow Request") {
+    if (status === "Library Manager Review Request") {
       bg = "info";
     }
 
@@ -92,7 +93,24 @@ const RequestDetail = () => {
       setLoading(false);
     });
   };
-
+  const onTryApproval = (e) => {
+    e.preventDefault();
+    Swal.fire({
+      title: `Are you sure want to ${
+        approval.approval === "Approved" ? "APPROVE" : "REJECT"
+      }?`,
+      text: `${detail.title} by ${detail.author}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Approve",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onSubmitReview();
+      }
+    });
+  };
   if (isLoading || loading) {
     return <Loading />;
   }
@@ -237,7 +255,7 @@ const RequestDetail = () => {
 
       <Card.Footer className="text-muted">
         <div className="d-flex justify-content-start gap-2">
-          <Button variant="primary" onClick={onSubmitReview}>
+          <Button variant="primary" onClick={onTryApproval}>
             Submit Review
           </Button>
           <Button variant="secondary" onClick={onCancel}>

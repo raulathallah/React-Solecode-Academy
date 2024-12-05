@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { getAllBook } from "../../api/services/Books";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { bookRequest } from "../../api/services/Transactions";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import Loading from "../../components/Elements/Loading";
+import ErrorMessage from "../../utils/ErrorMessage";
 
 const initialValue = {
   title: "",
@@ -32,7 +33,6 @@ const RequestForm = () => {
   }, []);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
   const userData = user?.user;
@@ -47,7 +47,7 @@ const RequestForm = () => {
 
   const [list, setList] = useState([]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["books"],
     queryFn: () => fetchAllBook(),
     placeholderData: keepPreviousData,
@@ -71,8 +71,6 @@ const RequestForm = () => {
       });
     }
   }, [bookId]);
-
-  console.log(newRequest);
 
   const onRequest = (e) => {
     e.preventDefault();
@@ -102,7 +100,7 @@ const RequestForm = () => {
     });
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading />;
   }
 

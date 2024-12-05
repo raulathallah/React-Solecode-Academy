@@ -45,6 +45,15 @@ const getAllRequestList = async () => {
     return err;
   }
 };
+const getAllRequestListPaged = async (body, searchParams) => {
+  try {
+    return await Api.post(`/api/stocks/request/list`, body, {
+      params: searchParams,
+    });
+  } catch (err) {
+    return err;
+  }
+};
 
 const bookRequest = async (body) => {
   try {
@@ -78,4 +87,5 @@ export {
   bookRequest,
   getBookRequestDetail,
   bookApproval,
+  getAllRequestListPaged,
 };

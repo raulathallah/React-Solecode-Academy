@@ -10,36 +10,63 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getAllRequestList } from "../../api/services/Transactions";
+import { getAllRequestListPaged } from "../../api/services/Transactions";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Loading from "../../components/Elements/Loading";
+import ReactPaginate from "react-paginate";
 
-const fetchRequestList = async () => {
-  const { data } = await getAllRequestList();
+const fetchRequestListPaged = async ({ page, pageSize, sortQuery }) => {
+  const { data } = await getAllRequestListPaged(
+    {
+      pageNumber: page + 1,
+      perPage: pageSize,
+    },
+    sortQuery
+  );
+
   return data;
 };
+const initialSortValue = {
+  sortBy: "requester",
+  sortOrder: "asc",
+};
+const sortParamList = [
+  "Requester",
+  "Title",
+  "Author",
+  "ISBN",
+  "Publisher",
+  "Status",
+];
 
 const RequestList = () => {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["requestList"],
-    queryFn: () => fetchRequestList(),
+  const [list, setList] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageCount, setPageCount] = useState(0);
+  const [sortQuery, setSortQuery] = useState(initialSortValue);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["requestListPaged", page, pageSize, sortQuery],
+    queryFn: () => fetchRequestListPaged({ page, pageSize, sortQuery }),
     placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
     if (data) {
-      setList(data);
+      setList(data.data.filter((val) => val.isDeleted !== true));
+      setPageCount(Math.ceil(data.total / pageSize));
     }
-  }, [data]);
+  }, [data, page, pageSize]);
 
-  const [list, setList] = useState([]);
   const getStatus = (status) => {
     let bg = "";
-    if (status === "Librarian Review Borrow Request") {
+    if (status === "Librarian Review Request") {
       bg = "warning";
     }
 
-    if (status === "Library Manager Review Borrow Request") {
+    if (status === "Library Manager Review Request") {
       bg = "info";
     }
 
@@ -54,24 +81,61 @@ const RequestList = () => {
     return <Badge bg={bg}>{status}</Badge>;
   };
 
+  const handlePageClick = (event) => {
+    setPage(event.selected);
+  };
+
+  const onChangePageSize = (e) => {
+    setPageSize(e.target.value);
+    setPage(0);
+  };
+
   if (isLoading) {
     return <Loading />;
   }
+
   return (
     <Card>
       <Card.Header>Request List</Card.Header>
       <Card.Body className="d-grid gap-3">
-        <div className="d-flex justify-content-between align-items-center">
-          {/* <Button variant="primary" as={Link} to={"/request/add"}>
-            Book Request
-          </Button> */}
-          <div className="d-flex gap-3">
-            <Form.Label>Items/page</Form.Label>
+        <div className="d-flex justify-content-between">
+          <div className="d-flex">
+            <Form.Label className="mx-2">Sort By</Form.Label>
+            <Form.Select
+              style={{ width: "100px" }}
+              value={sortQuery.sortBy}
+              size="sm"
+              onChange={(e) => {
+                setSortQuery({ ...sortQuery, sortBy: e.target.value });
+              }}
+            >
+              {sortParamList.map((val) => (
+                <option key={val} value={val.toLowerCase()}>
+                  {val}
+                </option>
+              ))}
+            </Form.Select>
+
+            <Form.Label className="mx-2">Sort Order</Form.Label>
+            <Form.Select
+              style={{ width: "150px" }}
+              size="sm"
+              value={sortQuery.sortOrder}
+              onChange={(e) => {
+                setSortQuery({ ...sortQuery, sortOrder: e.target.value });
+              }}
+            >
+              <option value="asc">Ascending</option>
+              <option value="dsc">Descending</option>
+            </Form.Select>
+          </div>
+
+          <div className="d-flex gap-1">
             <Form.Select
               type="text"
-              //value={itemsPerPage}
+              value={pageSize}
               size="sm"
-              //onChange={(e) => setItemsPerPage(e.target.value)}
+              onChange={onChangePageSize}
             >
               <option key={5} value={5}>
                 5
@@ -83,6 +147,7 @@ const RequestList = () => {
                 20
               </option>
             </Form.Select>
+            <Form.Label style={{ width: "100px" }}>/page</Form.Label>
           </div>
         </div>
         <Table striped bordered hover responsive="sm">
@@ -133,7 +198,7 @@ const RequestList = () => {
               ))}
           </tbody>
         </Table>
-        {/* 
+
         <ReactPaginate
           breakLabel="..."
           nextLabel="next >"
@@ -147,7 +212,7 @@ const RequestList = () => {
           previousLinkClassName="page-num text-decoration-none text-black"
           nextLinkClassName="page-num text-decoration-none text-black"
           activeLinkClassName="text-white bg-primary"
-        /> */}
+        />
       </Card.Body>
     </Card>
   );
