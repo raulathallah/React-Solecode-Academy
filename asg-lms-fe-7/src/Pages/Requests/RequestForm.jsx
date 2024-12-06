@@ -17,7 +17,15 @@ const initialValue = {
   isbn: "",
   startDate: "",
   endDate: null,
-  locationId: 1,
+  //locationId: 1,
+  notes: "",
+};
+
+const initialError = {
+  bookId: "",
+  startDate: "",
+  endDate: "",
+  //locationId: "",
   notes: "",
 };
 const fetchAllBook = async () => {
@@ -38,6 +46,7 @@ const RequestForm = () => {
   const userData = user?.user;
 
   const [newRequest, setNewRequest] = useState(initialValue);
+  const [errors, setErrors] = useState(initialError);
   const [bookId, setBookId] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -74,30 +83,51 @@ const RequestForm = () => {
 
   const onRequest = (e) => {
     e.preventDefault();
-    console.log("REQUEST");
-    console.log(newRequest);
 
-    toast.info("Please wait...");
-    setLoading(true);
-    bookRequest(newRequest).then((res) => {
-      if (res.status === 200) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Book requested!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        setTimeout(() => {
-          navigate("/books/search");
-        }, 1500);
-      } else {
-        if (res.message) {
-          ErrorMessage(res.message);
+    let valid = Validate();
+    if (valid) {
+      toast.info("Please wait...");
+      setLoading(true);
+      bookRequest(newRequest).then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Book requested!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setTimeout(() => {
+            navigate("/books/search");
+          }, 1500);
+        } else {
+          if (res.message) {
+            ErrorMessage(res.message);
+          }
         }
+        setLoading(false);
+      });
+    }
+  };
+
+  const Validate = () => {
+    let errorMessages = {};
+    if (!newRequest.startDate) {
+      errorMessages.startDate = "Request Date must be filled!";
+    }
+    if (!bookId) {
+      errorMessages.bookId = "Book must be filled!";
+    }
+    setErrors(errorMessages);
+
+    let formValid = true;
+    for (let propName in errorMessages) {
+      if (errorMessages[propName].length > 0) {
+        formValid = false;
       }
-      setLoading(false);
-    });
+    }
+
+    return formValid;
   };
 
   if (loading || isLoading) {
@@ -133,11 +163,11 @@ const RequestForm = () => {
                 onChange={(e) =>
                   setNewRequest({ ...newRequest, startDate: e.target.value })
                 }
-                // isInvalid={errors.dob}
+                isInvalid={errors.startDate}
                 value={newRequest.startDate}
                 size="sm"
               />
-              {/* {errors.dob && <small>{errors.dob}</small>} */}
+              {errors.startDate && <small>{errors.startDate}</small>}
             </Col>
           </Form.Group>
           <Form.Group as={Row} controlId="formBook">
@@ -146,7 +176,7 @@ const RequestForm = () => {
             </Col>
             <Col sm="5">
               <Form.Select
-                // isInvalid={errors.deptno}
+                isInvalid={errors.bookId}
                 onChange={(e) => setBookId(e.target.value)}
                 value={bookId}
                 size="sm"
@@ -161,6 +191,7 @@ const RequestForm = () => {
                     </option>
                   ))}
               </Form.Select>
+              {errors.bookId && <small>{errors.bookId}</small>}
             </Col>
 
             {/* {errors.deptno && <small>{errors.deptno}</small>} */}
@@ -200,7 +231,7 @@ const RequestForm = () => {
 
           <Form.Group as={Row} controlId="formNotes">
             <Col className="text-end" sm="2">
-              <Form.Label className="fw-semibold">Notes</Form.Label>
+              <Form.Label className="fw-semibold">Notes (Optional)</Form.Label>
             </Col>
             <Col sm="5">
               <Form.Text
