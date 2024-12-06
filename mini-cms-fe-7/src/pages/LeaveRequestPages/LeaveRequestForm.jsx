@@ -3,7 +3,7 @@ import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-import { leaveRequest } from "../../api/Employee";
+import { leaveRequest, leaveRequestUpload } from "../../api/Employee";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../utils/ErrorMessage";
 import Loading from "../../components/Elements/Loading";
@@ -26,6 +26,7 @@ const ALLOWED_FILE_TYPES = [
 const LeaveRequestForm = () => {
   const inputFocus = useRef(null);
   const navigate = useNavigate();
+  const { user: currentUser } = useSelector((state) => state.auth);
   useEffect(() => {
     if (inputFocus.current) {
       inputFocus.current.focus();
@@ -36,7 +37,8 @@ const LeaveRequestForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [newRequest, setNewRequest] = useState(initialValue);
   const [loading, setLoading] = useState(false);
-  const { user: currentUser } = useSelector((state) => state.auth);
+
+  const [leaveRequestId, setLeaveRequestId] = useState(0);
 
   const employeeName =
     currentUser?.employee?.fname + " " + currentUser?.employee?.lname;
@@ -47,6 +49,39 @@ const LeaveRequestForm = () => {
       setNewRequest({ ...newRequest, empno: empNo });
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (leaveRequestId && selectedFile) {
+      setLoading(true);
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+        formData.append("leaveRequestId", leaveRequestId);
+      }
+
+      leaveRequestUpload(formData)
+        .then((res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Upload success!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {
+              navigate("/profile");
+            }, 1500);
+          } else {
+            ErrorMessage(res.message);
+          }
+        })
+        .finally(() => {
+          setSelectedFile(null);
+          setLoading(false);
+        });
+    }
+  }, [leaveRequestId]);
 
   //ON CANCEL
   const onCancel = () => {
@@ -63,70 +98,39 @@ const LeaveRequestForm = () => {
       let result = Math.floor((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
       return result;
     }
+
+    return 0;
   };
 
   const onRequestLeave = (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-
-    if (selectedFile) {
-      formData.append("file", selectedFile);
-    }
-
-    formData.append("empno", newRequest.empno);
-    formData.append("leaveType", newRequest.leaveType);
-    formData.append("leaveReason", newRequest.leaveReason);
-    formData.append("startDate", newRequest.startDate);
-    formData.append("endDate", newRequest.endDate);
-
-    try {
-      leaveRequest(newRequest)
-        .then((res) => {
-          if (res.status === 200) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Request leave success!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            setTimeout(() => {
-              navigate("/profile");
-            }, 1500);
-          } else {
-            ErrorMessage(res.message);
+    setLoading(true);
+    leaveRequest(newRequest)
+      .then((res) => {
+        if (res.status === 200) {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Request leave success!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          if (res.data) {
+            setLeaveRequestId(res.data?.leaveRequestId);
           }
-        })
-        .catch((err) => ErrorMessage(err.message))
-        .finally(() => {
-          setSelectedFile(null);
-          setLoading(false);
-        });
-    } catch (error) {
-      let errorMessage = "Upload failed";
-      if (error.response) {
-        errorMessage = `Upload failed: ${error.response.data}`;
-      } else if (error.request) {
-        errorMessage = "No response from server";
-      } else {
-        errorMessage = `Error: ${error.message}`;
-      }
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: errorMessage,
-        showConfirmButton: false,
-        timer: 1500,
+          setLoading(true);
+        } else {
+          ErrorMessage(res.message);
+        }
+      })
+      .catch((err) => {
+        ErrorMessage(err.message);
       });
-    } finally {
-      setLoading(false);
-    }
   };
 
   const validateFile = (file) => {
     if (file.size > MAX_FILE_SIZE) {
-      return "File size exceeds 2MB limit";
+      return "File size exceeds 5 MB limit";
     }
 
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
@@ -194,7 +198,7 @@ const LeaveRequestForm = () => {
                 <Form.Label className="fw-semibold">Start Date</Form.Label>
                 <Form.Control
                   type="date"
-                  //max={new Date().toISOString().split("T")[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   value={newRequest.startDate}
                   onChange={(e) => onChangeValue("startDate", e)}
                   required
@@ -207,7 +211,14 @@ const LeaveRequestForm = () => {
                 <Form.Label className="fw-semibold">End Date</Form.Label>
                 <Form.Control
                   type="date"
-                  //max={new Date().toISOString().split("T")[0]}
+                  min={
+                    newRequest.startDate
+                      ? new Date(newRequest.startDate)
+                          .toISOString()
+                          .split("T")[0]
+                      : null
+                  }
+                  disabled={!newRequest.startDate}
                   value={newRequest.endDate}
                   onChange={(e) => onChangeValue("endDate", e)}
                   required
@@ -222,7 +233,6 @@ const LeaveRequestForm = () => {
                   type="number"
                   value={getTotalDays()}
                   size="sm"
-                  required
                   disabled
                 />
               </Form.Group>
@@ -234,7 +244,10 @@ const LeaveRequestForm = () => {
               <Form.Group controlId="formLeaveType">
                 <Form.Label className="fw-semibold">Leave Type</Form.Label>
                 <Form.Select
-                  onChange={(e) => onChangeValue("leaveType", e)}
+                  onChange={(e) => {
+                    onChangeValue("leaveType", e);
+                    setSelectedFile(null);
+                  }}
                   value={newRequest.leaveType}
                   size="sm"
                   required

@@ -95,9 +95,17 @@ const getLeaveRequest = async (id) => {
   }
 };
 
-const leaveRequest = async (formData) => {
+const leaveRequest = async (body) => {
   try {
-    await Api.post("/api/v1/Employees/leave", formData, {
+    return await Api.post("/api/v1/Employees/leave", body);
+  } catch (err) {
+    return err;
+  }
+};
+
+const leaveRequestUpload = async (formData) => {
+  try {
+    return await Api.post("/api/v1/Employees/leave/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -106,6 +114,7 @@ const leaveRequest = async (formData) => {
     return err;
   }
 };
+
 const leaveRequestApproval = async (body) => {
   try {
     return await Api.post(`/api/v1/Employees/leave-approval`, body);
@@ -128,4 +137,5 @@ export {
   leaveRequest,
   getLeaveRequest,
   leaveRequestApproval,
+  leaveRequestUpload,
 };

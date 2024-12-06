@@ -165,6 +165,7 @@ const LeaveRequest = () => {
                       as={Link}
                       variant="primary"
                       size="sm"
+                      target="_blank"
                       to={`http://localhost:5045/file/${val.file}`}
                     >
                       Open File
