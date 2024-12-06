@@ -48,8 +48,8 @@ const menuItems = [
     visibleForRoles: ["Administrator", "Employee Supervisor", "HR Manager"],
   },
   {
-    label: "Request Leave",
-    path: "/leave-request/add",
+    label: "My Leave Request",
+    path: "/leave-request/list",
     visibleForRoles: ["Administrator", "Employee"],
   },
   {

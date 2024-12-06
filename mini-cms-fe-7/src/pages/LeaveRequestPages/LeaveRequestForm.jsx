@@ -3,7 +3,7 @@ import ButtonCustom from "../../components/Elements/ButtonCustom";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-import { leaveRequest, leaveRequestUpload } from "../../api/Employee";
+import { leaveRequest } from "../../api/Employee";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../utils/ErrorMessage";
 import Loading from "../../components/Elements/Loading";
@@ -14,6 +14,14 @@ const initialValue = {
   leaveReason: "",
   startDate: "",
   endDate: "",
+};
+
+const initialError = {
+  leaveType: "",
+  leaveReason: "",
+  startDate: "",
+  endDate: "",
+  file: "",
 };
 
 const leaveTypeList = ["Annual Leave", "Sick Leave", "Personal Leave"];
@@ -34,11 +42,10 @@ const LeaveRequestForm = () => {
   }, []);
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB dalam bytes
 
+  const [errors, setErrors] = useState(initialError);
   const [selectedFile, setSelectedFile] = useState(null);
   const [newRequest, setNewRequest] = useState(initialValue);
   const [loading, setLoading] = useState(false);
-
-  const [leaveRequestId, setLeaveRequestId] = useState(0);
 
   const employeeName =
     currentUser?.employee?.fname + " " + currentUser?.employee?.lname;
@@ -49,40 +56,6 @@ const LeaveRequestForm = () => {
       setNewRequest({ ...newRequest, empno: empNo });
     }
   }, [currentUser]);
-
-  useEffect(() => {
-    if (leaveRequestId && selectedFile) {
-      setLoading(true);
-      const formData = new FormData();
-      if (selectedFile) {
-        formData.append("file", selectedFile);
-        formData.append("leaveRequestId", leaveRequestId);
-      }
-
-      leaveRequestUpload(formData)
-        .then((res) => {
-          if (res.status === 200) {
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Upload success!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-            setTimeout(() => {
-              navigate("/profile");
-            }, 1500);
-          } else {
-            ErrorMessage(res.message);
-          }
-        })
-        .finally(() => {
-          setSelectedFile(null);
-          setLoading(false);
-        });
-    }
-  }, [leaveRequestId]);
-
   //ON CANCEL
   const onCancel = () => {
     navigate(-1);
@@ -102,30 +75,81 @@ const LeaveRequestForm = () => {
     return 0;
   };
 
+  const Validate = () => {
+    let errorMessages = {};
+
+    if (!newRequest.leaveType) {
+      errorMessages.leaveType = `Leave type must be filled!`;
+    }
+    if (!newRequest.leaveReason) {
+      errorMessages.leaveReason = `Leave reason must be filled!`;
+    }
+    if (!newRequest.startDate) {
+      errorMessages.startDate = `Start Date must be filled!`;
+    }
+    if (!newRequest.endDate) {
+      errorMessages.endDate = `End Date must be filled!`;
+    }
+
+    if (getTotalDays() > 1) {
+      if (!selectedFile) {
+        errorMessages.file = `Choose file!`;
+      }
+    }
+
+    setErrors(errorMessages);
+
+    let formValid = true;
+    for (let propName in errorMessages) {
+      if (errorMessages[propName].length > 0) {
+        formValid = false;
+      }
+    }
+
+    return formValid;
+  };
+
   const onRequestLeave = (e) => {
     e.preventDefault();
-    setLoading(true);
-    leaveRequest(newRequest)
-      .then((res) => {
-        if (res.status === 200) {
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Request leave success!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          if (res.data) {
-            setLeaveRequestId(res.data?.leaveRequestId);
+
+    let valid = Validate();
+    if (valid) {
+      setLoading(true);
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
+
+      formData.append("empno", newRequest.empno);
+      formData.append("leaveType", newRequest.leaveType);
+      formData.append("leaveReason", newRequest.leaveReason);
+      formData.append("startDate", newRequest.startDate);
+      formData.append("endDate", newRequest.endDate);
+
+      leaveRequest(formData)
+        .then((res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Request leave success!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            ErrorMessage(res.message);
           }
-          setLoading(true);
-        } else {
-          ErrorMessage(res.message);
-        }
-      })
-      .catch((err) => {
-        ErrorMessage(err.message);
-      });
+        })
+        .catch((err) => {
+          ErrorMessage(err.message);
+        })
+        .finally(() => {
+          setLoading(false);
+          setTimeout(() => {
+            navigate("/leave-request/list");
+          }, 1500);
+        });
+    }
   };
 
   const validateFile = (file) => {
@@ -185,7 +209,6 @@ const LeaveRequestForm = () => {
                   type="text"
                   value={employeeName}
                   size="sm"
-                  required
                   disabled
                 />
               </Form.Group>
@@ -201,9 +224,10 @@ const LeaveRequestForm = () => {
                   min={new Date().toISOString().split("T")[0]}
                   value={newRequest.startDate}
                   onChange={(e) => onChangeValue("startDate", e)}
-                  required
+                  isInvalid={errors.startDate}
                   size="sm"
                 />
+                {errors.startDate && <small>{errors.startDate}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -219,11 +243,12 @@ const LeaveRequestForm = () => {
                       : null
                   }
                   disabled={!newRequest.startDate}
+                  isInvalid={errors.endDate}
                   value={newRequest.endDate}
                   onChange={(e) => onChangeValue("endDate", e)}
-                  required
                   size="sm"
                 />
+                {errors.endDate && <small>{errors.endDate}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -249,8 +274,8 @@ const LeaveRequestForm = () => {
                     setSelectedFile(null);
                   }}
                   value={newRequest.leaveType}
+                  isInvalid={errors.leaveType}
                   size="sm"
-                  required
                 >
                   <option disabled value={""} hidden />
                   {leaveTypeList.map((val) => (
@@ -259,6 +284,7 @@ const LeaveRequestForm = () => {
                     </option>
                   ))}
                 </Form.Select>
+                {errors.leaveType && <small>{errors.leaveType}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -268,9 +294,10 @@ const LeaveRequestForm = () => {
                   type="text"
                   onChange={(e) => onChangeValue("leaveReason", e)}
                   value={newRequest.leaveReason}
+                  isInvalid={errors.leaveReason}
                   size="sm"
-                  required
                 />
+                {errors.leaveReason && <small>{errors.leaveReason}</small>}
               </Form.Group>
             </Col>
             <Col>
@@ -286,6 +313,7 @@ const LeaveRequestForm = () => {
                       onChange={handleFileSelect}
                       className="form-control"
                       accept=".pdf,.jpg,.jpeg"
+                      isInvalid={errors.file}
                     />
 
                     {selectedFile && (
@@ -295,6 +323,7 @@ const LeaveRequestForm = () => {
                       </div>
                     )}
                   </div>
+                  {errors.file && <small>{errors.file}</small>}
                 </Form.Group>
               )}
             </Col>

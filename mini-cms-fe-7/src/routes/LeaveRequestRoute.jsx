@@ -16,8 +16,26 @@ const LeaveRequestRoute = [
         element: <LeaveRequest />,
       },
       {
-        path: "/leave-request/:id",
+        path: "/leave-request/:id/review",
         element: <LeaveRequestDetail />,
+      },
+    ],
+  },
+  {
+    element: (
+      <PrivateRoute
+        allowedRoles={[
+          "Administrator",
+          "Employee Supervisor",
+          "HR Manager",
+          "Employee",
+        ]}
+      />
+    ),
+    children: [
+      {
+        path: "/leave-request/:id",
+        element: <LeaveRequestDetail type={"detail"} />,
       },
     ],
   },
@@ -27,6 +45,10 @@ const LeaveRequestRoute = [
       {
         path: "/leave-request/add",
         element: <LeaveRequestForm />,
+      },
+      {
+        path: "/leave-request/list",
+        element: <LeaveRequest type={"employee"} />,
       },
     ],
   },

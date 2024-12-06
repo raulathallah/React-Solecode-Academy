@@ -1,4 +1,4 @@
-import Api from "./Api";
+import { Api } from "./Api";
 
 const getWorksOnPaginate = async (pageNumber, perPage) => {
   try {

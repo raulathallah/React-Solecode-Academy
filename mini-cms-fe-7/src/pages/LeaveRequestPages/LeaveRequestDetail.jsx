@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Form, Row, Table } from "react-bootstrap";
@@ -14,7 +15,7 @@ const initialValue = {
   approval: "",
   notes: "",
 };
-const LeaveRequestDetail = () => {
+const LeaveRequestDetail = ({ type }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading } = useQuery({
@@ -178,6 +179,7 @@ const LeaveRequestDetail = () => {
               as={Link}
               variant={detail.file ? "primary" : "secondary"}
               size="sm"
+              target="_blank"
               disabled={!detail.file}
               to={`http://localhost:5045/file/${detail.file}`}
             >
@@ -218,74 +220,79 @@ const LeaveRequestDetail = () => {
         </Table>
       </Card.Body>
 
-      <Card.Body>
-        <Form.Group as={Row} controlId="formSex">
-          <Col className="text-end" sm="2">
-            <Form.Label className="fw-semibold">Status</Form.Label>
-          </Col>
-          <Col sm="5">
-            <div className="d-flex gap-4">
-              <Form.Check
-                label={
-                  <p style={{ color: "green" }} className="fw-bold">
-                    Approve
-                  </p>
-                }
-                name="group1"
-                type="radio"
-                value={"Approved"}
-                checked={approval.approval === "Approved"}
+      {type !== "detail" && (
+        <Card.Body>
+          <Form.Group as={Row} controlId="formSex">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Status</Form.Label>
+            </Col>
+            <Col sm="5">
+              <div className="d-flex gap-4">
+                <Form.Check
+                  label={
+                    <p style={{ color: "green" }} className="fw-bold">
+                      Approve
+                    </p>
+                  }
+                  name="group1"
+                  type="radio"
+                  value={"Approved"}
+                  checked={approval.approval === "Approved"}
+                  onChange={(e) =>
+                    setApproval({ ...approval, approval: e.target.value })
+                  }
+                  id={`checkbox-1`}
+                  //isInvalid={errors.sex}
+                />
+                <Form.Check
+                  inline
+                  label={
+                    <p style={{ color: "red" }} className="fw-bold">
+                      Reject
+                    </p>
+                  }
+                  name="group1"
+                  type="radio"
+                  value={"Rejected"}
+                  checked={approval.approval === "Rejected"}
+                  id={`checkbox-1`}
+                  onChange={(e) =>
+                    setApproval({ ...approval, approval: e.target.value })
+                  }
+                  //isInvalid={errors.sex}
+                />
+              </div>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="formNotes">
+            <Col className="text-end" sm="2">
+              <Form.Label className="fw-semibold">Notes</Form.Label>
+            </Col>
+            <Col sm="5">
+              <Form.Text
+                as={"textarea"}
                 onChange={(e) =>
-                  setApproval({ ...approval, approval: e.target.value })
+                  setApproval({ ...approval, notes: e.target.value })
                 }
-                id={`checkbox-1`}
-                //isInvalid={errors.sex}
+                value={approval.notes}
+                cols={44}
+                rows={5}
               />
-              <Form.Check
-                inline
-                label={
-                  <p style={{ color: "red" }} className="fw-bold">
-                    Reject
-                  </p>
-                }
-                name="group1"
-                type="radio"
-                value={"Rejected"}
-                checked={approval.approval === "Rejected"}
-                id={`checkbox-1`}
-                onChange={(e) =>
-                  setApproval({ ...approval, approval: e.target.value })
-                }
-                //isInvalid={errors.sex}
-              />
-            </div>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId="formNotes">
-          <Col className="text-end" sm="2">
-            <Form.Label className="fw-semibold">Notes</Form.Label>
-          </Col>
-          <Col sm="5">
-            <Form.Text
-              as={"textarea"}
-              onChange={(e) =>
-                setApproval({ ...approval, notes: e.target.value })
-              }
-              value={approval.notes}
-              cols={44}
-              rows={5}
-            />
-          </Col>
+            </Col>
 
-          {/* {errors.deptno && <small>{errors.deptno}</small>} */}
-        </Form.Group>
-      </Card.Body>
+            {/* {errors.deptno && <small>{errors.deptno}</small>} */}
+          </Form.Group>
+        </Card.Body>
+      )}
 
       <Card.Footer className="text-muted">
         <div className="d-flex justify-content-start gap-2">
-          <Button variant="primary" onClick={onTryApproval}>
-            Submit Review
-          </Button>
+          {type !== "detail" && (
+            <Button variant="primary" onClick={onTryApproval}>
+              Submit Review
+            </Button>
+          )}
+
           <Button variant="secondary" onClick={onCancel}>
             Back
           </Button>

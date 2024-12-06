@@ -1,4 +1,4 @@
-import Api from "./Api";
+import { Api, ApiFormData } from "./Api";
 
 const getEmployeePaginate = async (pageNumber, perPage) => {
   try {
@@ -95,21 +95,9 @@ const getLeaveRequest = async (id) => {
   }
 };
 
-const leaveRequest = async (body) => {
+const leaveRequest = async (formData) => {
   try {
-    return await Api.post("/api/v1/Employees/leave", body);
-  } catch (err) {
-    return err;
-  }
-};
-
-const leaveRequestUpload = async (formData) => {
-  try {
-    return await Api.post("/api/v1/Employees/leave/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return await ApiFormData.post("/api/v1/Employees/leave", formData);
   } catch (err) {
     return err;
   }
@@ -137,5 +125,4 @@ export {
   leaveRequest,
   getLeaveRequest,
   leaveRequestApproval,
-  leaveRequestUpload,
 };

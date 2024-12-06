@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchLeaveRequestPaginate } from "../../api/Fetchs/FetchEmployees";
 import { useEffect, useState } from "react";
@@ -6,23 +7,24 @@ import ReactPaginate from "react-paginate";
 import {
   Badge,
   Button,
-  ButtonGroup,
   Card,
   Container,
   Form,
   InputGroup,
-  Row,
+  OverlayTrigger,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faList, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import ButtonCustom from "../../components/Elements/ButtonCustom";
 const initialSearchValue = {
   keyword: "",
 };
 
-const LeaveRequest = () => {
+const LeaveRequest = ({ type }) => {
   const [list, setList] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -90,8 +92,19 @@ const LeaveRequest = () => {
     <Card>
       <Card.Header>Leave Request List</Card.Header>
       <Card.Body className="d-grid gap-2">
+        <div className="tw-flex">
+          <ButtonCustom
+            icon={<FontAwesomeIcon icon={faPlus} />}
+            as={Link}
+            to={"/leave-request/add"}
+            size="sm"
+          >
+            Request Leave
+          </ButtonCustom>
+        </div>
+
         <div className="tw-flex tw-justify-between">
-          <InputGroup className="w-50">
+          <InputGroup className="w-75">
             <InputGroup.Text id="basic-addon1">
               <FontAwesomeIcon icon={faSearch} />
             </InputGroup.Text>
@@ -180,23 +193,31 @@ const LeaveRequest = () => {
                     ? moment(val.requestDate).format("LL")
                     : "(null)"}
                 </td>
-                <td style={{ width: "20px" }}>
-                  {val.status && val.status.includes("Under") && (
-                    <Container>
-                      <Row>
-                        <ButtonGroup aria-label="">
-                          <Button
-                            as={Link}
-                            variant="primary"
-                            size="sm"
-                            to={`/leave-request/${val.leaveRequestId}`}
-                          >
-                            Review
-                          </Button>
-                        </ButtonGroup>
-                      </Row>
-                    </Container>
-                  )}
+                <td style={{ width: "100px" }}>
+                  <Container className="d-flex gap-2">
+                    <OverlayTrigger overlay={<Tooltip>Details</Tooltip>}>
+                      <Button
+                        as={Link}
+                        variant="dark"
+                        size="sm"
+                        to={`/leave-request/${val.leaveRequestId}`}
+                      >
+                        <FontAwesomeIcon icon={faList} />
+                      </Button>
+                    </OverlayTrigger>
+                    {val.status && val.status.includes("Under") && !type && (
+                      <OverlayTrigger overlay={<Tooltip>Review</Tooltip>}>
+                        <Button
+                          as={Link}
+                          size="sm"
+                          variant="primary"
+                          to={`/leave-request/${val.leaveRequestId}/review`}
+                        >
+                          <FontAwesomeIcon icon={faSearch} />
+                        </Button>
+                      </OverlayTrigger>
+                    )}
+                  </Container>
                 </td>
               </tr>
             ))}
