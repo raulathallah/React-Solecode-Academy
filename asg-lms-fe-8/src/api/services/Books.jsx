@@ -55,9 +55,18 @@ const deleteBook = async (id, body) => {
 
 const getBookPurchaseReport = async (body) => {
   try {
-    return await Api.post(`/api/books/purchase-report`, body, {
-      responseType: "blob",
-    });
+    return await axios.post(
+      `http://localhost:5238/api/books/purchase-report`,
+      body,
+      {
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/pdf",
+        },
+        withCredentials: true,
+      }
+    );
   } catch (err) {
     return err;
   }
