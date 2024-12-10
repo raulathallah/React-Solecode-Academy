@@ -53,6 +53,16 @@ const deleteBook = async (id, body) => {
   }
 };
 
+const getBookPurchaseReport = async (body) => {
+  try {
+    return await Api.post(`/api/books/purchase-report`, body, {
+      responseType: "blob",
+    });
+  } catch (err) {
+    return err;
+  }
+};
+
 export {
   getAllBook,
   getBook,
@@ -60,4 +70,5 @@ export {
   addBook,
   deleteBook,
   getAllBookSearchPaged,
+  getBookPurchaseReport,
 };
