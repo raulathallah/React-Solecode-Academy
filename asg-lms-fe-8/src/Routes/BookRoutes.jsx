@@ -2,7 +2,6 @@ import PrivateRoute from "../components/PrivateRoutes";
 import BookDetail from "../Pages/Books/BookDetail";
 import BookForm from "../Pages/Books/BookForm";
 import BookList from "../Pages/Books/BookList";
-import BookReport from "../Pages/Books/BookReport";
 import BookSearch from "../Pages/Books/BookSearch";
 
 const BookRoutes = [
@@ -37,10 +36,6 @@ const BookRoutes = [
         element: <BookSearch />,
       },
     ],
-  },
-  {
-    path: "/books/report",
-    element: <BookReport />,
   },
 ];
 

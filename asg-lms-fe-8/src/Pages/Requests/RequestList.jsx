@@ -186,7 +186,9 @@ const RequestList = () => {
                       >
                         Detail
                       </Button>
-                      {val.status !== "Request Rejected" && (
+                      {val.status
+                        ?.toLowerCase()
+                        .includes("rejected" | "approved") && (
                         <Button
                           as={Link}
                           variant="primary"

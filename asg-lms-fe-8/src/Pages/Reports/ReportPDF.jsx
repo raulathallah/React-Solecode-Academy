@@ -1,9 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
-import { getBookPurchaseReport } from "../../api/services/Books";
 import { Document, Page, pdfjs } from "react-pdf";
 import ErrorMessage from "../../utils/ErrorMessage";
 
-const BookReport = () => {
+const ReportPDF = ({ reportName, reportAPI }) => {
   const [pdfFile, setPdfFile] = useState(null);
   const [error, setError] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
@@ -27,15 +27,15 @@ const BookReport = () => {
       setLoading(true);
       setError(null);
 
-      const response = await getBookPurchaseReport({ startDate, endDate });
-      console.log(response);
+      //const response = await getBookPurchaseReport({ startDate, endDate });
+      const response = await reportAPI({ startDate, endDate });
 
       if (response) {
         const pdfBlob = new Blob([response.data], { type: "application/pdf" });
         const pdfUrl = URL.createObjectURL(pdfBlob);
 
         const contentDisposition = response.headers.get("content-disposition");
-        console.log(contentDisposition);
+        //console.log(contentDisposition);
         let tempFileName = "document.pdf";
 
         if (contentDisposition) {
@@ -55,6 +55,7 @@ const BookReport = () => {
         }, 1500);
       }
     } catch (err) {
+      console.log(err);
       setError("Gagal menghasilkan laporan. Silakan coba lagi.");
     }
   };
@@ -63,7 +64,7 @@ const BookReport = () => {
     if (pdfFile) {
       const link = document.createElement("a");
       link.href = pdfFile;
-      link.setAttribute("download", filename);
+      link.setAttribute("download", `${filename}`);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
@@ -88,7 +89,7 @@ const BookReport = () => {
 
   return (
     <div className="container">
-      <h4>Book Purchase Report</h4>
+      <h4>{reportName}</h4>
       <div className="d-flex gap-3">
         <div className="col-md-4 mb-3">
           <label className="form-label">Start Date</label>
@@ -126,7 +127,7 @@ const BookReport = () => {
               Loading...
             </>
           ) : (
-            "Lihat Laporan"
+            "Preview Report"
           )}
         </button>
         {pdfFile && (
@@ -191,7 +192,6 @@ const BookReport = () => {
                       </button>
 
                       <p className="mb-0">
-                        {" "}
                         Page {pageNumber} of {numPages}{" "}
                       </p>
 
@@ -214,4 +214,4 @@ const BookReport = () => {
   );
 };
 
-export default BookReport;
+export default ReportPDF;

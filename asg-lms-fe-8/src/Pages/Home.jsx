@@ -1,14 +1,11 @@
-import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Loading from "../components/Elements/Loading";
-import ErrorMessage from "../utils/ErrorMessage";
 import { getDashboard } from "../api/services/Stocks";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -16,36 +13,25 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  Badge,
-  Button,
-  ButtonGroup,
-  Card,
-  Container,
-  Table,
-} from "react-bootstrap";
+import { Badge, Button, Card, Container, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const fetchDashboard = async () => {
   const { data } = await getDashboard();
   return data;
 };
 
-const initialSortValue = {
-  sortBy: "status",
-  sortOrder: "asc",
-};
-
 const Home = () => {
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
-  const [sortQuery, setSortQuery] = useState(initialSortValue);
-
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => fetchDashboard(),
     placeholderData: keepPreviousData,
   });
+
+  const { user: currentUser } = useSelector((state) => state.auth);
+
+  console.log(currentUser.roles[0]);
 
   const getStatus = (status) => {
     let bg = "";
@@ -74,6 +60,14 @@ const Home = () => {
 
   if (isError && error) {
     return <p>Error...</p>;
+  }
+
+  if (currentUser?.roles && currentUser?.roles.includes("Library User")) {
+    return (
+      <h3>
+        Welcome, {currentUser?.user?.fName} {currentUser?.user?.lName}!
+      </h3>
+    );
   }
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -203,40 +197,41 @@ const Home = () => {
               </tr>
             </thead>
             <tbody>
-              {data?.proccessToFollowUpData.map((val, key) => (
-                <tr key={key}>
-                  {/* <td>{getTableNumber(itemOffset, itemsPerPage, key)}</td> */}
-                  <td>{val.requestDate}</td>
-                  <td>{val.requesterName}</td>
-                  <td>{val.title}</td>
-                  <td>{val.author}</td>
-                  <td>{val.publisher}</td>
-                  <td>{val.isbn}</td>
-                  <td>{getStatus(val.status)}</td>
-                  <td style={{ width: "100px" }}>
-                    <Container className="d-flex gap-2">
-                      <Button
-                        as={Link}
-                        variant="dark"
-                        size="sm"
-                        to={`/request/${val.bookRequestId}/detail`}
-                      >
-                        Detail
-                      </Button>
-                      {val.status !== "Request Rejected" && (
+              {data?.proccessToFollowUpData &&
+                data?.proccessToFollowUpData.map((val, key) => (
+                  <tr key={key}>
+                    {/* <td>{getTableNumber(itemOffset, itemsPerPage, key)}</td> */}
+                    <td>{val.requestDate}</td>
+                    <td>{val.requesterName}</td>
+                    <td>{val.title}</td>
+                    <td>{val.author}</td>
+                    <td>{val.publisher}</td>
+                    <td>{val.isbn}</td>
+                    <td>{getStatus(val.status)}</td>
+                    <td style={{ width: "100px" }}>
+                      <Container className="d-flex gap-2">
                         <Button
                           as={Link}
-                          variant="primary"
+                          variant="dark"
                           size="sm"
-                          to={`/request/${val.bookRequestId}`}
+                          to={`/request/${val.bookRequestId}/detail`}
                         >
-                          Review
+                          Detail
                         </Button>
-                      )}
-                    </Container>
-                  </td>
-                </tr>
-              ))}
+                        {val.status !== "Request Rejected" && (
+                          <Button
+                            as={Link}
+                            variant="primary"
+                            size="sm"
+                            to={`/request/${val.bookRequestId}`}
+                          >
+                            Review
+                          </Button>
+                        )}
+                      </Container>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </Card.Body>

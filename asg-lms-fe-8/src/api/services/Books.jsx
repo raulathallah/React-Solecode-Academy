@@ -72,6 +72,25 @@ const getBookPurchaseReport = async (body) => {
   }
 };
 
+const getBookSignOutReport = async (body) => {
+  try {
+    return await axios.post(
+      `http://localhost:5238/api/books/signout-report`,
+      body,
+      {
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/pdf",
+        },
+        withCredentials: true,
+      }
+    );
+  } catch (err) {
+    return err;
+  }
+};
+
 export {
   getAllBook,
   getBook,
@@ -80,4 +99,5 @@ export {
   deleteBook,
   getAllBookSearchPaged,
   getBookPurchaseReport,
+  getBookSignOutReport,
 };

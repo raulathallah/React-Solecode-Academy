@@ -14,11 +14,7 @@ const menuItems = [
     path: "/books",
     visibleForRoles: ["Librarian"],
   },
-  {
-    label: "Books Report",
-    path: "/books/report",
-    visibleForRoles: ["Librarian", "Library Manager", "Library User"],
-  },
+
   {
     label: "Users",
     path: "/members",
@@ -45,6 +41,11 @@ const menuItems = [
     label: "Request Book",
     path: "/request/add",
     visibleForRoles: ["Library User"],
+  },
+  {
+    label: "Report",
+    path: "/reports",
+    visibleForRoles: ["Librarian", "Library Manager"],
   },
 ];
 

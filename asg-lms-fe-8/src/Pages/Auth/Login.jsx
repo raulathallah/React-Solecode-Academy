@@ -32,7 +32,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess || user) {
-      navigate("/profile");
+      navigate("/");
     }
 
     dispatch(reset());

@@ -12,6 +12,7 @@ import Register from "../Pages/Auth/Register";
 import Unauthorized from "../Pages/Unauthorized";
 import RequestRoutes from "./RequestRoutes";
 import TestUpload from "../Pages/Books/TestUpload";
+import ReportRoute from "./ReportRoutes";
 
 export const routers = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const routers = createBrowserRouter([
       ...BookRoutes,
       ...MemberRoutes,
       ...RequestRoutes,
+      ...ReportRoute,
     ],
   },
 ]);
