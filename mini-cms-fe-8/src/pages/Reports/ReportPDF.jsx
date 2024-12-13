@@ -32,12 +32,17 @@ const ReportPDF = ({ reportAPI, type, deptNo, startDate, endDate }) => {
       //const response = await getBookPurchaseReport({ startDate, endDate });
 
       let response = null;
+      let tempFileName = "";
+
       if (type === "POST") {
         response = await reportAPI({ startDate, endDate });
+        tempFileName = "LeaveRequestReport_" + new Date().toLocaleString();
       } else if (type === "GET" && deptNo) {
         response = await reportAPI(deptNo);
+        tempFileName = "EmployeeListReport_" + new Date().toLocaleString();
       } else if (type === "GET") {
         response = await reportAPI();
+        tempFileName = "ProjectReport_" + new Date().toLocaleString();
       }
 
       if (response) {
@@ -46,7 +51,6 @@ const ReportPDF = ({ reportAPI, type, deptNo, startDate, endDate }) => {
 
         const contentDisposition = response.headers.get("content-disposition");
         //console.log(contentDisposition);
-        let tempFileName = "document.pdf";
 
         if (contentDisposition) {
           const fileNameMatch = contentDisposition.match(
