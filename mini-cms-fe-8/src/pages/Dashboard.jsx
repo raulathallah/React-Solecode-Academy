@@ -93,35 +93,29 @@ const Dashboard = () => {
                       />
                     ))}
                   </Pie>
-
-                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </Card.Body>
         </Card>
-        <Card className="w-100">
+        <Card className="w-75">
           <Card.Header>Salary Average by Department</Card.Header>
           <Card.Body>
             <BarChart
-              width={400}
+              width={500}
               height={300}
               data={data?.deptAvgSalary}
-              layout="horizontal"
+              layout="vertical"
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="department"
-                type="category"
-                allowDecimals={true}
-              />
-              <YAxis type="number" dataKey="avgSalary" width={100} />
+              <YAxis dataKey="department" type="category" width={100} />
+              <XAxis type="number" dataKey="avgSalary" allowDecimals={true} />
               <Tooltip />
               <Bar dataKey="avgSalary" fill="#0d6efd" />
             </BarChart>
           </Card.Body>
         </Card>
-        <Card className="w-100">
+        <Card className="w-50">
           <Card.Header className="d-flex justify-content-between">
             Top 5 Employee by Performance
           </Card.Header>

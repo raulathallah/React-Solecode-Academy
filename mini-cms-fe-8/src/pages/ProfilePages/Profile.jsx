@@ -11,7 +11,6 @@ const Profile = () => {
     dispatch(logout());
   };
 
-  console.log(currentUser);
   return (
     <div>
       {currentUser && (
@@ -36,7 +35,6 @@ const Profile = () => {
         </Button>
         <Button
           variant="primary"
-          onClick={onLogout}
           as={Link}
           to={`/employees/${currentUser?.employee?.empno}/edit`}
         >

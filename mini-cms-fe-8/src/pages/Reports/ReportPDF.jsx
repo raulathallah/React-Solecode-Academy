@@ -56,6 +56,8 @@ const ReportPDF = ({ reportAPI, type, deptNo, startDate, endDate }) => {
             tempFileName = fileNameMatch[1].replace(/['"]/g, "");
             setFileName(tempFileName);
           }
+        } else {
+          setFileName(tempFileName);
         }
 
         setTimeout(() => {

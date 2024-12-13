@@ -6,12 +6,7 @@ const menuItems = [
   {
     label: "Employees",
     path: "/employees",
-    visibleForRoles: [
-      "Administrator",
-      "HR Manager",
-      "Employee Supervisor",
-      "Employee",
-    ],
+    visibleForRoles: ["Administrator", "HR Manager", "Employee Supervisor"],
   },
   {
     label: "Departments",

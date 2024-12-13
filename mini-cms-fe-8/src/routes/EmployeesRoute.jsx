@@ -9,27 +9,6 @@ const EmployeesRoute = [
   {
     element: (
       <PrivateRoute
-        allowedRoles={["Administrator", "HR Manager", "Employee Supervisor"]}
-      />
-    ),
-    children: [
-      {
-        path: "/employees",
-        element: <Employees />,
-      },
-      {
-        path: "/employees/:id",
-        element: <EmployeeDetail />,
-      },
-      {
-        path: "/employees/:id/history",
-        element: <EmployeeWorkHistory />,
-      },
-    ],
-  },
-  {
-    element: (
-      <PrivateRoute
         allowedRoles={[
           "Administrator",
           "HR Manager",
@@ -40,8 +19,21 @@ const EmployeesRoute = [
     ),
     children: [
       {
+        path: "/employees",
+        element: <Employees />,
+      },
+
+      {
+        path: "/employees/:id/history",
+        element: <EmployeeWorkHistory />,
+      },
+      {
         path: "/employees/:id/edit",
         element: <EmployeeForm type={"edit"} />,
+      },
+      {
+        path: "/employees/:id",
+        element: <EmployeeDetail />,
       },
     ],
   },

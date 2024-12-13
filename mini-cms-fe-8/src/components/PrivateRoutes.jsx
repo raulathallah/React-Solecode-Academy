@@ -4,8 +4,11 @@ import { useSelector } from "react-redux";
 
 const PrivateRoute = ({ allowedRoles }) => {
   const { user } = useSelector((state) => state.auth);
+
+  console.log(user);
   const hasRequiredRole = () => {
     if (!allowedRoles) return true;
+    console.log(user?.roles);
     return user?.roles?.some((role) => allowedRoles.includes(role)) || false;
   };
   if (allowedRoles && !hasRequiredRole()) {
