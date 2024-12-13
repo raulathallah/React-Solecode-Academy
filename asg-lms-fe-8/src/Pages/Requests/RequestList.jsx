@@ -1,13 +1,4 @@
-import {
-  Badge,
-  Button,
-  ButtonGroup,
-  Card,
-  Container,
-  Form,
-  Row,
-  Table,
-} from "react-bootstrap";
+import { Badge, Button, Card, Container, Form, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllRequestListPaged } from "../../api/services/Transactions";
@@ -186,9 +177,9 @@ const RequestList = () => {
                       >
                         Detail
                       </Button>
-                      {val.status
-                        ?.toLowerCase()
-                        .includes("rejected" | "approved") && (
+                      {!new RegExp(["approved", "rejected"].join("|")).test(
+                        val.status?.toLowerCase()
+                      ) && (
                         <Button
                           as={Link}
                           variant="primary"

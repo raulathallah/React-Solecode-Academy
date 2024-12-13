@@ -31,8 +31,6 @@ const Home = () => {
 
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  console.log(currentUser.roles[0]);
-
   const getStatus = (status) => {
     let bg = "";
     if (status === "Librarian Review Request") {
@@ -218,7 +216,9 @@ const Home = () => {
                         >
                           Detail
                         </Button>
-                        {val.status !== "Request Rejected" && (
+                        {!val.status
+                          ?.toLowerCase()
+                          .includes("rejected" | "approved") && (
                           <Button
                             as={Link}
                             variant="primary"
