@@ -11,6 +11,7 @@ import PrivateRoute from "../components/PrivateRoutes";
 import Profile from "../pages/ProfilePages/Profile";
 import Register from "../pages/AuthPages/Register";
 import LeaveRequestRoute from "./LeaveRequestRoute";
+import ReportRoute from "./ReportRoute";
 
 const routers = createBrowserRouter([
   {
@@ -52,6 +53,7 @@ const routers = createBrowserRouter([
       ...ProjectRoute,
       ...AssignmentRoute,
       ...LeaveRequestRoute,
+      ...ReportRoute,
     ],
   },
 ]);

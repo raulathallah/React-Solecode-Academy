@@ -3,24 +3,26 @@ import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import ErrorMessage from "../../utils/ErrorMessage";
 
-const ReportPDF = ({ reportName, reportAPI }) => {
+const ReportPDF = ({ reportAPI, type, deptNo, startDate, endDate }) => {
   const [pdfFile, setPdfFile] = useState(null);
   const [error, setError] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(false);
-
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
   const [filename, setFileName] = useState("");
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
   const handleGenerateReport = async () => {
-    if (!startDate || !endDate) {
-      return ErrorMessage("Harap pilih rentang tanggal lengkap");
+    if (type === "POST") {
+      if (!startDate || !endDate) {
+        return ErrorMessage("Pick a date range!");
+      }
+    } else if (type === "GET" && deptNo) {
+      if (!deptNo) {
+        return ErrorMessage("Choose department!");
+      }
     }
 
     try {
@@ -28,7 +30,15 @@ const ReportPDF = ({ reportName, reportAPI }) => {
       setError(null);
 
       //const response = await getBookPurchaseReport({ startDate, endDate });
-      const response = await reportAPI({ startDate, endDate });
+
+      let response = null;
+      if (type === "POST") {
+        response = await reportAPI({ startDate, endDate });
+      } else if (type === "GET" && deptNo) {
+        response = await reportAPI(deptNo);
+      } else if (type === "GET") {
+        response = await reportAPI();
+      }
 
       if (response) {
         const pdfBlob = new Blob([response.data], { type: "application/pdf" });
@@ -57,6 +67,7 @@ const ReportPDF = ({ reportName, reportAPI }) => {
     } catch (err) {
       console.log(err);
       setError("Gagal menghasilkan laporan. Silakan coba lagi.");
+      setLoading(false);
     }
   };
 
@@ -88,29 +99,7 @@ const ReportPDF = ({ reportName, reportAPI }) => {
   };
 
   return (
-    <div className="container">
-      <h4>{reportName}</h4>
-      <div className="d-flex gap-3">
-        <div className="col-md-4 mb-3">
-          <label className="form-label">Start Date</label>
-          <input
-            type="date"
-            className="form-control"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-        <div className="col-md-4 mb-3">
-          <label className="form-label">End Date</label>
-          <input
-            type="date"
-            className="form-control"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-      </div>
-
+    <div>
       <div className="mb-2">
         <button
           onClick={handleGenerateReport}

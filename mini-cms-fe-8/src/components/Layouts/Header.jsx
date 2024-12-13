@@ -53,6 +53,11 @@ const menuItems = [
     visibleForRoles: ["Administrator", "Employee"],
   },
   {
+    label: "Reports",
+    path: "/reports",
+    visibleForRoles: ["Administrator", "Employee Supervisor", "HR Manager"],
+  },
+  {
     label: "Make an account",
     path: "/register",
     visibleForRoles: ["Administrator"],

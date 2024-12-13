@@ -56,6 +56,15 @@ const Dashboard = () => {
     }
     return <Badge bg={bg}>{status}</Badge>;
   };
+
+  if (currentUser && currentUser?.roles.includes("Employee")) {
+    return (
+      <p>
+        Welcome, {currentUser?.employee?.fname} {currentUser?.employee?.lname}!
+      </p>
+    );
+  }
+
   return (
     <div className="d-grid gap-3">
       <div className="d-flex gap-3">
